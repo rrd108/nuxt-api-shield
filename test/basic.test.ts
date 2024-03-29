@@ -9,14 +9,14 @@ describe("shield", async () => {
   });
 
   it("respond to api call 2 times (limit.max, limit.duration)", async () => {
-    let response = await $fetch("/api/test", { method: "GET" });
+    let response = await $fetch("/api/example", { method: "GET" });
     expect(response.name).toBe("Gauranga");
 
-    response = await $fetch("/api/test", { method: "GET" });
+    response = await $fetch("/api/example", { method: "GET" });
     expect(response.name).toBe("Gauranga");
 
     try {
-      response = await $fetch("/api/test", { method: "GET" });
+      response = await $fetch("/api/example", { method: "GET" });
     } catch (err) {
       const typedErr = err as { statusCode: number; statusMessage: string };
       expect(typedErr.statusCode).toBe(429);
@@ -26,7 +26,7 @@ describe("shield", async () => {
 
   it("respond to api call after limit.ban expires", async () => {
     try {
-      const response = await $fetch("/api/test", { method: "GET" });
+      await $fetch("/api/example", { method: "GET" });
     } catch (err) {
       const typedErr = err as { statusCode: number; statusMessage: string };
       expect(typedErr.statusCode).toBe(429);
@@ -35,7 +35,7 @@ describe("shield", async () => {
 
     // here we should wait for the ban to be lifted
     await new Promise((resolve) => setTimeout(resolve, 3000));
-    const response = await $fetch("/api/test", { method: "GET" });
+    const response = await $fetch("/api/example", { method: "GET" });
     expect(response.name).toBe("Gauranga");
   });
 });
