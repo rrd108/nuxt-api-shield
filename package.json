@@ -8,7 +8,9 @@
   "keywords": [
     "nuxt",
     "nuxt-module",
-    "security"
+    "security",
+    "rate-limit",
+    "bruteforce"
   ],
   "exports": {
     ".": {
