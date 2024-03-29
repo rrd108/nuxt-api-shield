@@ -1,6 +1,5 @@
 export default defineNuxtConfig({
   modules: ["../src/module"],
-  devtools: { enabled: true },
   nuxtApiShield: {
     limit: {
       max: 12,
@@ -17,4 +16,5 @@ export default defineNuxtConfig({
       },
     },
   },
+  devtools: { enabled: true },
 });
