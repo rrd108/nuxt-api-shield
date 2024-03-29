@@ -62,6 +62,21 @@ export default defineNuxtConfig({
 });
 ```
 
+### 3. Add `nitro/storage` to `nuxt.config.ts`
+
+You can use any storage you want, but you have to use **shield** as the name of the storage.
+
+```json
+nitro: {
+    storage: {
+      shield: {   // storage name, you **must** use "shield" as the name
+        driver: "fs",
+        base: ".shield",
+      },
+    },
+  }
+```
+
 ## Development
 
 ```bash
