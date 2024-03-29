@@ -5,6 +5,11 @@
   "repository": "your-org/nuxt-api-shield",
   "license": "MIT",
   "type": "module",
+  "keywords": [
+    "nuxt",
+    "nuxt-module",
+    "security"
+  ],
   "exports": {
     ".": {
       "types": "./dist/types.d.ts",
