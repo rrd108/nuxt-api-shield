@@ -1,10 +1,7 @@
-import { defineEventHandler, getRequestIP } from "h3";
-import { createError, useRuntimeConfig, useStorage } from "#imports";
-
-interface RateLimit {
-  count: number;
-  time: number;
-}
+import { createError, defineEventHandler, getRequestIP } from "h3";
+import { useRuntimeConfig, useStorage } from "#imports";
+import type { RateLimit } from "../types/RateLimit";
+import isBanExpired from "../utils/isBanExpired";
 
 export default defineEventHandler(async (event) => {
   if (!event.node.req.url?.startsWith("/api/")) {
@@ -56,11 +53,6 @@ const isNotRateLimited = (req: RateLimit) => {
     req.count <= options.limit.max &&
     (Date.now() - req.time) / 1000 <= options.limit.duration
   );
-};
-
-const isBanExpired = (req: RateLimit) => {
-  const options = useRuntimeConfig().public.nuxtApiShield;
-  return (Date.now() - req.time) / 1000 > options.limit.ban;
 };
 
 const banDelay = async (req: RateLimit) => {

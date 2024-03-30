@@ -82,6 +82,21 @@ You can use any storage you want, but you have to use **shield** as the name of 
 }
 ```
 
+### 4. Add `shield:clean` to `nuxt.config.ts`
+
+```json
+{
+  "nitro": {
+    "experimental": {
+      "tasks": true
+    },
+    "scheduledTasks": {
+      "*/15 * * * *": ["shield:clean"] // clean the shield storage every 15 minutes
+    }
+  }
+}
+```
+
 ## Development
 
 ```bash

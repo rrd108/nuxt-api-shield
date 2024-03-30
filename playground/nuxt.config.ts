@@ -4,7 +4,7 @@ export default defineNuxtConfig({
     limit: {
       max: 12,
       duration: 10,
-      ban: 3600,
+      ban: 30,
     },
   },
   nitro: {
@@ -14,6 +14,12 @@ export default defineNuxtConfig({
         driver: "fs",
         base: ".shield",
       },
+    },
+    experimental: {
+      tasks: true,
+    },
+    scheduledTasks: {
+      "* * * * *": ["shield:clean"],
     },
   },
   devtools: { enabled: true },
