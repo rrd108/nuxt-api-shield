@@ -1,7 +1,6 @@
 # Changelog
 
-
-## v0.1.1
+## v0.2.0
 
 [compare changes](https://github.com/your-org/nuxt-api-shield/compare/v0.1.0...v0.1.1)
 
@@ -25,7 +24,6 @@
 
 ## v0.0.2
 
-
 ### 🚀 Enhancements
 
 - Rate limiting implemented ([04b9ea7](https://github.com/your-org/nuxt-api-shield/commit/04b9ea7))
@@ -46,4 +44,3 @@
 ### ❤️ Contributors
 
 - Rrd108 <rrd@webmania.cc>
-
