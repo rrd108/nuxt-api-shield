@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.2.1
+
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.2.0...v0.2.1)
+
+### 🚀 Enhancements
+
+- Implements auto cleanup fix #3 ([#3](https://github.com/rrd108/nuxt-api-shield/issues/3))
+
+### 🏡 Chore
+
+- Fix package description and link ([7d5ebff](https://github.com/rrd108/nuxt-api-shield/commit/7d5ebff))
+
+### ❤️ Contributors
+
+- Rrd108 <rrd@webmania.cc>
+
 ## v0.2.0
 
 [compare changes](https://github.com/your-org/nuxt-api-shield/compare/v0.1.0...v0.1.1)
