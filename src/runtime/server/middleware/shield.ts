@@ -37,6 +37,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  shieldStorage.setItem(`ip:${requestIP}`, {
+    count: req.count + 1,
+    time: req.time,
+  });
+
+  await banDelay(req);
+
   throw createError({
     statusCode: 429,
     statusMessage: "Too Many Requests",
@@ -54,4 +61,16 @@ const isNotRateLimited = (req: RateLimit) => {
 const isBanExpired = (req: RateLimit) => {
   const options = useRuntimeConfig().public.nuxtApiShield;
   return (Date.now() - req.time) / 1000 > options.limit.ban;
+};
+
+const banDelay = async (req: RateLimit) => {
+  const options = useRuntimeConfig().public.nuxtApiShield;
+
+  if (options.delayOnBan) {
+    // INFO Nuxt Devtools will send a new request if the response is slow,
+    // so we get the count incremented twice or more times, based on the ban delay time
+    await new Promise((resolve) =>
+      setTimeout(resolve, (req.count - options.limit.max) * 1000)
+    );
+  }
 };

@@ -12,6 +12,7 @@ export interface ModuleOptions {
     duration: number;
     ban: number;
   };
+  delayOnBan: boolean;
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -25,6 +26,7 @@ export default defineNuxtModule<ModuleOptions>({
       duration: 108,
       ban: 3600,
     },
+    delayOnBan: true,
   },
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url);

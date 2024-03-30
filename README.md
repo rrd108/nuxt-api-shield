@@ -59,7 +59,8 @@ export default defineNuxtConfig({
       max: 12,        // maximum requests per duration time, default is 12 second
       duration: 10,   // duration time in seconds, default is 10 second
       ban: 3600,      // ban time in seconds, default is 3600 second
-    },*/
+    },
+    delayOnBan: true*/
   },
 });
 ```
