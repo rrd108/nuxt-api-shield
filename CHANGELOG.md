@@ -1,6 +1,28 @@
 # Changelog
 
 
+## v0.1.1
+
+[compare changes](https://github.com/your-org/nuxt-api-shield/compare/v0.1.0...v0.1.1)
+
+### 🚀 Enhancements
+
+- Delay on ban implemented fix #1 ([#1](https://github.com/your-org/nuxt-api-shield/issues/1))
+
+### 🏡 Chore
+
+- New keywords added ([3327645](https://github.com/your-org/nuxt-api-shield/commit/3327645))
+- Ignore .shield ([d17878b](https://github.com/your-org/nuxt-api-shield/commit/d17878b))
+- Add comments ([9fc0ce9](https://github.com/your-org/nuxt-api-shield/commit/9fc0ce9))
+
+### ✅ Tests
+
+- Increase timeout to test ban time ([b7bfefd](https://github.com/your-org/nuxt-api-shield/commit/b7bfefd))
+
+### ❤️ Contributors
+
+- Rrd108 <rrd@webmania.cc>
+
 ## v0.0.2
 
 
