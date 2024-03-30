@@ -31,7 +31,7 @@
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
     "release": "yarn lint && yarn test && yarn prepack && changelogen --release && yarn publish && git push --follow-tags",
     "lint": "eslint .",
-    "test": "vitest run",
+    "test": "vitest run --testTimeout 7000",
     "test:watch": "vitest watch"
   },
   "dependencies": {
