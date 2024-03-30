@@ -49,14 +49,16 @@ npm install nuxt-api-shield
 
 ### 2. Add `nuxt-api-shield` to the `modules` section of `nuxt.config.ts`
 
+You should add only the values you want to use differently from the default values.
+
 ```js
 export default defineNuxtConfig({
   modules: ["nuxt-api-shield"],
   nuxtApiShield: {
     /*limit: {
-      max: 12,        // maximum requests per duration time, default is 12
-      duration: 10,   // duration time in seconds, default is 10
-      ban: 3600,      // ban time in seconds, default is 3600
+      max: 12,        // maximum requests per duration time, default is 12 second
+      duration: 10,   // duration time in seconds, default is 10 second
+      ban: 3600,      // ban time in seconds, default is 3600 second
     },*/
   },
 });
