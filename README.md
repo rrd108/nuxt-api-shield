@@ -72,8 +72,7 @@ You can use any storage you want, but you have to use **shield** as the name of 
     "storage": {
       "shield": {
         // storage name, you **must** use "shield" as the name
-        "driver": "fs",
-        "base": ".shield"
+        "driver": "memory"
       }
     }
   }
