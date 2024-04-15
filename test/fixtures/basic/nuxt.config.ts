@@ -8,6 +8,7 @@ export default defineNuxtConfig({
       duration: 10,
       ban: 3,
     },
+    errorMessage: "Leave me alone",
   },
   nitro: {
     storage: {

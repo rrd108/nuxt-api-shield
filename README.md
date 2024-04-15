@@ -60,7 +60,9 @@ export default defineNuxtConfig({
       duration: 10,   // duration time in seconds, default is 10 second
       ban: 3600,      // ban time in seconds, default is 3600 second
     },
-    delayOnBan: true*/
+    delayOnBan: true  // delay every response with +1sec when the user is banned, default is true
+    errorMessage: "Too Many Requests",  // error message when the user is banned, default is "Too Many Requests"
+    */
   },
 });
 ```

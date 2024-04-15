@@ -34,7 +34,8 @@ describe("shield", async () => {
     } catch (err) {
       const typedErr = err as { statusCode: number; statusMessage: string };
       expect(typedErr.statusCode).toBe(429);
-      expect(typedErr.statusMessage).toBe("Too Many Requests");
+      // custom error message
+      expect(typedErr.statusMessage).toBe("Leave me alone");
     }
 
     // here we should wait for the ban to expire

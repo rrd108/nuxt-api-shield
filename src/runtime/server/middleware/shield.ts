@@ -41,9 +41,10 @@ export default defineEventHandler(async (event) => {
 
   await banDelay(req);
 
+  const options = useRuntimeConfig().public.nuxtApiShield;
   throw createError({
     statusCode: 429,
-    statusMessage: "Too Many Requests",
+    statusMessage: options.errorMessage,
   });
 });
 

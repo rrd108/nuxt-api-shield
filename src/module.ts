@@ -13,6 +13,7 @@ export interface ModuleOptions {
     ban: number;
   };
   delayOnBan: boolean;
+  errorMessage: string;
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -27,6 +28,7 @@ export default defineNuxtModule<ModuleOptions>({
       ban: 3600,
     },
     delayOnBan: true,
+    errorMessage: "Too Many Requests",
   },
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url);
