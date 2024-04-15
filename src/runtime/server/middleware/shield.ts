@@ -19,10 +19,11 @@ export default defineEventHandler(async (event) => {
   }
 
   const req = await shieldStorage.getItem(`ip:${requestIP}`);
+  req.count++;
 
   if (isNotRateLimited(req)) {
     return await shieldStorage.setItem(`ip:${requestIP}`, {
-      count: req.count + 1,
+      count: req.count,
       time: req.time,
     });
   }
@@ -35,7 +36,7 @@ export default defineEventHandler(async (event) => {
   }
 
   shieldStorage.setItem(`ip:${requestIP}`, {
-    count: req.count + 1,
+    count: req.count,
     time: req.time,
   });
 
@@ -44,7 +45,7 @@ export default defineEventHandler(async (event) => {
   const options = useRuntimeConfig().public.nuxtApiShield;
 
   if (options.retryAfterHeader) {
-    event.node.res.setHeader("Retry-After", req.count + 2);
+    event.node.res.setHeader("Retry-After", req.count + 1); // and extra second is added
   }
 
   throw createError({
