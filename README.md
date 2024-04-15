@@ -18,6 +18,9 @@ This Nuxt module implements a rate limiting middleware to protect your API endpo
   - Prevents malicious actors or excessive requests from a single source from overwhelming your API.
 - **Customizable Rate Limits**
   - Configure maximum request count, duration within which the limit applies, and a ban period for exceeding the limit.
+  - Add a delay to responses when a user is banned to discourage further abuse.
+  - Customize the error message for banned users.
+  - Optionally include the `Retry-After` header in responses when a user is banned.
   - Tailor the rate-limiting behavior to align with your API's specific needs and usage patterns.
 - **Event-Driven Handling**
   - Intercepts incoming API requests efficiently using Nuxt's event system.
@@ -62,6 +65,7 @@ export default defineNuxtConfig({
     },
     delayOnBan: true  // delay every response with +1sec when the user is banned, default is true
     errorMessage: "Too Many Requests",  // error message when the user is banned, default is "Too Many Requests"
+    retryAfterHeader: false, // when the user is banned add the Retry-After header to the response, default is false
     */
   },
 });

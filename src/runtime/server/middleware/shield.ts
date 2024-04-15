@@ -42,6 +42,11 @@ export default defineEventHandler(async (event) => {
   await banDelay(req);
 
   const options = useRuntimeConfig().public.nuxtApiShield;
+
+  if (options.retryAfterHeader) {
+    event.node.res.setHeader("Retry-After", req.count + 2);
+  }
+
   throw createError({
     statusCode: 429,
     statusMessage: options.errorMessage,

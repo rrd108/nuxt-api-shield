@@ -9,6 +9,7 @@ export default defineNuxtConfig({
       ban: 3,
     },
     errorMessage: "Leave me alone",
+    retryAfterHeader: true,
   },
   nitro: {
     storage: {

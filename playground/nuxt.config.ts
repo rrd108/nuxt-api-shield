@@ -6,6 +6,8 @@ export default defineNuxtConfig({
       duration: 10,
       ban: 30,
     },
+    delayOnBan: true,
+    retryAfterHeader: true,
   },
   nitro: {
     storage: {
@@ -19,7 +21,7 @@ export default defineNuxtConfig({
       tasks: true,
     },
     scheduledTasks: {
-      "* * * * *": ["shield:clean"],
+      "*/5 * * * *": ["shield:clean"],
     },
   },
   devtools: { enabled: true },
