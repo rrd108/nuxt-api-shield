@@ -15,6 +15,8 @@ export default defineNuxtConfig({
     storage: {
       shield: {
         driver: "memory",
+        //driver: "fs",
+        //base: ".shield",
       },
     },
   },
