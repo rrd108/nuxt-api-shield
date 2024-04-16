@@ -24,9 +24,9 @@ describe("shield", async () => {
     try {
       // req.count = 3
       // as limit.max = 2, this should throw 429 and ban for 3 seconds (limit.ban)
-      response = await $fetch("/api/example", { method: "GET" });
-      // we should never reach here
-      expect(response).toBeUndefined();
+      expect(async () =>
+        $fetch("/api/example", { method: "GET" })
+      ).rejects.toThrowError();
     } catch (err) {
       const typedErr = err as { statusCode: number; statusMessage: string };
       expect(typedErr.statusCode).toBe(429);
@@ -35,11 +35,14 @@ describe("shield", async () => {
   });
 
   it("respond to api call after limit.ban expires", async () => {
+    // req.count reset here
+    await $fetch("/api/example", { method: "GET" }); // req.count = 1
+    await $fetch("/api/example", { method: "GET" }); // req.count = 2
     try {
-      // req.count = 4
-      const response = await $fetch("/api/example", { method: "GET" });
-      // we should never reach here
-      // TODO uncomment this and the test fails // expect(response).toBeUndefined();
+      // req.count = 3
+      expect(async () =>
+        $fetch("/api/example", { method: "GET" })
+      ).rejects.toThrowError();
     } catch (err) {
       const typedErr = err as {
         response: Response;
