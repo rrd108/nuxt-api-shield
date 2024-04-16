@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.3.1
+
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.3.0...v0.3.1)
+
+### 🚀 Enhancements
+
+- Add optional retry-after header fix #4 ([#4](https://github.com/rrd108/nuxt-api-shield/issues/4))
+
+### 🏡 Chore
+
+- Comment added ([b5ed91a](https://github.com/rrd108/nuxt-api-shield/commit/b5ed91a))
+
+### ✅ Tests
+
+- Change test to pass for custom error message ([a13b631](https://github.com/rrd108/nuxt-api-shield/commit/a13b631))
+- Fix error throwing problems ([9538b42](https://github.com/rrd108/nuxt-api-shield/commit/9538b42))
+
+### ❤️ Contributors
+
+- Rrd108 <rrd@webmania.cc>
+
 ## v0.3.0
 
 [compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.2.0...v0.2.1)
