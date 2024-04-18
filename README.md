@@ -60,7 +60,7 @@ export default defineNuxtConfig({
   nuxtApiShield: {
     /*limit: {
       max: 12,        // maximum requests per duration time, default is 12 second
-      duration: 10,   // duration time in seconds, default is 10 second
+      duration: 108,   // duration time in seconds, default is 108 seconds
       ban: 3600,      // ban time in seconds, default is 3600 second
     },
     delayOnBan: true  // delay every response with +1sec when the user is banned, default is true
