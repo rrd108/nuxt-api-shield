@@ -59,9 +59,9 @@ export default defineNuxtConfig({
   modules: ["nuxt-api-shield"],
   nuxtApiShield: {
     /*limit: {
-      max: 12,        // maximum requests per duration time, default is 12 second
+      max: 12,        // maximum requests per duration time, default is 12/duration
       duration: 108,   // duration time in seconds, default is 108 seconds
-      ban: 3600,      // ban time in seconds, default is 3600 second
+      ban: 3600,      // ban time in seconds, default is 3600 seconds = 1 hour
     },
     delayOnBan: true  // delay every response with +1sec when the user is banned, default is true
     errorMessage: "Too Many Requests",  // error message when the user is banned, default is "Too Many Requests"
