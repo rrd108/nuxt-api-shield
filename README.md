@@ -13,7 +13,7 @@ This Nuxt module implements a rate limiting middleware to protect your API endpo
 
 ## Features
 
-- **IP-Based Rate limiting**
+- **IP-Based Rate limiting and Brute Force Protection**
   - Tracks and enforces rate limits for individual IP addresses.
   - Prevents malicious actors or excessive requests from a single source from overwhelming your API.
 - **Customizable Rate Limits**
