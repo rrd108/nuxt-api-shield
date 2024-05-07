@@ -1,4 +1,5 @@
 import type { RateLimit } from "../types/RateLimit";
+import { useRuntimeConfig } from "#imports";
 
 const isBanExpired = (req: RateLimit) => {
   const options = useRuntimeConfig().public.nuxtApiShield;
