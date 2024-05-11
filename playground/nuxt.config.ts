@@ -8,6 +8,10 @@ export default defineNuxtConfig({
     },
     delayOnBan: true,
     retryAfterHeader: true,
+    log: {
+      path: "logs",
+      attempts: 5,
+    },
   },
   nitro: {
     storage: {

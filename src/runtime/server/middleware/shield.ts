@@ -2,6 +2,7 @@ import { createError, defineEventHandler, getRequestIP } from "h3";
 import { useRuntimeConfig, useStorage } from "#imports";
 import type { RateLimit } from "../types/RateLimit";
 import isBanExpired from "../utils/isBanExpired";
+import shieldLog from "../utils/shieldLog";
 
 export default defineEventHandler(async (event) => {
   if (!event.node.req.url?.startsWith("/api/")) {
@@ -20,6 +21,8 @@ export default defineEventHandler(async (event) => {
 
   const req = await shieldStorage.getItem(`ip:${requestIP}`);
   req.count++;
+
+  shieldLog(req, requestIP, event.node.req.url);
 
   if (isNotRateLimited(req)) {
     return await shieldStorage.setItem(`ip:${requestIP}`, {

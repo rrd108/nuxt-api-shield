@@ -15,6 +15,7 @@ export interface ModuleOptions {
   delayOnBan: boolean;
   errorMessage: string;
   retryAfterHeader: boolean;
+  log: boolean | { path: string; attempts: number };
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -31,6 +32,7 @@ export default defineNuxtModule<ModuleOptions>({
     delayOnBan: true,
     errorMessage: "Too Many Requests",
     retryAfterHeader: false,
+    log: false,
   },
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url);

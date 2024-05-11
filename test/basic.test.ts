@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { fileURLToPath } from "node:url";
 import { setup, $fetch } from "@nuxt/test-utils/e2e";
 import { beforeEach } from "vitest";
+import { readFile } from "node:fs/promises";
 
 beforeEach(async () => {
   // TODO await useStorage().clear();
@@ -59,5 +60,12 @@ describe("shield", async () => {
     await new Promise((resolve) => setTimeout(resolve, 3000)); // limit.ban
     const response = await $fetch("/api/example", { method: "GET" });
     expect(response.name).toBe("Gauranga");
+  });
+
+  it("should created a log file", async () => {
+    const logDate = new Date().toISOString().split("T")[0].replace(/-/g, "");
+    const logFile = `logs/shield-${logDate}.log`;
+    const contents = await readFile(logFile, { encoding: "utf8" });
+    expect(contents).toContain("127.0.0.1");
   });
 });

@@ -10,6 +10,10 @@ export default defineNuxtConfig({
     },
     errorMessage: "Leave me alone",
     retryAfterHeader: true,
+    log: {
+      path: "logs",
+      attempts: 5,
+    },
   },
   nitro: {
     storage: {

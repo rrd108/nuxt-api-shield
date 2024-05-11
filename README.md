@@ -66,6 +66,11 @@ export default defineNuxtConfig({
     delayOnBan: true  // delay every response with +1sec when the user is banned, default is true
     errorMessage: "Too Many Requests",  // error message when the user is banned, default is "Too Many Requests"
     retryAfterHeader: false, // when the user is banned add the Retry-After header to the response, default is false
+    log: false, // request logging into a file, it accepts a boolean `false`, or an object, default is false - no logging
+    log: {
+      path: "logs", // path to the log file, every day a new log file will be created
+      attempts: 100,    // if an IP reach 100 requests, all the requests will be logged, can be used for further analysis or blocking for example with fail2ban
+    }
     */
   },
 });
