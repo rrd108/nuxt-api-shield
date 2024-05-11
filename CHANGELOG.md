@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.4.2
+
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.4.1...v0.4.2)
+
+### 🏡 Chore
+
+- **release:** V0.4.1 ([656f5d6](https://github.com/rrd108/nuxt-api-shield/commit/656f5d6))
+
+### ❤️ Contributors
+
+- Rrd108 <rrd@webmania.cc>
+
 ## v0.4.1
 
 [compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.4.0...v0.4.1)
