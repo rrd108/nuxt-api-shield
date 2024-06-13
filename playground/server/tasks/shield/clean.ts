@@ -5,9 +5,6 @@ export default defineTask({
     description: "Clean expired bans",
   },
   async run() {
-    //  async run({ payload, context }) {
-    //    console.log({ payload, context });
-
     const shieldStorage = useStorage("shield");
 
     const keys = await shieldStorage.getKeys();
