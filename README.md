@@ -108,6 +108,30 @@ You can use any storage you want, but you have to use **shield** as the name of 
 }
 ```
 
+### 5. Create your `clean` task
+
+In `server/tasks/shield/clean.ts` you should have something like this.
+
+```ts
+export default defineTask({
+  meta: {
+    description: "Clean expired bans",
+  },
+  async run() {
+    const shieldStorage = useStorage("shield");
+
+    const keys = await shieldStorage.getKeys();
+    keys.forEach(async (key) => {
+      const rateLimit = await shieldStorage.getItem(key);
+      if (isBanExpired(rateLimit)) {
+        await shieldStorage.removeItem(key);
+      }
+    });
+    return { result: keys };
+  },
+});
+```
+
 ## Development
 
 ```bash
