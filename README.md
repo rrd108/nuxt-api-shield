@@ -113,6 +113,8 @@ You can use any storage you want, but you have to use **shield** as the name of 
 In `server/tasks/shield/clean.ts` you should have something like this.
 
 ```ts
+import type { RateLimit } from "#imports";
+
 export default defineTask({
   meta: {
     description: "Clean expired bans",
@@ -122,7 +124,7 @@ export default defineTask({
 
     const keys = await shieldStorage.getKeys();
     keys.forEach(async (key) => {
-      const rateLimit = await shieldStorage.getItem(key);
+      const rateLimit = (await shieldStorage.getItem(key)) as RateLimit;
       if (isBanExpired(rateLimit)) {
         await shieldStorage.removeItem(key);
       }
