@@ -155,7 +155,8 @@ yarn test
 yarn test:watch
 
 # Release new version
-yarn release
+yarn release:patch
+yarn release:minor
 ```
 
 <!-- Badges -->
