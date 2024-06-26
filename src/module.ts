@@ -4,6 +4,7 @@ import {
   createResolver,
   addServerHandler,
   addServerImports,
+  addTypeTemplate,
 } from "@nuxt/kit";
 import defu from "defu";
 
@@ -44,6 +45,11 @@ export default defineNuxtModule<ModuleOptions>({
     );
 
     addServerImports([
+      {
+        name: "RateLimit",
+        as: "RateLimit",
+        from: resolver.resolve("./runtime/server/types/RateLimit"),
+      },
       {
         name: "isBanExpired",
         as: "isBanExpired",
