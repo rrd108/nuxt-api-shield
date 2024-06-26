@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.6.1
+
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.6.0...v0.6.1)
+
+### 🚀 Enhancements
+
+- Expose RateLimit type ([536c73e](https://github.com/rrd108/nuxt-api-shield/commit/536c73e))
+
+### 🏡 Chore
+
+- Remove unused import ([17f40fe](https://github.com/rrd108/nuxt-api-shield/commit/17f40fe))
+
+### ❤️ Contributors
+
+- Rrd108 <rrd@webmania.cc>
+
 ## v0.5.1
 
 [compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.4.2...v0.5.1)
