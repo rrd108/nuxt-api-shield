@@ -1,4 +1,4 @@
-import isBanExpired from "../../../../src/runtime/server/utils/isBanExpired";
+import { RateLimit } from "../../../../src/runtime/server/types/RateLimit";
 
 export default defineTask({
   meta: {

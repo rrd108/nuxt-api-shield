@@ -3,6 +3,7 @@ import {
   addPlugin,
   createResolver,
   addServerHandler,
+  addServerImports,
 } from "@nuxt/kit";
 import defu from "defu";
 
@@ -41,6 +42,14 @@ export default defineNuxtModule<ModuleOptions>({
       nuxt.options.runtimeConfig.public.nuxtApiShield,
       options
     );
+
+    addServerImports([
+      {
+        name: "isBanExpired",
+        as: "isBanExpired",
+        from: resolver.resolve("./runtime/server/utils/isBanExpired"),
+      },
+    ]);
 
     addServerHandler({
       middleware: true,
