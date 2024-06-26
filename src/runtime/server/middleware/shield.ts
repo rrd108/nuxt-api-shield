@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const shieldStorage = useStorage("shield");
-  const requestIP = getRequestIP(event, { xForwardedFor: true });
+  const requestIP = getRequestIP(event, { xForwardedFor: true }) || "unKnownIP";
 
   if (!(await shieldStorage.hasItem(`ip:${requestIP}`))) {
     return await shieldStorage.setItem(`ip:${requestIP}`, {
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const req = await shieldStorage.getItem(`ip:${requestIP}`);
+  const req = (await shieldStorage.getItem(`ip:${requestIP}`)) as RateLimit;
   req.count++;
 
   shieldLog(req, requestIP, event.node.req.url);

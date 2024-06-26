@@ -8,8 +8,9 @@ export default defineTask({
     const shieldStorage = useStorage("shield");
 
     const keys = await shieldStorage.getKeys();
+
     keys.forEach(async (key) => {
-      const rateLimit = await shieldStorage.getItem(key);
+      const rateLimit = (await shieldStorage.getItem(key)) as RateLimit;
       if (isBanExpired(rateLimit)) {
         await shieldStorage.removeItem(key);
       }
