@@ -1,6 +1,6 @@
 {
   "name": "nuxt-api-shield",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "Nuxt API Shield - Rate Limiting",
   "repository": "rrd108/nuxt-api-shield",
   "license": "MIT",
@@ -31,7 +31,7 @@
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
     "release:patch": "yarn version --patch && yarn release",
     "release:minor": "yarn version --minor && yarn release",
-    "release": "yarn lint && yarn test && yarn prepack && changelogen --release && yarn publish && git push --follow-tags",
+    "release": "yarn lint && yarn test && yarn prepack && changelogen --release && yarn publish --new-version $(node -p \"require('./package.json').version\") && git push --follow-tags",
     "lint": "eslint .",
     "test": "vitest run --testTimeout 7000",
     "test:watch": "vitest watch"
