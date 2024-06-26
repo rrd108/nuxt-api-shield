@@ -4,7 +4,6 @@ import {
   createResolver,
   addServerHandler,
   addServerImports,
-  addTypeTemplate,
 } from "@nuxt/kit";
 import defu from "defu";
 
