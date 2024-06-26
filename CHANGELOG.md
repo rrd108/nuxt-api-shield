@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.6.5
+
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.6.4...v0.6.5)
+
 ## v0.6.3
 
 [compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.6.2...v0.6.3)
