@@ -29,6 +29,8 @@
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
+    "release:patch": "yarn version --patch && yarn release",
+    "release:minor": "yarn version --minor && yarn release",
     "release": "yarn lint && yarn test && yarn prepack && changelogen --release && yarn publish && git push --follow-tags",
     "lint": "eslint .",
     "test": "vitest run --testTimeout 7000",
