@@ -16,11 +16,11 @@ describe("shield", async () => {
   it("respond to api call 2 times (limit.max, limit.duration)", async () => {
     // req.count = 1
     let response = await $fetch("/api/example", { method: "GET" });
-    expect(response.name).toBe("Gauranga");
+    expect((response as any).name).toBe("Gauranga");
 
     // req.count = 2
     response = await $fetch("/api/example", { method: "GET" });
-    expect(response.name).toBe("Gauranga");
+    expect((response as any).name).toBe("Gauranga");
 
     try {
       // req.count = 3
@@ -59,7 +59,7 @@ describe("shield", async () => {
     // here we should wait for the 3 sec ban to expire
     await new Promise((resolve) => setTimeout(resolve, 3000)); // limit.ban
     const response = await $fetch("/api/example", { method: "GET" });
-    expect(response.name).toBe("Gauranga");
+    expect((response as any).name).toBe("Gauranga");
   });
 
   it("should created a log file", async () => {
