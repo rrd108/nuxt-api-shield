@@ -4,8 +4,15 @@ import { setup, $fetch } from "@nuxt/test-utils/e2e";
 import { beforeEach } from "vitest";
 import { readFile } from "node:fs/promises";
 
+const nuxtConfigDuration = 3;
+const nuxtConfigBan = 10;
+
 beforeEach(async () => {
   // TODO await useStorage().clear();
+  // as we can not clear the store yet, we should wait duration
+  await new Promise((resolve) =>
+    setTimeout(resolve, nuxtConfigDuration * 1000)
+  );
 });
 
 describe("shield", async () => {
@@ -13,7 +20,7 @@ describe("shield", async () => {
     rootDir: fileURLToPath(new URL("./fixtures/basic", import.meta.url)),
   });
 
-  it("respond to api call 2 times (limit.max, limit.duration)", async () => {
+  it("respond to api call 2 times (limit.max, limit.duration) and rejects the 3rd call", async () => {
     // req.count = 1
     let response = await $fetch("/api/example", { method: "GET" });
     expect((response as any).name).toBe("Gauranga");
@@ -33,6 +40,19 @@ describe("shield", async () => {
       expect(typedErr.statusCode).toBe(429);
       expect(typedErr.statusMessage).toBe("Leave me alone");
     }
+  });
+
+  it("TODO respond to 2 api calls when more then limit.duration time passes", async () => {
+    // req.count = 1
+    let response = await $fetch("/api/example", { method: "GET" });
+
+    await new Promise((resolve) =>
+      setTimeout(resolve, (nuxtConfigDuration + 2) * 1000)
+    );
+
+    // req.count = 2
+    response = await $fetch("/api/example", { method: "GET" });
+    expect((response as any).name).toBe("Gauranga");
   });
 
   it("respond to api call after limit.ban expires", async () => {
@@ -57,7 +77,7 @@ describe("shield", async () => {
     }
 
     // here we should wait for the 3 sec ban to expire
-    await new Promise((resolve) => setTimeout(resolve, 3000)); // limit.ban
+    await new Promise((resolve) => setTimeout(resolve, nuxtConfigBan * 1000));
     const response = await $fetch("/api/example", { method: "GET" });
     expect((response as any).name).toBe("Gauranga");
   });
