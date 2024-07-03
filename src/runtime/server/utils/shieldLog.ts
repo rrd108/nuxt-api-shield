@@ -3,6 +3,7 @@ import { useRuntimeConfig } from "#imports";
 import { access, appendFile, mkdir } from "node:fs/promises";
 
 const shieldLog = async (req: RateLimit, requestIP: string, url: string) => {
+  //console.log(`shieldLog(${req}, ${requestIP}, ${url})`);
   const options = useRuntimeConfig().public.nuxtApiShield;
   if (options.log?.attempts && req.count >= options.log.attempts) {
     const logLine = `${requestIP} - (${req.count}) - ${new Date(
