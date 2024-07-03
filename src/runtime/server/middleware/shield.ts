@@ -91,7 +91,7 @@ const isRateLimited = (req: RateLimit) => {
 const banDelay = async (req: RateLimit) => {
   const options = useRuntimeConfig().public.nuxtApiShield;
   //console.log("delayOnBan: " + options.delayOnBan);
-  if (options.delayOnBan) {
+  if (options.delayOnBan && req.count > options.limit.max) {
     // INFO Nuxt Devtools will send a new request if the response is slow,
     // so we get the count incremented twice or more times, based on the ban delay time
     //console.log(`Applying ban delay for ${req.count - options.limit.max} sec`);
