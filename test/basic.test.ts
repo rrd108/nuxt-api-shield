@@ -3,7 +3,9 @@ import { fileURLToPath } from "node:url";
 import { setup, $fetch } from "@nuxt/test-utils/e2e";
 import { beforeEach } from "vitest";
 import { readFile } from "node:fs/promises";
+//import { useStorage } from "nitropack/runtime";
 
+// TODO get these from the config
 const nuxtConfigDuration = 3;
 const nuxtConfigBan = 10;
 
