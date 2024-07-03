@@ -5,8 +5,8 @@ export default defineNuxtConfig({
   nuxtApiShield: {
     limit: {
       max: 2,
-      duration: 10,
-      ban: 3,
+      duration: 3,
+      ban: 10,
     },
     errorMessage: "Leave me alone",
     retryAfterHeader: true,
