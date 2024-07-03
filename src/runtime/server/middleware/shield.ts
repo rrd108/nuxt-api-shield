@@ -73,7 +73,7 @@ export default defineEventHandler(async (event) => {
   //console.error("Throwing 429 error");
   throw createError({
     statusCode: 429,
-    statusMessage: options.errorMessage,
+    message: options.errorMessage,
   });
 });
 
