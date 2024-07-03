@@ -77,13 +77,15 @@ export default defineEventHandler(async (event) => {
   });
 });
 
-const isNotRateLimited = (req: RateLimit) => {
+const isRateLimited = (req: RateLimit) => {
   const options = useRuntimeConfig().public.nuxtApiShield;
-  return (
+
   console.log(`count: ${req.count} > limit: ${options.limit.max}`);
-    (Date.now() - req.time) / 1000 <= options.limit.duration
-  );
+  if (req.count > options.limit.max) {
+    return true;
+  }
   console.log((Date.now() - req.time) / 1000, ">", options.limit.duration);
+  return (Date.now() - req.time) / 1000 > options.limit.duration;
 };
 
 const banDelay = async (req: RateLimit) => {
