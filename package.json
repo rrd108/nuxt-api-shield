@@ -32,7 +32,7 @@
     "release:patch": "yarn lint && yarn test && yarn prepack && changelogen --release --patch && yarn publish && git push --follow-tags",
     "release:minor": "yarn lint && yarn test && yarn prepack && changelogen --release --minor && yarn publish && git push --follow-tags",
     "lint": "eslint .",
-    "test": "vitest run --reporter=basic --disable-console-intercept",
+    "test": "vitest run --testTimeout 15000 --reporter=basic --disable-console-intercept",
     "test:watch": "vitest watch  --testTimeout 15000 --reporter=basic --disable-console-intercept "
   },
   "dependencies": {

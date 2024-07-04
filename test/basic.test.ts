@@ -2,15 +2,17 @@ import { describe, it, expect } from "vitest";
 import { fileURLToPath } from "node:url";
 import { setup, $fetch } from "@nuxt/test-utils/e2e";
 import { beforeEach } from "vitest";
-import { readFile } from "node:fs/promises";
-//import { useStorage } from "nitropack/runtime";
+import { readFile, rm } from "node:fs/promises";
 
 // TODO get these from the config
 const nuxtConfigDuration = 3;
 const nuxtConfigBan = 10;
 
 beforeEach(async () => {
-  // TODO await useStorage("shield").clear();
+  // await useStorage("shield").clear(); TODO waiting for https://github.com/nuxt/test-utils/issues/531
+  // this is a workaround to clean the storage
+  const storagePath = fileURLToPath(new URL("../_testShield", import.meta.url));
+  await rm(storagePath, { recursive: true, force: true });
 });
 
 describe("shield", async () => {
@@ -66,7 +68,7 @@ describe("shield", async () => {
     expect((response as any).name).toBe("Gauranga");
   });
 
-  it.skip("respond to api call after limit.ban expires", async () => {
+  it("respond to api call after limit.ban expires", async () => {
     // req.count reset here
     await $fetch("/api/example?c=3/1", { method: "GET", retryStatusCodes: [] }); // req.count = 1
     await $fetch("/api/example?c=3/2", { method: "GET", retryStatusCodes: [] }); // req.count = 2
@@ -96,9 +98,11 @@ describe("shield", async () => {
     expect((response as any).name).toBe("Gauranga");
   });
 
-  it.skip("should created a log file", async () => {
+  it("should created a log file", async () => {
     const logDate = new Date().toISOString().split("T")[0].replace(/-/g, "");
-    const logFile = `logs/shield-${logDate}.log`;
+    const logFile = fileURLToPath(
+      new URL(`../_logs/shield-${logDate}.log`, import.meta.url)
+    );
     const contents = await readFile(logFile, { encoding: "utf8" });
     expect(contents).toContain("127.0.0.1");
   });

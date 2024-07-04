@@ -11,16 +11,16 @@ export default defineNuxtConfig({
     errorMessage: "Leave me alone",
     retryAfterHeader: true,
     log: {
-      path: "logs",
-      attempts: 5,
+      path: "_logs",
+      attempts: 3,
     },
   },
   nitro: {
     storage: {
       shield: {
-        driver: "memory",
-        //driver: "fs",
-        //base: ".shield",
+        //driver: "memory",
+        driver: "fs",
+        base: "_testShield",
       },
     },
   },
