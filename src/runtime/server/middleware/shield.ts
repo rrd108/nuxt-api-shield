@@ -14,17 +14,17 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  console.log(
-    `👉 Handling request for URL: ${event.node.req.url} from IP: ${
-      getRequestIP(event, { xForwardedFor: true }) || "unKnownIP"
-    }`
-  );
+  // console.log(
+  //   `👉 Handling request for URL: ${event.node.req.url} from IP: ${
+  //     getRequestIP(event, { xForwardedFor: true }) || "unKnownIP"
+  //   }`
+  // );
 
   const shieldStorage = useStorage("shield");
   const requestIP = getRequestIP(event, { xForwardedFor: true }) || "unKnownIP";
 
   if (!(await shieldStorage.hasItem(`ip:${requestIP}`))) {
-    console.log("IP not found in storage, setting initial count.", requestIP);
+    //console.log("IP not found in storage, setting initial count.", requestIP);
     return await shieldStorage.setItem(`ip:${requestIP}`, {
       count: 1,
       time: Date.now(),
@@ -33,12 +33,12 @@ export default defineEventHandler(async (event) => {
 
   const req = (await shieldStorage.getItem(`ip:${requestIP}`)) as RateLimit;
   req.count++;
-  console.log(`Set count for IP ${requestIP}: ${req.count}`);
+  //console.log(`Set count for IP ${requestIP}: ${req.count}`);
 
   shieldLog(req, requestIP, event.node.req.url);
 
   if (!isRateLimited(req)) {
-    console.log("Request not rate-limited, updating storage.");
+    //console.log("Request not rate-limited, updating storage.");
     return await shieldStorage.setItem(`ip:${requestIP}`, {
       count: req.count,
       time: req.time,
@@ -85,12 +85,12 @@ export default defineEventHandler(async (event) => {
 const isRateLimited = (req: RateLimit) => {
   const options = useRuntimeConfig().public.nuxtApiShield;
 
-  console.log(`count: ${req.count} > limit: ${options.limit.max}`);
-  if (req.count > options.limit.max) {
-    return true;
+  //console.log(`count: ${req.count} <= limit: ${options.limit.max}`);
+  if (req.count <= options.limit.max) {
+    return false;
   }
-  console.log((Date.now() - req.time) / 1000, ">", options.limit.duration);
-  return (Date.now() - req.time) / 1000 > options.limit.duration;
+  //console.log((Date.now() - req.time) / 1000, "<", options.limit.duration);
+  return (Date.now() - req.time) / 1000 < options.limit.duration;
 };
 
 const banDelay = async (req: RateLimit) => {
