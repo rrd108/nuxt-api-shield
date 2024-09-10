@@ -21,5 +21,8 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
+      - name: Generate type stubs
+        run: yarn dev:prepare
+
       - name: Run tests
         run: yarn test
