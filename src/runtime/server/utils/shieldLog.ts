@@ -3,9 +3,14 @@ import { useRuntimeConfig } from "#imports";
 import { access, appendFile, mkdir } from "node:fs/promises";
 
 const shieldLog = async (req: RateLimit, requestIP: string, url: string) => {
-  //console.log(`shieldLog(${req}, ${requestIP}, ${url})`);
   const options = useRuntimeConfig().public.nuxtApiShield;
-  if (options.log?.attempts && req.count >= options.log.attempts) {
+
+  if (options.log === false) {
+    return;
+  }
+
+  //console.log(`shieldLog(${req}, ${requestIP}, ${url})`);
+  if (options.log.attempts && req.count >= options.log.attempts) {
     const logLine = `${requestIP} - (${req.count}) - ${new Date(
       req.time
     ).toISOString()} - ${url}\n`;
@@ -15,7 +20,7 @@ const shieldLog = async (req: RateLimit, requestIP: string, url: string) => {
     try {
       await access(options.log.path);
       await appendFile(`${options.log.path}/shield-${date}.log`, logLine);
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === "ENOENT") {
         await mkdir(options.log.path);
         await appendFile(`${options.log.path}/shield-${date}.log`, logLine);
