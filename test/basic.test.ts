@@ -49,16 +49,15 @@ describe("shield", async () => {
   });
 
   it("respond to the 2nd api call when more then limit.duration time passes", async () => {
+    // here we should wait for the 3 sec ban to expire
+    await new Promise((resolve) => setTimeout(resolve, (nuxtConfigBan + 1) * 1000));
+
     // see #13
     // req.count = 1
     let response = await $fetch("/api/example?c=2/1", {
       method: "GET",
       retryStatusCodes: [],
     });
-
-    await new Promise((resolve) =>
-      setTimeout(resolve, (nuxtConfigDuration + 1) * 1000)
-    );
 
     // req.count = 2
     response = await $fetch("/api/example?c=2/2", {
