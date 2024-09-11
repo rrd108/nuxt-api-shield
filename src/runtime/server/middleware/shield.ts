@@ -10,9 +10,13 @@ import { isBanExpired } from "../utils/isBanExpired";
 import shieldLog from "../utils/shieldLog";
 
 export default defineEventHandler(async (event) => {
-  if (!event.node.req.url?.startsWith("/api/")) {
+  const config = useRuntimeConfig().public.nuxtApiShield;
+  const url = event.node.req.url;
+
+  if (!url?.startsWith("/api/") || (config.routes?.length && !config.routes.some(route => url.startsWith(route)))) {
     return;
   }
+
 
   // console.log(
   //   `👉 Handling request for URL: ${event.node.req.url} from IP: ${

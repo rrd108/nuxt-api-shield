@@ -18,6 +18,7 @@ export interface ModuleOptions {
   errorMessage: string;
   retryAfterHeader: boolean;
   log: false | LogEntry;
+  routes: string[];
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -35,6 +36,7 @@ export default defineNuxtModule<ModuleOptions>({
     errorMessage: "Too Many Requests",
     retryAfterHeader: false,
     log: false,
+    routes: [],
   },
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url);

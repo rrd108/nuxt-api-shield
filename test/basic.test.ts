@@ -11,7 +11,7 @@ const nuxtConfigBan = 10;
 beforeEach(async () => {
   // await useStorage("shield").clear(); TODO waiting for https://github.com/nuxt/test-utils/issues/531
   // this is a workaround to clean the storage
-  const storagePath = fileURLToPath(new URL("../_testShield", import.meta.url));
+  const storagePath = fileURLToPath(new URL("../_testBasciShield", import.meta.url));
   await rm(storagePath, { recursive: true, force: true });
 });
 
