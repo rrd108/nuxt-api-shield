@@ -69,8 +69,10 @@ export default defineNuxtConfig({
     log: {
       path: "logs", // path to the log file, every day a new log file will be created, use "" to disable logging
       attempts: 100,    // if an IP reach 100 requests, all the requests will be logged, can be used for further analysis or blocking for example with fail2ban, use 0 to disable logging
-    }
-    */
+    },
+    routes: [], // specify routes to apply rate limiting to, default is an empty array meaning all routes are protected.
+    // Example:
+    // routes: ["/api/v2/", "/api/v3/"], // /api/v1 will not be protected, /api/v2/ and /api/v3/ will be protected */
   },
 });
 ```
