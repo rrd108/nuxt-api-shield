@@ -19,8 +19,7 @@ export default defineEventHandler(async (event) => {
 
 
   // console.log(
-  //   `👉 Handling request for URL: ${event.node.req.url} from IP: ${
-  //     getRequestIP(event, { xForwardedFor: true }) || "unKnownIP"
+  // `👉 Handling request for URL: ${url} from IP: ${getRequestIP(event, { xForwardedFor: true }) || "unKnownIP"
   //   }`
   // );
 
@@ -28,7 +27,7 @@ export default defineEventHandler(async (event) => {
   const requestIP = getRequestIP(event, { xForwardedFor: true }) || "unKnownIP";
 
   if (!(await shieldStorage.hasItem(`ip:${requestIP}`))) {
-    //console.log("IP not found in storage, setting initial count.", requestIP);
+    // console.log("  IP not found in storage, setting initial count.", requestIP);
     return await shieldStorage.setItem(`ip:${requestIP}`, {
       count: 1,
       time: Date.now(),
@@ -37,34 +36,29 @@ export default defineEventHandler(async (event) => {
 
   const req = (await shieldStorage.getItem(`ip:${requestIP}`)) as RateLimit;
   req.count++;
-  //console.log(`Set count for IP ${requestIP}: ${req.count}`);
+  // console.log(`  Set count for IP ${requestIP}: ${req.count}`);
 
-  shieldLog(req, requestIP, event.node.req.url);
+  shieldLog(req, requestIP, url);
 
   if (!isRateLimited(req)) {
-    //console.log("Request not rate-limited, updating storage.");
+    // console.log("  Request not rate-limited, updating storage.");
     return await shieldStorage.setItem(`ip:${requestIP}`, {
       count: req.count,
       time: req.time,
     });
   }
 
+  // console.log("  Request is rate-limited.");
+
   if (isBanExpired(req)) {
-    //console.log("Ban expired, resetting count.");
+    // console.log("  Ban expired, resetting count.");
     return await shieldStorage.setItem(`ip:${requestIP}`, {
       count: 1,
       time: Date.now(),
     });
   }
 
-  // console.log(
-  //   "setItem for IP:",
-  //   requestIP,
-  //   "with count:",
-  //   req.count,
-  //   "and time:",
-  //   req.time
-  // );
+  // console.log("  setItem for IP:", requestIP, "with count:", req.count, "and time:", req.time);
   shieldStorage.setItem(`ip:${requestIP}`, {
     count: req.count,
     time: req.time,
@@ -75,7 +69,7 @@ export default defineEventHandler(async (event) => {
   const options = useRuntimeConfig().public.nuxtApiShield;
 
   if (options.retryAfterHeader) {
-    //console.log("Setting Retry-After header", req.count + 1);
+    // console.log("  Setting Retry-After header", req.count + 1);
     event.node.res.setHeader("Retry-After", req.count + 1); // and extra second is added
   }
 
@@ -89,24 +83,24 @@ export default defineEventHandler(async (event) => {
 const isRateLimited = (req: RateLimit) => {
   const options = useRuntimeConfig().public.nuxtApiShield;
 
-  //console.log(`count: ${req.count} <= limit: ${options.limit.max}`);
+  // console.log(`  count: ${req.count} <= limit: ${options.limit.max}`);
   if (req.count <= options.limit.max) {
     return false;
   }
-  //console.log((Date.now() - req.time) / 1000, "<", options.limit.duration);
+  // console.log("  ", (Date.now() - req.time) / 1000, "<", options.limit.duration);
   return (Date.now() - req.time) / 1000 < options.limit.duration;
 };
 
 const banDelay = async (req: RateLimit) => {
   const options = useRuntimeConfig().public.nuxtApiShield;
-  //console.log("delayOnBan: " + options.delayOnBan);
+  // console.log("  delayOnBan is: " + options.delayOnBan);
   if (options.delayOnBan && req.count > options.limit.max) {
     // INFO Nuxt Devtools will send a new request if the response is slow,
     // so we get the count incremented twice or more times, based on the ban delay time
-    //console.log(`Applying ban delay for ${req.count - options.limit.max} sec`);
+    // console.log(`  Applying ban delay for ${(req.count - options.limit.max) * options.limit.ban} sec (${Date.now()})`);
     await new Promise((resolve) =>
-      setTimeout(resolve, (req.count - options.limit.max) * 1000)
+      setTimeout(resolve, (req.count - options.limit.max) * options.limit.ban * 1000)
     );
-    //console.log(`Ban delay completed`);
+    // console.log(`  Ban delay completed (${Date.now()})`);
   }
 };

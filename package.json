@@ -33,14 +33,14 @@
     "release:minor": "yarn lint && yarn test && yarn prepack && changelogen --release --minor && yarn publish && git push --follow-tags",
     "lint": "eslint .",
     "test": "vitest run --testTimeout 15000 --reporter=basic --disable-console-intercept",
-    "test:watch": "vitest watch  --testTimeout 15000 --reporter=basic --disable-console-intercept "
+    "test:watch": "vitest watch  --testTimeout 15000 --reporter=basic --disable-console-intercept"
   },
   "dependencies": {
     "@nuxt/kit": "^3.12.2",
     "defu": "^6.1.4"
   },
   "devDependencies": {
-    "@nuxt/devtools": "latest",
+    "@nuxt/devtools": "^1.4.2",
     "@nuxt/eslint-config": "^0.5.0",
     "@nuxt/module-builder": "^0.8.3",
     "@nuxt/schema": "^3.11.1",
