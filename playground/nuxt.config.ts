@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ["../src/module"],
+  modules: ['../src/module'],
   nuxtApiShield: {
     limit: {
       max: 12,
@@ -9,24 +9,24 @@ export default defineNuxtConfig({
     delayOnBan: true,
     retryAfterHeader: true,
     log: {
-      path: "logs",
+      path: 'logs',
       attempts: 5,
     },
   },
   nitro: {
     storage: {
       shield: {
-        //driver: "memory",
-        driver: "fs",
-        base: ".shield",
+        // driver: "memory",
+        driver: 'fs',
+        base: '.shield',
       },
     },
     experimental: {
       tasks: true,
     },
     scheduledTasks: {
-      "*/5 * * * *": ["shield:clean"],
+      '*/5 * * * *': ['shield:clean'],
     },
   },
   devtools: { enabled: true },
-});
+})

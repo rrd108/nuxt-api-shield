@@ -1,4 +1,4 @@
-import nuxtApiShield from "../../../src/module";
+import nuxtApiShield from '../../../src/module'
 
 export default defineNuxtConfig({
   modules: [nuxtApiShield],
@@ -8,18 +8,18 @@ export default defineNuxtConfig({
       duration: 3,
       ban: 10,
     },
-    errorMessage: "Leave me alone",
+    errorMessage: 'Leave me alone',
     retryAfterHeader: true,
-    log: false,
-    routes: ["/api/v3"],
+    log: { path: '', attempts: 0 },
+    routes: ['/api/v3'],
   },
   nitro: {
     storage: {
       shield: {
-        //driver: "memory",
-        driver: "fs",
-        base: "_testWithRoutesShield",
+        // driver: "memory",
+        driver: 'fs',
+        base: '_testWithRoutesShield',
       },
     },
   },
-});
+})

@@ -1,20 +1,20 @@
-import { RateLimit } from "../../../../src/runtime/server/types/RateLimit";
+import type { RateLimit } from '../../../../src/runtime/server/types/RateLimit'
 
 export default defineTask({
   meta: {
-    description: "Clean expired bans",
+    description: 'Clean expired bans',
   },
   async run() {
-    const shieldStorage = useStorage("shield");
+    const shieldStorage = useStorage('shield')
 
-    const keys = await shieldStorage.getKeys();
+    const keys = await shieldStorage.getKeys()
 
     keys.forEach(async (key) => {
-      const rateLimit = (await shieldStorage.getItem(key)) as RateLimit;
+      const rateLimit = (await shieldStorage.getItem(key)) as RateLimit
       if (isBanExpired(rateLimit)) {
-        await shieldStorage.removeItem(key);
+        await shieldStorage.removeItem(key)
       }
-    });
-    return { result: keys };
+    })
+    return { result: keys }
   },
-});
+})

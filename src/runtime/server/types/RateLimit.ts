@@ -1,4 +1,4 @@
 export type RateLimit = {
-  count: number;
-  time: number;
-};
+  count: number
+  time: number
+}

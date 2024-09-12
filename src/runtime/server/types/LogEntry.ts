@@ -1,4 +1,4 @@
 export interface LogEntry {
-    path: string;
-    attempts: number;
+  path: string
+  attempts: number
 }
