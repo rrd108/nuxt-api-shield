@@ -1,6 +1,6 @@
 {
   "name": "nuxt-api-shield",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Nuxt API Shield - Rate Limiting",
   "repository": "rrd108/nuxt-api-shield",
   "license": "MIT",

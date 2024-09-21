@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.7.1
+
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.7.0...v0.7.1)
+
+### 🩹 Fixes
+
+- **deps:** Update nuxtjs monorepo to v3.13.2 ([95197ee](https://github.com/rrd108/nuxt-api-shield/commit/95197ee))
+
 ## v0.6.10
 
 [compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.6.8...v0.6.10)
