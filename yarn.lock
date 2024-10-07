@@ -36,7 +36,7 @@
   resolved "https://registry.yarnpkg.com/@babel/compat-data/-/compat-data-7.25.7.tgz#b8479fe0018ef0ac87b6b7a5c6916fcd67ae2c9c"
   integrity sha512-9ickoLz+hcXCeh7jrcin+/SLWm+GkxE2kTvoYyp38p4WkdFXfQJxDFGWp/YHjiKLPx06z2A7W8XKuqbReXDzsw==
 
-"@babel/core@^7.23.0", "@babel/core@^7.23.7", "@babel/core@^7.25.2":
+"@babel/core@^7.23.0", "@babel/core@^7.23.7", "@babel/core@^7.25.7":
   version "7.25.7"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.25.7.tgz#1b3d144157575daf132a3bc80b2b18e6e3ca6ece"
   integrity sha512-yJ474Zv3cwiSOO9nXJuqzvwEeM+chDuQ8GJirw+pZ91sCGCyOZ3dJkVE09fTV0VEVzXyLWhh3G/AolYTPX7Mow==
@@ -293,7 +293,7 @@
     "@babel/helper-skip-transparent-expression-wrappers" "^7.24.7"
     "@babel/plugin-syntax-typescript" "^7.24.7"
 
-"@babel/standalone@^7.23.8", "@babel/standalone@^7.25.6":
+"@babel/standalone@^7.23.8", "@babel/standalone@^7.25.7":
   version "7.25.7"
   resolved "https://registry.yarnpkg.com/@babel/standalone/-/standalone-7.25.7.tgz#f134e51e5e91f1ff2ffead46cc0436158b9e0f4b"
   integrity sha512-7H+mK18Ew4C/pIIiZwF1eiVjUEh2Ju/BpwRZwcPeXltF/rIjHjFL0gol7PtGrHocmIq6P6ubJrylmmWQ3lGJPA==
@@ -1223,13 +1223,13 @@
     std-env "^3.7.0"
 
 "@nuxt/test-utils@>=3.13.1", "@nuxt/test-utils@^3.14.2":
-  version "3.14.2"
-  resolved "https://registry.yarnpkg.com/@nuxt/test-utils/-/test-utils-3.14.2.tgz#05a767e432f2f0874987581b4f148c87c86aa14b"
-  integrity sha512-n5soEpHom9aL9sMwrBiD3xGR+oXbx+O8zL2NF9aelWOTSzPPNN+Qo3cBEECMc6NYQi1a4LbCKkPjQfbtPvaqkg==
+  version "3.14.3"
+  resolved "https://registry.yarnpkg.com/@nuxt/test-utils/-/test-utils-3.14.3.tgz#ba202cbd7b9f2bb05f7496ccfd87e563efa58ba7"
+  integrity sha512-5SoyaR9bQG7xcyj6kSnzFVWvpAdiKSruRkq3KVDKEAbxwHhtyz2Ijqxf8iGE3W9dAM0F+omIvLmjen3ITgd3rA==
   dependencies:
-    "@nuxt/kit" "^3.13.1"
-    "@nuxt/schema" "^3.13.1"
-    c12 "^1.11.2"
+    "@nuxt/kit" "^3.13.2"
+    "@nuxt/schema" "^3.13.2"
+    c12 "^2.0.1"
     consola "^3.2.3"
     defu "^6.1.4"
     destr "^2.0.3"
@@ -1239,7 +1239,7 @@
     local-pkg "^0.5.0"
     magic-string "^0.30.11"
     node-fetch-native "^1.6.4"
-    ofetch "^1.3.4"
+    ofetch "^1.4.0"
     pathe "^1.1.2"
     perfect-debounce "^1.0.0"
     radix3 "^1.1.2"
@@ -1248,7 +1248,7 @@
     tinyexec "^0.3.0"
     ufo "^1.5.4"
     unenv "^1.10.0"
-    unplugin "^1.14.0"
+    unplugin "^1.14.1"
     vitest-environment-nuxt "^1.0.1"
 
 "@nuxt/vite-builder@3.13.2":
@@ -2533,6 +2533,24 @@ c12@^1.11.1, c12@^1.11.2:
     pkg-types "^1.2.0"
     rc9 "^2.1.2"
 
+c12@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/c12/-/c12-2.0.1.tgz#5702d280b31a08abba39833494c9b1202f0f5aec"
+  integrity sha512-Z4JgsKXHG37C6PYUtIxCfLJZvo6FyhHJoClwwb9ftUkLpPSkuYqn6Tr+vnaN8hymm0kIbcg6Ey3kv/Q71k5w/A==
+  dependencies:
+    chokidar "^4.0.1"
+    confbox "^0.1.7"
+    defu "^6.1.4"
+    dotenv "^16.4.5"
+    giget "^1.2.3"
+    jiti "^2.3.0"
+    mlly "^1.7.1"
+    ohash "^1.1.4"
+    pathe "^1.1.2"
+    perfect-debounce "^1.0.0"
+    pkg-types "^1.2.0"
+    rc9 "^2.1.2"
+
 cac@^6.7.14:
   version "6.7.14"
   resolved "https://registry.yarnpkg.com/cac/-/cac-6.7.14.tgz#804e1e6f506ee363cb0e3ccbb09cad5dd9870959"
@@ -2558,10 +2576,15 @@ caniuse-lite@^1.0.0:
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001660.tgz#31218de3463fabb44d0b7607b652e56edf2e2355"
   integrity sha512-GacvNTTuATm26qC74pt+ad1fW15mlQ/zuTzzY1ZoIzECTP8HURDfF43kNxPgf7H1jmelCBQTTbBNxdSXOA7Bqg==
 
-caniuse-lite@^1.0.30001646, caniuse-lite@^1.0.30001663:
+caniuse-lite@^1.0.30001646:
   version "1.0.30001666"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001666.tgz#112d77e80f1762f62a1b71ba92164e0cb3f3dd13"
   integrity sha512-gD14ICmoV5ZZM1OdzPWmpx+q4GyefaK06zi8hmfHV5xe4/2nOQX3+Dw5o+fSqOws2xVwL9j+anOPFwHzdEdV4g==
+
+caniuse-lite@^1.0.30001663:
+  version "1.0.30001667"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001667.tgz#99fc5ea0d9c6e96897a104a8352604378377f949"
+  integrity sha512-7LTwJjcRkzKFmtqGsibMeuXmvFDfZq/nzIjnmgCGzKKRVzjD72selLDK1oPF/Oxzmt4fNcPvTDvGqSDG4tCALw==
 
 chai@^5.1.1:
   version "5.1.1"
@@ -2635,6 +2658,13 @@ chokidar@^3.5.1, chokidar@^3.6.0:
     readdirp "~3.6.0"
   optionalDependencies:
     fsevents "~2.3.2"
+
+chokidar@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-4.0.1.tgz#4a6dff66798fb0f72a94f616abbd7e1a19f31d41"
+  integrity sha512-n8enUVCED/KVRQlab1hr3MVpcVMvxtZjmEa956u+4YijlmQED223XMSYj2tLuKvr4jcCTzNNMpQDUer72MMmzA==
+  dependencies:
+    readdirp "^4.0.1"
 
 chownr@^2.0.0:
   version "2.0.0"
@@ -2779,9 +2809,9 @@ concat-map@0.0.1:
   integrity sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==
 
 confbox@^0.1.7:
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/confbox/-/confbox-0.1.7.tgz#ccfc0a2bcae36a84838e83a3b7f770fb17d6c579"
-  integrity sha512-uJcB/FKZtBMCJpK8MQji6bJHgu1tixKPxRLeGkNzBoOZzpnZUJm0jm2/sBDWcuBx1dYgxV4JU+g5hmNxCyAmdA==
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/confbox/-/confbox-0.1.8.tgz#820d73d3b3c82d9bd910652c5d4d599ef8ff8b06"
+  integrity sha512-RMtmw0iFkeR4YV+fUOSucriAQNb9g8zFR52MWCtl+cCZOFRNL6zeB395vPzFhEjjn4fMxXudmELnl/KF/WrK6w==
 
 consola@^3.2.3:
   version "3.2.3"
@@ -3162,7 +3192,12 @@ ee-first@1.1.1:
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
-electron-to-chromium@^1.5.28, electron-to-chromium@^1.5.4:
+electron-to-chromium@^1.5.28:
+  version "1.5.32"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.32.tgz#4a05ee78e29e240aabaf73a67ce9fe73f52e1bc7"
+  integrity sha512-M+7ph0VGBQqqpTT2YrabjNKSQ2fEl9PVx6AK3N558gDH9NO8O6XN9SXXFWRo9u9PbEg/bWq+tjXQr+eXmxubCw==
+
+electron-to-chromium@^1.5.4:
   version "1.5.31"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.31.tgz#b1478418769dec72ea70d9fdf147a81491857f10"
   integrity sha512-QcDoBbQeYt0+3CWcK/rEbuHvwpbT/8SV9T3OSgs6cX1FlcUAkgrkqbg9zLnDrMM/rLamzQwal4LYFCiWk861Tg==
@@ -4360,10 +4395,10 @@ jiti@^1.19.3, jiti@^1.21.0, jiti@^1.21.6:
   resolved "https://registry.yarnpkg.com/jiti/-/jiti-1.21.6.tgz#6c7f7398dd4b3142767f9a168af2f317a428d268"
   integrity sha512-2yTgeWTWzMWkHu6Jp9NKgePDaYHbntiwvYuuJLbbN9vl7DC9DvXKOB2BC3ZZ92D3cvV/aflH0osDfwpHepQ53w==
 
-jiti@^2.0.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/jiti/-/jiti-2.1.0.tgz#54bdaa411f543554aed9bf3458351bbc1fa5acab"
-  integrity sha512-Nftp80J8poC3u+93ZxpjstsgfQ5d0o5qyD6yStv32sgnWr74xRxBppEwsUoA/GIdrJpgGRkC1930YkLcAsFdSw==
+jiti@^2.3.0, jiti@^2.3.1:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/jiti/-/jiti-2.3.2.tgz#ea3620d59372cf4829458fa4b921b54255435819"
+  integrity sha512-9ZLDe7kYLCyWTAP6EIyg3B4ZuHy5W0gdy6y1rgrWrAOpTrUU+vKuKa1+OXB7MBkujyvm6a2b7i0ETHQDbgY98A==
 
 js-tokens@^4.0.0:
   version "4.0.0"
@@ -4757,7 +4792,7 @@ mkdist@^1.3.0:
     postcss-nested "^6.2.0"
     semver "^7.6.3"
 
-mlly@^1.3.0, mlly@^1.4.0, mlly@^1.4.2, mlly@^1.6.1, mlly@^1.7.1:
+mlly@^1.3.0, mlly@^1.4.0, mlly@^1.6.1:
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/mlly/-/mlly-1.7.1.tgz#e0336429bb0731b6a8e887b438cbdae522c8f32f"
   integrity sha512-rrVRZRELyQzrIUAVMHxP97kv+G786pHmOKzuFII8zDYahFBS7qnHh2AlYSl1GAHhaMPCz6/oHjVMcfFYgFYHgA==
@@ -4766,6 +4801,16 @@ mlly@^1.3.0, mlly@^1.4.0, mlly@^1.4.2, mlly@^1.6.1, mlly@^1.7.1:
     pathe "^1.1.2"
     pkg-types "^1.1.1"
     ufo "^1.5.3"
+
+mlly@^1.4.2, mlly@^1.7.1:
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/mlly/-/mlly-1.7.2.tgz#21c0d04543207495b8d867eff0ac29fac9a023c0"
+  integrity sha512-tN3dvVHYVz4DhSXinXIk7u9syPYaJvio118uomkovAtWBT+RdbP6Lfh/5Lvo519YMmwBafwlh20IPTXIStscpA==
+  dependencies:
+    acorn "^8.12.1"
+    pathe "^1.1.2"
+    pkg-types "^1.2.0"
+    ufo "^1.5.4"
 
 mri@^1.2.0:
   version "1.2.0"
@@ -5081,6 +5126,15 @@ ofetch@^1.3.4:
     destr "^2.0.3"
     node-fetch-native "^1.6.3"
     ufo "^1.5.3"
+
+ofetch@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/ofetch/-/ofetch-1.4.0.tgz#89ef58fb673fbe2a87250973d4586ce7725e8399"
+  integrity sha512-MuHgsEhU6zGeX+EMh+8mSMrYTnsqJQQrpM00Q6QHMKNqQ0bKy0B43tk8tL1wg+CnsSTy1kg4Ir2T5Ig6rD+dfQ==
+  dependencies:
+    destr "^2.0.3"
+    node-fetch-native "^1.6.4"
+    ufo "^1.5.4"
 
 ohash@^1.1.3, ohash@^1.1.4:
   version "1.1.4"
@@ -5706,6 +5760,11 @@ readdir-glob@^1.1.2:
   integrity sha512-v05I2k7xN8zXvPD9N+z/uhXPaj0sUFCe2rcWZIpBsqxfP7xXFQ0tipAd/wjj1YxWyWtUS5IDJpOG82JKt2EAVA==
   dependencies:
     minimatch "^5.1.0"
+
+readdirp@^4.0.1:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/readdirp/-/readdirp-4.0.2.tgz#388fccb8b75665da3abffe2d8f8ed59fe74c230a"
+  integrity sha512-yDMz9g+VaZkqBYS/ozoBJwaBhTbZo3UNYQHNRw1D3UFQB8oHB4uS/tAODO+ZLjGWmUbKnIlOWO+aaIiAxrUWHA==
 
 readdirp@~3.6.0:
   version "3.6.0"
@@ -6642,7 +6701,7 @@ unplugin-vue-router@^0.10.8:
     unplugin "^1.12.2"
     yaml "^2.5.0"
 
-unplugin@^1.10.0, unplugin@^1.12.2, unplugin@^1.14.0, unplugin@^1.14.1, unplugin@^1.3.1, unplugin@^1.8.3:
+unplugin@^1.10.0, unplugin@^1.12.2, unplugin@^1.14.1, unplugin@^1.3.1, unplugin@^1.8.3:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/unplugin/-/unplugin-1.14.1.tgz#c76d6155a661e43e6a897bce6b767a1ecc344c1a"
   integrity sha512-lBlHbfSFPToDYp9pjXlUEFVxYLaue9f9T1HC+4OHlmj+HnMDdz9oZY+erXfoCe/5V/7gKUSY2jpXPb9S7f0f/w==
@@ -6689,15 +6748,15 @@ untyped@^1.4.0:
     scule "^1.2.0"
 
 untyped@^1.4.2:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/untyped/-/untyped-1.5.0.tgz#18b5329b72e49f6c75ff7fea537ea5fe4cf52270"
-  integrity sha512-o2Vjmn2dal08BzCcINxSmWuAteReUUiXseii5VRhmxyLF0b21K0iKZQ9fMYK7RWspVkY+0saqaVQNq4roe3Efg==
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/untyped/-/untyped-1.5.1.tgz#2ccf3ee09419d59a44c21a192877ab45aa98361a"
+  integrity sha512-reBOnkJBFfBZ8pCKaeHgfZLcehXtM6UTxc+vqs1JvCps0c4amLNp3fhdGBZwYp+VLyoY9n3X5KOP7lCyWBUX9A==
   dependencies:
-    "@babel/core" "^7.25.2"
-    "@babel/standalone" "^7.25.6"
-    "@babel/types" "^7.25.6"
+    "@babel/core" "^7.25.7"
+    "@babel/standalone" "^7.25.7"
+    "@babel/types" "^7.25.7"
     defu "^6.1.4"
-    jiti "^2.0.0"
+    jiti "^2.3.1"
     mri "^1.2.0"
     scule "^1.3.0"
 
