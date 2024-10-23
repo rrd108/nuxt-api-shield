@@ -94,6 +94,22 @@ You can use any storage you want, but you have to use **shield** as the name of 
 }
 ```
 
+If you use for example redis, you can use the following configuration, define the host and port.
+
+```json
+{
+  "nitro": {
+    "storage": {
+      "shield": {
+        "driver": "redis",
+        "host": "localhost",
+        "port": 6379,
+      }
+    }
+  }
+}
+```
+
 ### 4. Add `shield:clean` to `nuxt.config.ts`
 
 ```json
