@@ -11,7 +11,7 @@ beforeEach(async () => {
   await rm(storagePath, { recursive: true, force: true })
 })
 
-describe('shield', async () => {
+describe('shield with /api/v3 route', async () => {
   await setup({
     rootDir: fileURLToPath(new URL('./fixtures/withroutes', import.meta.url)),
   })
