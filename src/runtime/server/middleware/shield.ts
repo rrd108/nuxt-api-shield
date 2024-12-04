@@ -5,15 +5,16 @@ import {
   createError,
   defineEventHandler,
   getRequestIP,
+  getRequestURL,
   useRuntimeConfig,
   useStorage,
 } from '#imports'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig().public.nuxtApiShield
-  const url = event.node.req.url
+  const url = getRequestURL(event)
 
-  if (!url?.startsWith('/api/') || (config.routes?.length && !config.routes.some(route => url.startsWith(route)))) {
+  if (!url?.pathname?.startsWith('/api/') || (config.routes?.length && !config.routes.some(route => url.pathname?.startsWith(route)))) {
     return
   }
 
