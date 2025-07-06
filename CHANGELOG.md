@@ -1,5 +1,31 @@
 # Changelog
 
+## v0.8.1
+
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.8.0...v0.8.1)
+
+### 🩹 Fixes
+
+- **deps:** Update nuxtjs monorepo to v3.14.159 ([bafc40b](https://github.com/rrd108/nuxt-api-shield/commit/bafc40b))
+- **deps:** Update nuxtjs monorepo to v3.14.1592 ([576f866](https://github.com/rrd108/nuxt-api-shield/commit/576f866))
+- Improve rate limiting logic closes #77 ([#77](https://github.com/rrd108/nuxt-api-shield/issues/77))
+
+### 📖 Documentation
+
+- Update README to clarify ban behavior and response handling for rate limits ([b435cba](https://github.com/rrd108/nuxt-api-shield/commit/b435cba))
+
+### 🏡 Chore
+
+- Add nuxi dependency and update tsconfig options ([a95dca3](https://github.com/rrd108/nuxt-api-shield/commit/a95dca3))
+
+### ✅ Tests
+
+- Adjust wait time for ban expiration in rate limit tests ([f87cd12](https://github.com/rrd108/nuxt-api-shield/commit/f87cd12))
+
+### ❤️ Contributors
+
+- Rrd ([@rrd108](https://github.com/rrd108))
+
 ## v0.7.1
 
 [compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.7.0...v0.7.1)
