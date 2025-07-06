@@ -1,5 +1,5 @@
 export default defineNuxtModuleConfig({
-    build: {
-        failOnWarn: false,
-    },
+  build: {
+    failOnWarn: false,
+  },
 })
