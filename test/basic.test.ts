@@ -86,8 +86,8 @@ describe('shield', async () => {
       expect(typedErr.response.headers.get('Retry-After')).toBe('6')
     }
 
-    // here we should wait for the 3 sec ban to expire
-    await new Promise(resolve => setTimeout(resolve, nuxtConfigBan * 1000))
+    // wait for the 3 sec ban to expire, added 1 sec for CI
+    await new Promise(resolve => setTimeout(resolve, (nuxtConfigBan + 1) * 1000))
     const response = await $fetch('/api/basicexample?c=3/4', {
       method: 'GET',
       retryStatusCodes: [],
