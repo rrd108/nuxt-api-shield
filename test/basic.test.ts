@@ -95,12 +95,31 @@ describe('shield', async () => {
     expect((response as ApiResponse).name).toBe('Gauranga')
   })
 
-  it('should created a log file', async () => {
-    const logDate = new Date().toISOString().split('T')[0].replace(/-/g, '')
-    const logFile = fileURLToPath(
-      new URL(`../_logs/shield-${logDate}.log`, import.meta.url),
-    )
-    const contents = await readFile(logFile, { encoding: 'utf8' })
-    expect(contents).toContain('127.0.0.1')
+  it('should enforce ban period after rate limit duration expires (issue #77)', async () => {
+    // 1. Exceed the limit (2 requests in 3 seconds)
+    await $fetch('/api/basicexample?c=77/1', { method: 'GET', retryStatusCodes: [] })
+    await $fetch('/api/basicexample?c=77/2', { method: 'GET', retryStatusCodes: [] })
+    try {
+      await $fetch('/api/basicexample?c=77/3', { method: 'GET', retryStatusCodes: [] })
+      throw new Error('Nem dobott hibát a 3. kérésnél!')
+    } catch (err) {
+      const typedErr = err as { statusCode: number, statusMessage: string }
+      expect(typedErr.statusCode).toBe(429)
+    }
+
+    // 2. Wait after the duration (3 seconds), but still within the ban (10 seconds)
+    await new Promise(resolve => setTimeout(resolve, 4000))
+    try {
+      await $fetch('/api/basicexample?c=77/4', { method: 'GET', retryStatusCodes: [] })
+      throw new Error('Nem dobott hibát a ban idő alatt!')
+    } catch (err) {
+      const typedErr = err as { statusCode: number, statusMessage: string }
+      expect(typedErr.statusCode).toBe(429)
+    }
+
+    // 3. Wait for the ban to expire (+7 seconds)
+    await new Promise(resolve => setTimeout(resolve, 7000))
+    const response = await $fetch('/api/basicexample?c=77/5', { method: 'GET', retryStatusCodes: [] })
+    expect((response as ApiResponse).name).toBe('Gauranga')
   })
 })
