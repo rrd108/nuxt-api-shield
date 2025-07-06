@@ -1,5 +1,4 @@
 import type { RateLimit } from '../types/RateLimit'
-import { isBanExpired } from '../utils/isBanExpired'
 import shieldLog from '../utils/shieldLog'
 import {
   createError,
@@ -29,7 +28,7 @@ export default defineEventHandler(async (event) => {
   const banKey = `ban:${requestIP}`
   const bannedUntilRaw = await shieldStorage.getItem(banKey)
   const bannedUntil = typeof bannedUntilRaw === 'number' ? bannedUntilRaw : Number(bannedUntilRaw)
-  if (bannedUntilRaw && !isNaN(bannedUntil) && Date.now() < bannedUntil) {
+  if (bannedUntilRaw && !Number.isNaN(bannedUntil) && Date.now() < bannedUntil) {
     if (config.retryAfterHeader) {
       const retryAfter = Math.ceil((bannedUntil - Date.now()) / 1000)
       event.node.res.setHeader('Retry-After', retryAfter)
@@ -38,7 +37,8 @@ export default defineEventHandler(async (event) => {
       statusCode: 429,
       message: config.errorMessage,
     })
-  } else if (bannedUntilRaw && !isNaN(bannedUntil) && Date.now() >= bannedUntil) {
+  }
+  else if (bannedUntilRaw && !Number.isNaN(bannedUntil) && Date.now() >= bannedUntil) {
     await shieldStorage.removeItem(banKey)
     await shieldStorage.setItem(`ip:${requestIP}`, {
       count: 1,
@@ -74,7 +74,6 @@ export default defineEventHandler(async (event) => {
     count: 1,
     time: Date.now(),
   })
-  
 
   if (config.retryAfterHeader) {
     event.node.res.setHeader('Retry-After', config.limit.ban)
@@ -96,18 +95,4 @@ const isRateLimited = (req: RateLimit) => {
   }
   // console.log("  ", (Date.now() - req.time) / 1000, "<", options.limit.duration);
   return (Date.now() - req.time) / 1000 < options.limit.duration
-}
-
-const banDelay = async (req: RateLimit) => {
-  const options = useRuntimeConfig().public.nuxtApiShield
-  // console.log("  delayOnBan is: " + options.delayOnBan);
-  if (options.delayOnBan && req.count > options.limit.max) {
-    // INFO Nuxt Devtools will send a new request if the response is slow,
-    // so we get the count incremented twice or more times, based on the ban delay time
-    // console.log(`  Applying ban delay for ${(req.count - options.limit.max) * options.limit.ban} sec (${Date.now()})`);
-    await new Promise(resolve =>
-      setTimeout(resolve, (req.count - options.limit.max) * options.limit.ban * 1000),
-    )
-    // console.log(`  Ban delay completed (${Date.now()})`);
-  }
 }

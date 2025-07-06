@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url'
-import { readFile, rm } from 'node:fs/promises'
+import { rm } from 'node:fs/promises'
 import { beforeEach, describe, it, expect } from 'vitest'
 import { setup, $fetch } from '@nuxt/test-utils/e2e'
 import type { ApiResponse } from './ApiResponse'
@@ -102,7 +102,8 @@ describe('shield', async () => {
     try {
       await $fetch('/api/basicexample?c=77/3', { method: 'GET', retryStatusCodes: [] })
       throw new Error('Nem dobott hibát a 3. kérésnél!')
-    } catch (err) {
+    }
+    catch (err) {
       const typedErr = err as { statusCode: number, statusMessage: string }
       expect(typedErr.statusCode).toBe(429)
     }
@@ -112,7 +113,8 @@ describe('shield', async () => {
     try {
       await $fetch('/api/basicexample?c=77/4', { method: 'GET', retryStatusCodes: [] })
       throw new Error('Nem dobott hibát a ban idő alatt!')
-    } catch (err) {
+    }
+    catch (err) {
       const typedErr = err as { statusCode: number, statusMessage: string }
       expect(typedErr.statusCode).toBe(429)
     }

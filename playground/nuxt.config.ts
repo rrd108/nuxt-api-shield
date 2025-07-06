@@ -1,18 +1,6 @@
 export default defineNuxtConfig({
   modules: ['../src/module'],
-  nuxtApiShield: {
-    limit: {
-      max: 12,
-      duration: 10,
-      ban: 30,
-    },
-    delayOnBan: true,
-    retryAfterHeader: true,
-    log: {
-      path: 'logs',
-      attempts: 5,
-    },
-  },
+  devtools: { enabled: true },
   nitro: {
     storage: {
       shield: {
@@ -28,5 +16,17 @@ export default defineNuxtConfig({
       '*/5 * * * *': ['shield:clean'],
     },
   },
-  devtools: { enabled: true },
+  nuxtApiShield: {
+    limit: {
+      max: 12,
+      duration: 10,
+      ban: 30,
+    },
+    delayOnBan: true,
+    retryAfterHeader: true,
+    log: {
+      path: 'logs',
+      attempts: 5,
+    },
+  },
 })

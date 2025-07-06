@@ -2,6 +2,15 @@ import nuxtApiShield from '../../../src/module'
 
 export default defineNuxtConfig({
   modules: [nuxtApiShield],
+  nitro: {
+    storage: {
+      shield: {
+        // driver: "memory",
+        driver: 'fs',
+        base: '_testBasicShield',
+      },
+    },
+  },
   nuxtApiShield: {
     limit: {
       max: 2,
@@ -13,15 +22,6 @@ export default defineNuxtConfig({
     log: {
       path: '_logs',
       attempts: 3,
-    },
-  },
-  nitro: {
-    storage: {
-      shield: {
-        // driver: "memory",
-        driver: 'fs',
-        base: '_testBasicShield',
-      },
     },
   },
 })
