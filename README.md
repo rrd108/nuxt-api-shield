@@ -18,7 +18,8 @@ This Nuxt module implements a rate limiting middleware to protect your API endpo
   - Prevents malicious actors or excessive requests from a single source from overwhelming your API.
 - **Customizable Rate Limits**
   - Configure maximum request count, duration within which the limit applies, and a ban period for exceeding the limit.
-  - Add a delay to responses when a user is banned to discourage further abuse.
+  - If the request limit is exceeded, the user is banned for the configured ban period. During the ban period, **all requests are blocked with a 429 error**, regardless of the rate limit window.
+  - Add a delay to responses when a user is banned to discourage further abuse (optional).
   - Customize the error message for banned users.
   - Optionally include the `Retry-After` header in responses when a user is banned.
   - Tailor the rate-limiting behavior to align with your API's specific needs and usage patterns.
@@ -32,7 +33,7 @@ This Nuxt module implements a rate limiting middleware to protect your API endpo
   - Easily adjust rate-limiting parameters without code changes.
   - Adapt to dynamic needs and maintain control over rate-limiting behavior through Nuxt's runtime configuration.
 - **Clear Error Handling**
-  - Returns a standardized 429 "Too Many Requests" error response when rate limits are exceeded.
+  - Returns a standardized 429 "Too Many Requests" error response when rate limits are exceeded or when a user is banned.
   - Facilitates proper error handling in client-side applications for a smooth user experience.
 
 ## Quick Setup
@@ -62,6 +63,7 @@ export default defineNuxtConfig({
       max: 12,        // maximum requests per duration time, default is 12/duration
       duration: 108,   // duration time in seconds, default is 108 seconds
       ban: 3600,      // ban time in seconds, default is 3600 seconds = 1 hour
+      // If the request limit is exceeded, the user is banned for this period. During the ban, all requests are blocked with 429.
     },
     delayOnBan: true  // delay every response with +1sec when the user is banned, default is true
     errorMessage: "Too Many Requests",  // error message when the user is banned, default is "Too Many Requests"
