@@ -26,6 +26,26 @@ export default defineEventHandler(async (event) => {
   const shieldStorage = useStorage('shield')
   const requestIP = getRequestIP(event, { xForwardedFor: true }) || 'unKnownIP'
 
+  const banKey = `ban:${requestIP}`
+  const bannedUntilRaw = await shieldStorage.getItem(banKey)
+  const bannedUntil = typeof bannedUntilRaw === 'number' ? bannedUntilRaw : Number(bannedUntilRaw)
+  if (bannedUntilRaw && !isNaN(bannedUntil) && Date.now() < bannedUntil) {
+    if (config.retryAfterHeader) {
+      const retryAfter = Math.ceil((bannedUntil - Date.now()) / 1000)
+      event.node.res.setHeader('Retry-After', retryAfter)
+    }
+    throw createError({
+      statusCode: 429,
+      message: config.errorMessage,
+    })
+  } else if (bannedUntilRaw && !isNaN(bannedUntil) && Date.now() >= bannedUntil) {
+    await shieldStorage.removeItem(banKey)
+    await shieldStorage.setItem(`ip:${requestIP}`, {
+      count: 1,
+      time: Date.now(),
+    })
+  }
+
   if (!(await shieldStorage.hasItem(`ip:${requestIP}`))) {
     // console.log("  IP not found in storage, setting initial count.", requestIP);
     return await shieldStorage.setItem(`ip:${requestIP}`, {
@@ -38,7 +58,7 @@ export default defineEventHandler(async (event) => {
   req.count++
   // console.log(`  Set count for IP ${requestIP}: ${req.count}`);
 
-  shieldLog(req, requestIP, url)
+  shieldLog(req, requestIP, url.toString())
 
   if (!isRateLimited(req)) {
     // console.log("  Request not rate-limited, updating storage.");
@@ -48,35 +68,22 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // console.log("  Request is rate-limited.");
-
-  if (isBanExpired(req)) {
-    // console.log("  Ban expired, resetting count.");
-    return await shieldStorage.setItem(`ip:${requestIP}`, {
-      count: 1,
-      time: Date.now(),
-    })
-  }
-
-  // console.log("  setItem for IP:", requestIP, "with count:", req.count, "and time:", req.time);
-  shieldStorage.setItem(`ip:${requestIP}`, {
-    count: req.count,
-    time: req.time,
+  const banUntil = Date.now() + config.limit.ban * 1000
+  await shieldStorage.setItem(banKey, banUntil)
+  await shieldStorage.setItem(`ip:${requestIP}`, {
+    count: 1,
+    time: Date.now(),
   })
+  
 
-  await banDelay(req)
-
-  const options = useRuntimeConfig().public.nuxtApiShield
-
-  if (options.retryAfterHeader) {
-    // console.log("  Setting Retry-After header", req.count + 1);
-    event.node.res.setHeader('Retry-After', req.count + 1) // and extra second is added
+  if (config.retryAfterHeader) {
+    event.node.res.setHeader('Retry-After', config.limit.ban)
   }
 
   // console.error("Throwing 429 error");
   throw createError({
     statusCode: 429,
-    message: options.errorMessage,
+    message: config.errorMessage,
   })
 })
 
