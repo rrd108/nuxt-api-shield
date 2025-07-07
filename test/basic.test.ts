@@ -37,7 +37,7 @@ describe('shield', async () => {
     try {
       // req.count = 3
       // as limit.max = 2, this should throw 429 and ban for 3 seconds (limit.ban)
-      expect(async () =>
+      await expect(async () =>
         $fetch('/api/basicexample?c=1/3', { method: 'GET', retryStatusCodes: [] }),
       ).rejects.toThrowError()
     }
@@ -70,7 +70,7 @@ describe('shield', async () => {
     await $fetch('/api/basicexample?c=3/2', { method: 'GET', retryStatusCodes: [] }) // req.count = 2
     try {
       // req.count = 3
-      expect(async () =>
+      await expect(async () =>
         $fetch('/api/basicexample?c=3/3', { method: 'GET', retryStatusCodes: [] }),
       ).rejects.toThrowError()
     }

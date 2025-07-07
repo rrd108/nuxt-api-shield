@@ -34,7 +34,7 @@ describe('shield with /api/v3 route', async () => {
     try {
       // req.count = 3
       // as limit.max = 2, this should throw 429 and ban for 3 seconds (limit.ban)
-      expect(async () =>
+      await expect(async () =>
         $fetch('/api/v3/example?c=1/3', { method: 'GET', retryStatusCodes: [] }),
       ).rejects.toThrowError()
     }
