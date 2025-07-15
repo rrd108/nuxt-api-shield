@@ -5003,9 +5003,9 @@ nth-check@^2.0.1, nth-check@^2.1.1:
     boolbase "^1.0.0"
 
 nuxi@^3.25.1:
-  version "3.25.1"
-  resolved "https://registry.yarnpkg.com/nuxi/-/nuxi-3.25.1.tgz#8baea8c41a916e418728cba0cdbc135e795f86bd"
-  integrity sha512-NeZDRVdn58QF3+clrkKRXE3PtfhE4hkmj8/Wqf6th707SDqmdBb/KZV2BE4lwL+FhgEDgtN7AMF8WZCkicudXg==
+  version "3.26.2"
+  resolved "https://registry.yarnpkg.com/nuxi/-/nuxi-3.26.2.tgz#9046e2a4b90bfdb936a024b7674529f600d9ec79"
+  integrity sha512-2EYUSJbWcc1wOPg5oGfNqDh7hSja87THWebie6p5nqp5TxYC68MUQBfYvZdNGRU92CSTgXXxS/Bk6lEYlMF5Vg==
 
 nuxt@^3.13.0:
   version "3.17.6"
