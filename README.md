@@ -75,9 +75,45 @@ export default defineNuxtConfig({
     routes: [], // specify routes to apply rate limiting to, default is an empty array meaning all routes are protected.
     // Example:
     // routes: ["/api/v2/", "/api/v3/"], // /api/v1 will not be protected, /api/v2/ and /api/v3/ will be protected */
+    ipTTL: 604800, // Optional: Time-to-live in seconds for IP tracking entries (default: 7 days). Set to 0 or negative to disable this specific cleanup.
+    security: { // Optional: Security-related configurations
+      trustXForwardedFor: true, // Default: true. Whether to trust X-Forwarded-For headers. See warning below.
+    }
   },
 });
 ```
+
+**Default Configuration Values:**
+(These are applied by the module if not specified in your `nuxtApiShield` config)
+```js
+{
+  limit: {
+    max: 12,
+    duration: 108, // seconds
+    ban: 3600,     // seconds
+  },
+  delayOnBan: true,
+  errorMessage: "Too Many Requests",
+  retryAfterHeader: false,
+  log: {
+    path: "logs", // Logging is disabled if path is empty
+    attempts: 100, // Logging per IP is disabled if attempts is 0
+  },
+  routes: [],
+  ipTTL: 7 * 24 * 60 * 60, // 7 days in seconds
+  security: {
+    trustXForwardedFor: true,
+  }
+}
+```
+
+**Security Warning: `trustXForwardedFor`**
+
+The `security.trustXForwardedFor` option (default is `true`, set by the module) determines if the module uses the `X-Forwarded-For` HTTP header to identify the client's IP address.
+- If set to `true`: The module will use the IP address provided in the `X-Forwarded-For` header. This is common when your Nuxt application is behind a trusted reverse proxy, load balancer, or CDN (like Nginx, Cloudflare, AWS ELB/ALB) that correctly sets this header with the real client IP.
+- **WARNING:** If `trustXForwardedFor` is `true` and your application is directly internet-facing OR your proxy is not configured to strip incoming `X-Forwarded-For` headers from clients, malicious users can spoof their IP address by sending a fake `X-Forwarded-For` header. This would allow them to bypass rate limits or cause other users to be incorrectly rate-limited.
+- If set to `false`: The module will use the direct IP address of the incoming connection (i.e., `event.node.req.socket.remoteAddress`). Use this setting if your application is directly internet-facing or if you are unsure about your proxy's configuration.
+- **Recommendation:** Only enable `trustXForwardedFor: true` if you are certain your reverse proxy is correctly configured to set this header and strip any client-sent versions of it. Otherwise, set it to `false`.
 
 ### 3. Add `nitro/storage` to `nuxt.config.ts`
 
@@ -112,7 +148,7 @@ If you use for example redis, you can use the following configuration, define th
 }
 ```
 
-### 4. Add `shield:clean` to `nuxt.config.ts`
+### 4. Add Cleanup Task(s) to `nuxt.config.ts`
 
 ```json
 {
@@ -121,37 +157,133 @@ If you use for example redis, you can use the following configuration, define th
       "tasks": true
     },
     "scheduledTasks": {
-      "*/15 * * * *": ["shield:clean"] // clean the shield storage every 15 minutes
+      "*/15 * * * *": ["shield:cleanBans"], // Example: clean expired bans every 15 minutes
+      "0 0 * * *": ["shield:cleanIpData"]   // Example: clean old IP data daily at midnight
     }
   }
 }
 ```
 
-### 5. Create your `clean` task
+### 5. Create your Cleanup Task(s)
 
-In `server/tasks/shield/clean.ts` you should have something like this.
+It's recommended to clean up expired bans and old IP tracking data regularly to prevent storage bloat and ensure good performance.
+
+#### a) Task for Cleaning Expired Bans
+
+This task removes ban entries (`ban:xxx.xxx.xxx.xxx`) from storage once their ban period has passed.
+
+In `server/tasks/shield/cleanBans.ts` (you can name the file and task as you like):
 
 ```ts
-import type { RateLimit } from "#imports";
+import { isActualBanTimestampExpired } from '#imports'; // Auto-imported utility from nuxt-api-shield
 
 export default defineTask({
   meta: {
-    description: "Clean expired bans",
+    name: 'shield:cleanBans', // Match the name in scheduledTasks
+    description: 'Clean expired bans from nuxt-api-shield storage.',
   },
   async run() {
-    const shieldStorage = useStorage("shield");
+    const shieldStorage = useStorage('shield'); // Use your configured storage name
 
-    const keys = await shieldStorage.getKeys();
-    keys.forEach(async (key) => {
-      const rateLimit = (await shieldStorage.getItem(key)) as RateLimit;
-      if (isBanExpired(rateLimit)) {
+    // Only fetch keys that start with the 'ban:' prefix
+    const banKeys = await shieldStorage.getKeys('ban:');
+
+    let cleanedCount = 0;
+    for (const key of banKeys) {
+      const bannedUntilRaw = await shieldStorage.getItem(key);
+      if (isActualBanTimestampExpired(bannedUntilRaw)) {
         await shieldStorage.removeItem(key);
+        cleanedCount++;
       }
-    });
-    return { result: keys };
+    }
+    console.log(`[nuxt-api-shield] Cleaned ${cleanedCount} expired ban(s).`);
+    return { result: { cleanedCount } };
   },
 });
 ```
+The `isActualBanTimestampExpired` utility is provided by `nuxt-api-shield` and should be available via `#imports`.
+
+#### b) Task for Cleaning Old IP Tracking Data
+
+This task cleans up IP tracking entries (`ip:xxx.xxx.xxx.xxx`) that haven't been active (i.e., their `time` field hasn't been updated) for a certain period. This period is defined by the `ipTTL` configuration option in your `nuxt.config.ts` (under `nuxtApiShield`), which defaults to 7 days. This cleanup helps prevent your storage from growing indefinitely with IPs that make a few requests but are never banned.
+
+In `server/tasks/shield/cleanIpData.ts`:
+
+```ts
+import type { RateLimit } from '#imports'; // Or from 'nuxt-api-shield/types' if made available by the module
+import { useRuntimeConfig } from '#imports';
+
+export default defineTask({
+  meta: {
+    name: 'shield:cleanIpData', // Match the name in scheduledTasks
+    description: 'Clean old IP tracking data from nuxt-api-shield storage.',
+  },
+  async run() {
+    const shieldStorage = useStorage('shield');
+    const config = useRuntimeConfig().public.nuxtApiShield;
+
+    // ipTTL is expected to be in seconds from config (module applies default if not set by user)
+    const ipTTLseconds = config.ipTTL;
+
+    if (!ipTTLseconds || ipTTLseconds <= 0) {
+      console.log('[nuxt-api-shield] IP data cleanup (ipTTL) is disabled or invalid.');
+      return { result: { cleanedCount: 0, status: 'disabled_or_invalid_ttl' } };
+    }
+    const ipTTLms = ipTTLseconds * 1000;
+
+    const ipKeys = await shieldStorage.getKeys('ip:');
+    const currentTime = Date.now();
+    let cleanedCount = 0;
+
+    for (const key of ipKeys) {
+      const entry = await shieldStorage.getItem(key) as RateLimit | null;
+
+      // Check if entry exists and has a numeric 'time' property
+      if (entry && typeof entry.time === 'number') {
+        if ((currentTime - entry.time) > ipTTLms) {
+          await shieldStorage.removeItem(key);
+          cleanedCount++;
+        }
+      } else {
+        // Clean up entries that are null, not an object, or missing a numeric 'time'
+        await shieldStorage.removeItem(key);
+        cleanedCount++;
+      }
+    }
+
+    console.log(`[nuxt-api-shield] Cleaned ${cleanedCount} old/malformed IP data entries.`);
+    return { result: { cleanedCount } };
+  },
+});
+```
+Make sure to configure `ipTTL` in your `nuxt.config.ts` under `nuxtApiShield` if you wish to use a value different from the default (7 days). Setting `ipTTL: 0` (or any non-positive number) in your config will disable this cleanup task. The `RateLimit` type should be available via `#imports` if your module exports it or makes it available to Nuxt's auto-import system.
+
+## Important Considerations
+
+### Data Privacy (IP Address Storage)
+
+`nuxt-api-shield` functions by tracking IP addresses to monitor request rates and apply bans. This means IP addresses, which can be considered Personally Identifiable Information (PII) under regulations like GDPR, are stored by the module.
+
+- **Data Stored:**
+    - `ip:<IP_ADDRESS>`: Stores `{ count: number, time: number }` for tracking request rates.
+    - `ban:<IP_ADDRESS>`: Stores a timestamp indicating when a ban on an IP address expires.
+- **Compliance:** Ensure your usage complies with any applicable data privacy regulations. This may involve updating your privacy policy to inform users about this data processing.
+- **Data Retention:**
+    - Ban entries are cleaned up by the `shield:cleanBans` task after expiry.
+    - IP tracking entries are cleaned up by the `shield:cleanIpData` task based on the `ipTTL` setting.
+
+### Storage Security
+
+- **Filesystem Driver (`driver: 'fs'`):** If you use the filesystem driver for `unstorage` (e.g., `driver: 'fs'`, `base: '.shield'`), ensure that the storage directory (and the `logs` directory if logging is enabled via `log.path`) is:
+    - **Not web-accessible:** Your web server should not be configured to serve files from these directories.
+    - **Properly permissioned:** The directories should have appropriate server-side file permissions to prevent unauthorized reading or writing.
+- **Other Drivers (Redis, etc.):** If using database drivers like Redis, ensure your database server itself is secured (e.g., authentication, network access controls).
+
+### Error Message (`errorMessage`)
+
+The `errorMessage` option in the module configuration is returned in the body of a 429 response.
+- It's recommended to use a plain text message.
+- If you choose to use HTML in your `errorMessage`, ensure your client-side application correctly sanitizes it or renders it in a way that prevents XSS vulnerabilities. The module itself does not sanitize this user-configured message.
 
 ## Development
 
