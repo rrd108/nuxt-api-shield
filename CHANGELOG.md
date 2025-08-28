@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.8.3
+
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.8.2...v0.8.3)
+
+### 🚀 Enhancements
+
+- Implement fixes and improvements from security audit (v2) ([6238f4e](https://github.com/rrd108/nuxt-api-shield/commit/6238f4e))
+
+### 🩹 Fixes
+
+- **deps:** Update nuxtjs monorepo to v3.18.0 ([250a3d0](https://github.com/rrd108/nuxt-api-shield/commit/250a3d0))
+- Remove AI crap ([f901e1d](https://github.com/rrd108/nuxt-api-shield/commit/f901e1d))
+- Failing test ([01f3ecf](https://github.com/rrd108/nuxt-api-shield/commit/01f3ecf))
+- **deps:** Update nuxtjs monorepo to v3.18.1 ([17cd36d](https://github.com/rrd108/nuxt-api-shield/commit/17cd36d))
+
+### 🏡 Chore
+
+- Fix linting errors ([6f8b0d3](https://github.com/rrd108/nuxt-api-shield/commit/6f8b0d3))
+- Fix formatting ([647d565](https://github.com/rrd108/nuxt-api-shield/commit/647d565))
+- Add lint back ([f7e53d6](https://github.com/rrd108/nuxt-api-shield/commit/f7e53d6))
+
+### ❤️ Contributors
+
+- Rrd108 ([@rrd108](https://github.com/rrd108))
+
 ## v0.8.2
 
 [compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.8.1...v0.8.2)
