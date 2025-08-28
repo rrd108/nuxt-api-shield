@@ -5760,9 +5760,9 @@ nth-check@^2.0.1, nth-check@^2.1.1:
     boolbase "^1.0.0"
 
 nuxi@^3.25.1:
-  version "3.27.0"
-  resolved "https://registry.yarnpkg.com/nuxi/-/nuxi-3.27.0.tgz#32b6b3705fb85a62415e9c5467638fbe39a6190a"
-  integrity sha512-g9xoZAY44ltxSygk5+STwlA6rqM5wRENKaCcLrn2vgATzC4VWI6zFbbUwIXI3PsUaNHVuaEjMzMuTRPOcqn/Yw==
+  version "3.28.0"
+  resolved "https://registry.yarnpkg.com/nuxi/-/nuxi-3.28.0.tgz#2ee5c71a79be08b0d797cfd0950a2f422d598b8c"
+  integrity sha512-sH4z8U/wo9dOfeGHsngK6CMjG05lLm/Yt4PcVAQR1KrAa+Hrh+L4/U0UMKtlgQLze5KbFLit0fn4WXL6iqCZ6A==
 
 nuxt@^3.13.0:
   version "3.18.1"
