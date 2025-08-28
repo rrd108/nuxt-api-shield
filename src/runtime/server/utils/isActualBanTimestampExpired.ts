@@ -6,13 +6,13 @@
 export const isActualBanTimestampExpired = (bannedUntilRaw: unknown): boolean => {
   if (bannedUntilRaw === null || bannedUntilRaw === undefined) {
     // Consider null/undefined entries as invalid/expired for cleanup
-    return true;
+    return true
   }
-  const numericTimestamp = Number(bannedUntilRaw);
+  const numericTimestamp = Number(bannedUntilRaw)
   if (Number.isNaN(numericTimestamp)) {
     // Malformed data, treat as expired for cleanup
-    return true;
+    return true
   }
   // Ban is expired if current time is greater than or equal to the stored timestamp
-  return Date.now() >= numericTimestamp;
-};
+  return Date.now() >= numericTimestamp
+}
