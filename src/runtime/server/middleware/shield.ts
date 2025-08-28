@@ -7,15 +7,13 @@ import {
   useRuntimeConfig,
   useStorage,
 } from '#imports'
+import type { RateLimit } from '../types/RateLimit'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig().public.nuxtApiShield
   const url = getRequestURL(event)
-  if (
-    !url?.pathname?.startsWith('/api/')
-    || (config.routes?.length
-      && !config.routes.some(route => url.pathname?.startsWith(route)))
-  ) {
+  if (!url?.pathname?.startsWith('/api/')
+    || (config.routes?.length && !config.routes.some(route => url.pathname?.startsWith(route)))) {
     return
   }
 
@@ -23,17 +21,10 @@ export default defineEventHandler(async (event) => {
   const requestIP = getRequestIP(event, { xForwardedFor: true }) || 'unKnownIP'
   const banKey = `ban:${requestIP}`
   const bannedUntilRaw = await shieldStorage.getItem(banKey)
-  const bannedUntil
-    = typeof bannedUntilRaw === 'number'
-      ? bannedUntilRaw
-      : Number(bannedUntilRaw)
+  const bannedUntil = typeof bannedUntilRaw === 'number' ? bannedUntilRaw : Number(bannedUntilRaw)
 
   // Check if the user is currently banned
-  if (
-    bannedUntilRaw
-    && !Number.isNaN(bannedUntil)
-    && Date.now() < bannedUntil
-  ) {
+  if (bannedUntilRaw && !Number.isNaN(bannedUntil) && Date.now() < bannedUntil) {
     if (config.retryAfterHeader) {
       const retryAfter = Math.ceil((bannedUntil - Date.now()) / 1e3)
       event.node.res.setHeader('Retry-After', retryAfter)
@@ -44,20 +35,16 @@ export default defineEventHandler(async (event) => {
     })
   }
   // Unban the user if the ban has expired
-  else if (
-    bannedUntilRaw
-    && !Number.isNaN(bannedUntil)
-    && Date.now() >= bannedUntil
-  ) {
+  if (bannedUntilRaw && !Number.isNaN(bannedUntil) && Date.now() >= bannedUntil) {
     await shieldStorage.removeItem(banKey)
   }
 
   const ipKey = `ip:${requestIP}`
-  const req = await shieldStorage.getItem(ipKey)
+  const req = await shieldStorage.getItem(ipKey) as RateLimit
   const now = Date.now()
 
   // Check if a new request is outside the duration window
-  if (!req || (now - req.time) / 1e3 >= config.limit.duration) {
+  if (!req || (now - req.time) / 1000 >= config.limit.duration) {
     // If no record exists, or the duration has expired, reset the counter and timestamp
     await shieldStorage.setItem(ipKey, {
       count: 1,
