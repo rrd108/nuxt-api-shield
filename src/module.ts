@@ -53,9 +53,9 @@ export default defineNuxtModule<ModuleOptions>({
         from: resolver.resolve('./runtime/server/types/RateLimit'),
       },
       {
-        name: 'isBanExpired',
-        as: 'isBanExpired',
-        from: resolver.resolve('./runtime/server/utils/isBanExpired'),
+        name: 'isActualBanTimestampExpired',
+        as: 'isActualBanTimestampExpired',
+        from: resolver.resolve('./runtime/server/utils/isActualBanTimestampExpired'),
       },
     ])
 
