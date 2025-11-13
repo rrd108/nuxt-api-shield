@@ -6,20 +6,7 @@ import {
   addServerImports,
 } from '@nuxt/kit'
 import defu from 'defu'
-import type { LogEntry } from './runtime/server/types/LogEntry'
-
-export interface ModuleOptions {
-  limit: {
-    max: number
-    duration: number
-    ban: number
-  }
-  delayOnBan: boolean
-  errorMessage: string
-  retryAfterHeader: boolean
-  log?: LogEntry
-  routes: string[]
-}
+import type { ModuleOptions } from './type'
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {

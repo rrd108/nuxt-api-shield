@@ -8,18 +8,35 @@ import {
   useStorage,
 } from '#imports'
 import type { RateLimit } from '../types/RateLimit'
+import type { ModuleOptions } from '~/src/type'
+import {
+  extractRoutePaths,
+  getRouteLimit,
+  hasRouteLimit,
+} from '../utils/routes'
+import createKey from '../utils/createKey'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig().public.nuxtApiShield
+  const config = useRuntimeConfig().public.nuxtApiShield as ModuleOptions
   const url = getRequestURL(event)
+
+  /**
+   * Get Route limit, if match with configured route its override default limit configuration
+   */
+  const routeLimit = getRouteLimit(url?.pathname, config)
+  const isRouteLimit = hasRouteLimit(url?.pathname, config)
+  const routePaths = extractRoutePaths(config.routes || [])
   if (!url?.pathname?.startsWith('/api/')
-    || (config.routes?.length && !config.routes.some(route => url.pathname?.startsWith(route)))) {
+    || (routePaths.length && !routePaths.some(path => url.pathname.startsWith(path)))) {
     return
   }
 
   const shieldStorage = useStorage('shield')
   const requestIP = getRequestIP(event, { xForwardedFor: true }) || 'unKnownIP'
-  const banKey = `ban:${requestIP}`
+  const banKey = createKey({
+    ipAddress: requestIP,
+    prefix: 'ban',
+  })
   const bannedUntilRaw = await shieldStorage.getItem(banKey)
   const bannedUntil = typeof bannedUntilRaw === 'number' ? bannedUntilRaw : Number(bannedUntilRaw)
 
@@ -39,12 +56,16 @@ export default defineEventHandler(async (event) => {
     await shieldStorage.removeItem(banKey)
   }
 
-  const ipKey = `ip:${requestIP}`
+  const ipKey = createKey({
+    ipAddress: requestIP,
+    path: isRouteLimit ? url?.pathname : undefined,
+  })
+
   const req = await shieldStorage.getItem(ipKey) as RateLimit
   const now = Date.now()
 
   // Check if a new request is outside the duration window
-  if (!req || (now - req.time) / 1000 >= config.limit.duration) {
+  if (!req || (now - req.time) / 1000 >= routeLimit.duration) {
     // If no record exists, or the duration has expired, reset the counter and timestamp
     await shieldStorage.setItem(ipKey, {
       count: 1,
@@ -58,15 +79,15 @@ export default defineEventHandler(async (event) => {
   shieldLog(req, requestIP, url.toString())
 
   // Check if the new count triggers a rate limit
-  if (req.count > config.limit.max) {
-    const banUntil = now + config.limit.ban * 1e3
+  if (req.count > routeLimit.max) {
+    const banUntil = now + routeLimit.ban * 1e3
     await shieldStorage.setItem(banKey, banUntil)
     await shieldStorage.setItem(ipKey, {
       count: 1,
       time: now,
     })
     if (config.retryAfterHeader) {
-      event.node.res.setHeader('Retry-After', config.limit.ban)
+      event.node.res.setHeader('Retry-After', routeLimit.ban)
     }
     throw createError({
       statusCode: 429,

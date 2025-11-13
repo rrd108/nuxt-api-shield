@@ -258,6 +258,49 @@ export default defineTask({
 ```
 Make sure to configure `ipTTL` in your `nuxt.config.ts` under `nuxtApiShield` if you wish to use a value different from the default (7 days). Setting `ipTTL: 0` (or any non-positive number) in your config will disable this cleanup task. The `RateLimit` type should be available via `#imports` if your module exports it or makes it available to Nuxt's auto-import system.
 
+## Per-Route Rate Limiting
+
+`nuxt-api-shield` supports **per-route rate limiting**, allowing you to define custom limits for specific API endpoints while keeping a global default configuration for all other routes.
+
+This is useful when certain endpoints (such as `/api/login`, `/api/auth`, or `/api/payment`) require stricter protection.
+
+---
+
+### Configuration Example
+
+The `routes` option accepts a mixed array:
+
+- **String:** applies the **global rate limit configuration**
+- **Object:** applies **custom per-route limits**
+
+```ts
+export default defineNuxtConfig({
+  modules: ['nuxt-api-shield'],
+
+  nuxtApiShield: {
+    limit: {
+      max: 12,
+      duration: 108,
+      ban: 3600
+    },
+
+    routes: [
+      // 1. String: uses the global default limit
+      '/api/example',
+
+      // 2. Object: custom rate limit for a specific route
+      {
+        path: '/api/example-per-route',
+        max: 5,       // custom max requests
+        duration: 10  // custom duration (seconds)
+        // ⚠️ "ban" always uses the global value
+      }
+    ],
+  }
+})
+```
+
+
 ## Important Considerations
 
 ### Data Privacy (IP Address Storage)
