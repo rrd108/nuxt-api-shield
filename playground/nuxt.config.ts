@@ -23,6 +23,14 @@ export default defineNuxtConfig({
       duration: 10,
       ban: 30,
     },
+    routes: [
+      '/api/example',
+      {
+        path: '/api/example-per-route',
+        max: 5,
+        duration: 10,
+      },
+    ],
     delayOnBan: true,
     retryAfterHeader: true,
     log: {
