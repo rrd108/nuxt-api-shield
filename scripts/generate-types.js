@@ -19,4 +19,3 @@ export type { ModuleOptions } from './types.d.mts'
 
 writeFileSync(indexPath, content, 'utf-8')
 console.log('✓ Generated dist/index.d.mts')
-
