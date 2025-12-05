@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.9.1
+
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.9.0...v0.9.1)
+
+### 🩹 Fixes
+
+- **deps:** Update nuxtjs monorepo to v4 ([50a0b73](https://github.com/rrd108/nuxt-api-shield/commit/50a0b73))
+- Exposes RateLimit type and improves documentation ([13915b9](https://github.com/rrd108/nuxt-api-shield/commit/13915b9))
+- Updates imports and adds export ([bb4ce30](https://github.com/rrd108/nuxt-api-shield/commit/bb4ce30))
+
+### ❤️ Contributors
+
+- Rrd108 ([@rrd108](https://github.com/rrd108))
+
 ## v0.8.5
 
 [compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.8.4...v0.8.5)
