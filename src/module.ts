@@ -4,6 +4,7 @@ import {
   createResolver,
   addServerHandler,
   addServerImports,
+  addTypeTemplate,
 } from '@nuxt/kit'
 import defu from 'defu'
 import type { ModuleOptions } from './type'
@@ -40,6 +41,16 @@ export default defineNuxtModule<ModuleOptions>({
         from: resolver.resolve('./runtime/server/utils/isActualBanTimestampExpired'),
       },
     ])
+
+    // Make RateLimit type available via #imports for type-only imports
+    addTypeTemplate({
+      filename: 'types/nuxt-api-shield.d.ts',
+      getContents: () => `declare module '#imports' {
+  export type { RateLimit } from '${resolver.resolve('./runtime/server/types/RateLimit')}'
+}`,
+    }, {
+      nitro: true,
+    })
 
     addServerHandler({
       middleware: true,

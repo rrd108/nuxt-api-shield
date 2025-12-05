@@ -56,6 +56,7 @@ Temporary Items
 .apdisk
 
 .shield
+_test*
 
 # Snyk Security Extension - AI Rules (auto-generated)
 .cursor/rules/snyk_rules.mdc

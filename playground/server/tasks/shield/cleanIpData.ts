@@ -1,4 +1,4 @@
-import type { RateLimit } from '#imports' // Assuming RateLimit type is made available via #imports
+import type { RateLimit } from 'nuxt-api-shield'
 import { useRuntimeConfig } from '#imports'
 
 export default defineTask({

@@ -15,19 +15,18 @@
   "exports": {
     ".": {
       "import": "./dist/module.mjs",
-      "types": "./dist/types.d.mts"
+      "types": "./dist/index.d.mts"
     },
     "./types": {
-      "types": "./dist/types.d.mts"
+      "types": "./dist/index.d.mts"
     }
   },
-  "types": "./dist/types.d.mts",
   "main": "./dist/module.mjs",
   "files": [
     "dist"
   ],
   "scripts": {
-    "prepack": "nuxt-module-build build && node scripts/add-types-export.js",
+    "prepack": "nuxt-module-build build && node scripts/generate-types.js",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
@@ -35,8 +34,10 @@
     "release:minor": "yarn lint && yarn test && yarn prepack && changelogen --release --minor && yarn publish && git push --follow-tags",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "vitest run --testTimeout 15000 --reporter=default --reporter.summary=false --disable-console-intercept",
-    "test:watch": "vitest watch  --testTimeout 15000 --reporter=default --reporter.summary=false --disable-console-intercept"
+    "test": "vitest run --testTimeout 15000 --reporter=default --reporter.summary=false --disable-console-intercept && yarn test:types",
+    "test:watch": "vitest watch  --testTimeout 15000 --reporter=default --reporter.summary=false --disable-console-intercept",
+    "build:test": "nuxt-module-build build --logLevel silent 2>&1 | grep -v 'Potential missing package.json' || true && node scripts/generate-types.js",
+    "test:types": "bash scripts/test-types-fix.sh"
   },
   "dependencies": {
     "@nuxt/kit": "^4.0.0",
