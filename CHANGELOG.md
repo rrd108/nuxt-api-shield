@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.9.2
+
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.9.1...v0.9.2)
+
+### 🩹 Fixes
+
+- Resolves type export issue and improves build ([8b524a3](https://github.com/rrd108/nuxt-api-shield/commit/8b524a3))
+- Linter errors ([b8b0cd5](https://github.com/rrd108/nuxt-api-shield/commit/b8b0cd5))
+
+### ❤️ Contributors
+
+- Rrd108 ([@rrd108](https://github.com/rrd108))
+
 ## v0.9.1
 
 [compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.9.0...v0.9.1)
