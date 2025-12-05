@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.10.0
+
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.9.2...v0.10.0)
+
+### 🩹 Fixes
+
+- Correctly configures build process ([87d775a](https://github.com/rrd108/nuxt-api-shield/commit/87d775a))
+
+### ❤️ Contributors
+
+- Rrd108 ([@rrd108](https://github.com/rrd108))
+
 ## v0.9.2
 
 [compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.9.1...v0.9.2)
