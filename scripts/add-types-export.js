@@ -1,7 +1,6 @@
-import { readFileSync, writeFileSync } from 'fs'
-import { join } from 'path'
-import { fileURLToPath } from 'url'
-import { dirname } from 'path'
+import { readFileSync, writeFileSync } from 'node:fs'
+import { join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -17,7 +16,6 @@ if (content.includes('export type { RateLimit }')) {
 }
 
 // Append the export if it doesn't exist
-const newContent = content + "\n\nexport type { RateLimit } from './runtime/server/types/RateLimit'\n"
+const newContent = content + '\n\nexport type { RateLimit } from \'./runtime/server/types/RateLimit\'\n'
 writeFileSync(typesFile, newContent, 'utf-8')
 console.log('Added RateLimit export to types.d.mts')
-
