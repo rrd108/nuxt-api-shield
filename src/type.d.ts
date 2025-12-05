@@ -1,4 +1,7 @@
 import type { LogEntry } from './runtime/server/types/LogEntry'
+import type { RateLimit } from './runtime/server/types/RateLimit'
+
+export type { RateLimit }
 
 export interface LimitConfiguration {
   max: number

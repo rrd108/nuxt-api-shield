@@ -14,15 +14,20 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/module.mjs"
+      "import": "./dist/module.mjs",
+      "types": "./dist/types.d.mts"
+    },
+    "./types": {
+      "types": "./dist/types.d.mts"
     }
   },
+  "types": "./dist/types.d.mts",
   "main": "./dist/module.mjs",
   "files": [
     "dist"
   ],
   "scripts": {
-    "prepack": "nuxt-module-build build",
+    "prepack": "nuxt-module-build build && node scripts/add-types-export.js",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",

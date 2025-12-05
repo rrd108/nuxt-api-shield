@@ -35,11 +35,6 @@ export default defineNuxtModule<ModuleOptions>({
 
     addServerImports([
       {
-        name: 'RateLimit',
-        as: 'RateLimit',
-        from: resolver.resolve('./runtime/server/types/RateLimit'),
-      },
-      {
         name: 'isActualBanTimestampExpired',
         as: 'isActualBanTimestampExpired',
         from: resolver.resolve('./runtime/server/utils/isActualBanTimestampExpired'),
