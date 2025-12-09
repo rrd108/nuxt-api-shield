@@ -13,8 +13,9 @@ const indexPath = join(rootDir, 'dist', 'index.d.mts')
 const content = `// Auto-generated type exports for nuxt-api-shield
 // This file is generated automatically during build - DO NOT EDIT MANUALLY
 
-export type { RateLimit } from './runtime/server/types/RateLimit'
-export type { ModuleOptions } from './types.d.mts'
+export type { RateLimit } from './runtime/server/types/RateLimit.js'
+export type { LogEntry } from './runtime/server/types/LogEntry.js'
+export type { ModuleOptions, RouteLimitConfiguration } from './types.js'
 `
 
 writeFileSync(indexPath, content, 'utf-8')
