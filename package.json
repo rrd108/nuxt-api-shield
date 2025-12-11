@@ -34,10 +34,9 @@
     "release:minor": "yarn lint && yarn test && yarn prepack && changelogen --release --minor && yarn publish && git push --follow-tags",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "vitest run --testTimeout 15000 --reporter=default --reporter.summary=false --disable-console-intercept && yarn test:types",
+    "test": "vitest run --testTimeout 15000 --reporter=default --reporter.summary=false --disable-console-intercept",
     "test:watch": "vitest watch  --testTimeout 15000 --reporter=default --reporter.summary=false --disable-console-intercept",
-    "build:test": "nuxt-module-build build --logLevel silent 2>&1 | grep -v 'Potential missing package.json' || true && node scripts/generate-types.js",
-    "test:types": "bash scripts/test-types-fix.sh"
+    "test:types": "vue-tsc --noEmit --project ./test/tsconfig.json --moduleResolution bundler"
   },
   "dependencies": {
     "@nuxt/kit": "^4.0.0",
