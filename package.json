@@ -34,7 +34,7 @@
     "release:minor": "yarn lint && yarn test && yarn prepack && changelogen --release --minor && yarn publish && git push --follow-tags",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "vitest run --testTimeout 15000 --reporter=default --reporter.summary=false --disable-console-intercept",
+    "test": "yarn dev:prepare && vitest run --testTimeout 15000 --reporter=default --reporter.summary=false --disable-console-intercept && yarn test:types",
     "test:watch": "vitest watch  --testTimeout 15000 --reporter=default --reporter.summary=false --disable-console-intercept",
     "test:types": "vue-tsc --noEmit --project ./test/tsconfig.json --moduleResolution bundler"
   },

@@ -30,7 +30,7 @@ export default defineNuxtModule<ModuleOptions>({
     const resolver = createResolver(import.meta.url)
 
     nuxt.options.runtimeConfig.public.nuxtApiShield = defu(
-      nuxt.options.runtimeConfig.public.nuxtApiShield,
+      nuxt.options.runtimeConfig.public.nuxtApiShield as ModuleOptions,
       options,
     )
 
