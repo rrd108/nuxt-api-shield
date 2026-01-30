@@ -100,49 +100,65 @@ describe('wildcard route matching', async () => {
 
     // First, verify the routes exist and return expected content
     try {
-      const monthlyResponse = await $fetch('/api/reports/monthly/2023/summary', {
+      const response = await $fetch('/api/reports/monthly/2023/summary', {
         method: 'GET',
         retryStatusCodes: [],
-      }) as { result: string }
+      })
 
       // Verify we got JSON response with expected structure
-      expect(monthlyResponse).toBeDefined()
-      expect(typeof monthlyResponse).toBe('object')
+      if (typeof response !== 'object') {
+        throw new TypeError(`Expected object data, but got ${typeof response}: ${JSON.stringify(response)}`)
+      }
+
+      const monthlyResponse = response as { result: string }
       expect(monthlyResponse).toHaveProperty('result')
       expect(monthlyResponse.result).toBe('Report Summary')
     }
     catch (error: unknown) {
+      // If it's our custom error, just rethrow it
+      if (error instanceof Error && (error.message.startsWith('Expected object data') || error.message.startsWith('Expected object response'))) {
+        throw error
+      }
       // If the initial request fails, provide detailed error information
-      const err = error as { message?: string, data?: unknown, statusCode?: number, response?: { status?: number }, status?: number }
+      const err = error as { message?: string, data?: unknown, statusCode?: number, response?: { status?: number, _data?: unknown, headers?: { get: (n: string) => string } }, status?: number }
       const errorMessage = err.message || 'Unknown error'
-      const errorData = err.data || 'No error data'
+      const errorData = err.data || err.response?._data || 'No error data'
       const statusCode = err.statusCode || err.response?.status || err.status || 'Unknown status'
+      const contentType = err.response?.headers?.get('content-type') || 'Unknown content-type'
 
-      throw new Error(`Failed to access /api/reports/monthly/2023/summary: ${errorMessage} (Status: ${statusCode}) Data: ${JSON.stringify(errorData)}`)
+      throw new Error(`Failed to access /api/reports/monthly/2023/summary: ${errorMessage} (Status: ${statusCode}, Content-Type: ${contentType}) Data: ${JSON.stringify(errorData)}`)
     }
 
     // Add a longer delay to ensure proper timing
     await new Promise(resolve => setTimeout(resolve, 500))
 
     try {
-      const annualResponse = await $fetch('/api/reports/annual/summary', {
+      const response = await $fetch('/api/reports/annual/summary', {
         method: 'GET',
         retryStatusCodes: [],
-      }) as { result: string }
+      })
 
       // Verify we got JSON response with expected structure
-      expect(annualResponse).toBeDefined()
-      expect(typeof annualResponse).toBe('object')
+      if (typeof response !== 'object') {
+        throw new TypeError(`Expected object data for annual, but got ${typeof response}: ${JSON.stringify(response)}`)
+      }
+
+      const annualResponse = response as { result: string }
       expect(annualResponse).toHaveProperty('result')
       expect(annualResponse.result).toBe('Annual Report Summary')
     }
     catch (error: unknown) {
-      const err = error as { message?: string, data?: unknown, statusCode?: number, response?: { status?: number }, status?: number }
+      // If it's our custom error, just rethrow it
+      if (error instanceof Error && (error.message.startsWith('Expected object data') || error.message.startsWith('Expected object response'))) {
+        throw error
+      }
+      const err = error as { message?: string, data?: unknown, statusCode?: number, response?: { status?: number, _data?: unknown, headers?: { get: (n: string) => string } }, status?: number }
       const errorMessage = err.message || 'Unknown error'
-      const errorData = err.data || 'No error data'
+      const errorData = err.data || err.response?._data || 'No error data'
       const statusCode = err.statusCode || err.response?.status || err.status || 'Unknown status'
+      const contentType = err.response?.headers?.get('content-type') || 'Unknown content-type'
 
-      throw new Error(`Failed to access /api/reports/annual/summary: ${errorMessage} (Status: ${statusCode}) Data: ${JSON.stringify(errorData)}`)
+      throw new Error(`Failed to access /api/reports/annual/summary: ${errorMessage} (Status: ${statusCode}, Content-Type: ${contentType}) Data: ${JSON.stringify(errorData)}`)
     }
 
     // Add another longer delay
