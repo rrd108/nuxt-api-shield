@@ -38,7 +38,7 @@ export const handleRateLimit = async (
     time: rateLimitState.time,
   }
 
-  await shieldLog(updatedState, requestIP, url)
+  await shieldLog(updatedState, requestIP, url, config.log)
 
   // Check if the new count triggers a rate limit
   if (newCount > routeLimit.max) {

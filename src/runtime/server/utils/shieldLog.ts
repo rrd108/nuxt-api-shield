@@ -1,37 +1,46 @@
-import { access, appendFile, mkdir } from 'node:fs/promises'
+import { appendFile, mkdir } from 'node:fs/promises'
 import type { RateLimit } from '../types/RateLimit'
 import type { LogEntry } from '../types/LogEntry'
-import { useRuntimeConfig } from '#imports'
 
-const shieldLog = async (req: RateLimit, requestIP: string, url: string) => {
-  const options = useRuntimeConfig().public.nuxtApiShield
+/**
+ * Formats a log line for the shield log.
+ */
+const formatLogLine = (req: RateLimit, requestIP: string, url: string): string => {
+  return `${requestIP} - (${req.count}) - ${new Date(req.time).toISOString()} - ${url}\n`
+}
 
-  if (!options.log.path || !options.log.attempts) {
+/**
+ * Generates the log filename based on current date.
+ */
+const getLogFilename = (): string => {
+  const date = new Date().toISOString().split('T')[0].replace(/-/g, '')
+  return `shield-${date}.log`
+}
+
+/**
+ * Logs rate limit attempts to a file if configured.
+ */
+const shieldLog = async (req: RateLimit, requestIP: string, url: string, logConfig?: LogEntry) => {
+  if (!logConfig?.path || !logConfig?.attempts) {
     return
   }
 
-  // console.log(`shieldLog(${req}, ${requestIP}, ${url})`);
-  if ((options.log as LogEntry).attempts && req.count >= (options.log as LogEntry).attempts) {
-    const logLine = `${requestIP} - (${req.count}) - ${new Date(
-      req.time,
-    ).toISOString()} - ${url}\n`
+  if (req.count < logConfig.attempts) {
+    return
+  }
 
-    const date = new Date().toISOString().split('T')[0].replace(/-/g, '')
+  const logLine = formatLogLine(req, requestIP, url)
+  const fileName = getLogFilename()
+  const filePath = `${logConfig.path}/${fileName}`
 
-    try {
-      await access((options.log as LogEntry).path)
-      await appendFile(`${(options.log as LogEntry).path}/shield-${date}.log`, logLine)
-    }
-    catch (error: unknown) {
-      if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
-        await mkdir((options.log as LogEntry).path)
-        await appendFile(`${(options.log as LogEntry).path}/shield-${date}.log`, logLine)
-      }
-      else {
-        console.error('Unexpected error:', error)
-        // Handle other potential errors
-      }
-    }
+  try {
+    // Ensure directory exists
+    await mkdir(logConfig.path, { recursive: true })
+    await appendFile(filePath, logLine)
+  }
+  catch (error: unknown) {
+    // Using console.error as a fallback if file logging fails
+    console.error('[nuxt-api-shield] Failed to write log:', error)
   }
 }
 
