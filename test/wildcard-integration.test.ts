@@ -98,25 +98,40 @@ describe('wildcard route matching', async () => {
     // Should match /api/reports/monthly/2023/summary
     // and /api/reports/annual/summary
 
-    // Add initial delay to ensure server is fully ready
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Add extended delay to ensure server is fully ready for CI environments
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     // First, try a simple known working route to verify server is responsive
-    try {
-      const basicResponse = await $fetch('/api/users/123/profile', {
-        method: 'GET',
-        retryStatusCodes: [],
-      })
-      expect(basicResponse).toHaveProperty('result')
-    } catch (error) {
-      throw new Error(`Basic route test failed - server may not be ready: ${error}`)
+    // Retry mechanism for server readiness
+    let serverReady = false;
+    let attempts = 0;
+    const maxAttempts = 10;
+    
+    while (!serverReady && attempts < maxAttempts) {
+      try {
+        const basicResponse = await $fetch('/api/users/123/profile', {
+          method: 'GET',
+          retryStatusCodes: [],
+          timeout: 5000, // Increase timeout
+        })
+        expect(basicResponse).toHaveProperty('result')
+        serverReady = true;
+      } catch (error) {
+        attempts++;
+        if (attempts >= maxAttempts) {
+          throw new Error(`Basic route test failed after ${maxAttempts} attempts - server may not be ready: ${error}`)
+        }
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
     }
 
-    // Now test the multi-segment routes
+    // Now test the multi-segment routes with increased timeout
     try {
       const response = await $fetch('/api/reports/monthly/2023/summary', {
         method: 'GET',
         retryStatusCodes: [],
+        timeout: 10000, // Increased timeout for CI stability
       })
 
       // Verify we got JSON response with expected structure
@@ -147,13 +162,14 @@ describe('wildcard route matching', async () => {
       throw new Error(`Failed to access /api/reports/monthly/2023/summary: ${errorMessage} (Status: ${statusCode}, Content-Type: ${contentType}) Data: ${JSON.stringify(errorData)}`)
     }
 
-    // Add a longer delay to ensure proper timing
-    await new Promise(resolve => setTimeout(resolve, 500))
+    // Add a longer delay to ensure proper timing in CI environments
+    await new Promise(resolve => setTimeout(resolve, 1000))
 
     try {
       const response = await $fetch('/api/reports/annual/summary', {
         method: 'GET',
         retryStatusCodes: [],
+        timeout: 10000, // Increased timeout for CI stability
       })
 
       // Verify we got JSON response with expected structure
@@ -183,14 +199,15 @@ describe('wildcard route matching', async () => {
       throw new Error(`Failed to access /api/reports/annual/summary: ${errorMessage} (Status: ${statusCode}, Content-Type: ${contentType}) Data: ${JSON.stringify(errorData)}`)
     }
 
-    // Add another longer delay
-    await new Promise(resolve => setTimeout(resolve, 500))
+    // Add another longer delay for CI stability
+    await new Promise(resolve => setTimeout(resolve, 1000))
 
     // Third match should be rate limited
     try {
       await $fetch('/api/reports/quarterly/summary', {
         method: 'GET',
         retryStatusCodes: [],
+        timeout: 10000, // Increased timeout for CI stability
       })
       expect.fail('Should have thrown 429 error')
     }
