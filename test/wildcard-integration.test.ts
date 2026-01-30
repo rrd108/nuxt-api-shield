@@ -7,6 +7,10 @@ beforeEach(async () => {
   // Clean test storage
   const storagePath = fileURLToPath(new URL('../_testWildcardIntegrationShield', import.meta.url))
   await rm(storagePath, { recursive: true, force: true })
+  
+  // Also clean the other storage path that might be used
+  const storagePath2 = fileURLToPath(new URL('../_testWildcardShield', import.meta.url))
+  await rm(storagePath2, { recursive: true, force: true })
 })
 
 describe('wildcard route matching', async () => {
@@ -34,7 +38,7 @@ describe('wildcard route matching', async () => {
     expect(response).toHaveProperty('result')
 
     // Wait a bit to ensure proper timing
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise(resolve => setTimeout(resolve, 200))
 
     // Second request should succeed
     response = await $fetch('/api/users/456/profile', {
@@ -44,7 +48,7 @@ describe('wildcard route matching', async () => {
     expect(response).toHaveProperty('result')
 
     // Wait a bit more
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise(resolve => setTimeout(resolve, 200))
 
     // Third request should be rate limited
     try {
@@ -70,6 +74,8 @@ describe('wildcard route matching', async () => {
         retryStatusCodes: [],
       })
       expect(response).toHaveProperty('result')
+      // Add delay between requests to avoid timing issues
+      if (i < 4) await new Promise(resolve => setTimeout(resolve, 100))
     }
   })
 
@@ -81,23 +87,60 @@ describe('wildcard route matching', async () => {
         retryStatusCodes: [],
       })
       expect(response).toHaveProperty('result')
+      // Add delay between requests to avoid timing issues
+      if (i < 2) await new Promise(resolve => setTimeout(resolve, 100))
     }
   })
 
   it('should handle multi-segment wildcard patterns', async () => {
     // Should match /api/reports/monthly/2023/summary
     // and /api/reports/annual/summary
-    let response = await $fetch('/api/reports/monthly/2023/summary', {
-      method: 'GET',
-      retryStatusCodes: [],
-    })
-    expect(response).toHaveProperty('result')
+    
+    // First, verify the routes exist and return expected content
+    try {
+      const monthlyResponse = await $fetch('/api/reports/monthly/2023/summary', {
+        method: 'GET',
+        retryStatusCodes: [],
+      })
+      
+      // Verify we got JSON response with expected structure
+      expect(monthlyResponse).toBeDefined()
+      expect(typeof monthlyResponse).toBe('object')
+      expect(monthlyResponse).toHaveProperty('result')
+      expect(monthlyResponse.result).toBe('Report Summary')
+    } catch (error: any) {
+      // If the initial request fails, provide detailed error information
+      const errorMessage = error.message || 'Unknown error'
+      const errorData = error.data || 'No error data'
+      const statusCode = error.statusCode || error.response?.status || error.status || 'Unknown status'
+      
+      throw new Error(`Failed to access /api/reports/monthly/2023/summary: ${errorMessage} (Status: ${statusCode}) Data: ${JSON.stringify(errorData)}`)
+    }
 
-    response = await $fetch('/api/reports/annual/summary', {
-      method: 'GET',
-      retryStatusCodes: [],
-    })
-    expect(response).toHaveProperty('result')
+    // Add a longer delay to ensure proper timing
+    await new Promise(resolve => setTimeout(resolve, 500))
+
+    try {
+      const annualResponse = await $fetch('/api/reports/annual/summary', {
+        method: 'GET',
+        retryStatusCodes: [],
+      })
+      
+      // Verify we got JSON response with expected structure
+      expect(annualResponse).toBeDefined()
+      expect(typeof annualResponse).toBe('object')
+      expect(annualResponse).toHaveProperty('result')
+      expect(annualResponse.result).toBe('Annual Report Summary')
+    } catch (error: any) {
+      const errorMessage = error.message || 'Unknown error'
+      const errorData = error.data || 'No error data'
+      const statusCode = error.statusCode || error.response?.status || error.status || 'Unknown status'
+      
+      throw new Error(`Failed to access /api/reports/annual/summary: ${errorMessage} (Status: ${statusCode}) Data: ${JSON.stringify(errorData)}`)
+    }
+
+    // Add another longer delay
+    await new Promise(resolve => setTimeout(resolve, 500))
 
     // Third match should be rate limited
     try {
@@ -110,6 +153,15 @@ describe('wildcard route matching', async () => {
       // Handle different error structures
       const statusCode = error.statusCode || error.response?.status || error.status
       expect(statusCode).toBe(429)
+      
+      // Also check that we're not getting HTML error pages
+      const message = error.data?.message || error.message || error.statusMessage || error.response?.statusText
+      expect(message).toContain('Too Many Requests')
+      
+      // Additional check to ensure we're not getting HTML responses
+      if (typeof error.data === 'string' && error.data.startsWith('<!DOCTYPE')) {
+        throw new Error('Received HTML error page instead of JSON response')
+      }
     }
   })
 })
