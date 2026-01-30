@@ -10,13 +10,10 @@ import {
 import type { RateLimit } from '../types/RateLimit'
 import type { ModuleOptions } from '../../type'
 import {
-  extractRoutePaths,
   getRouteLimit,
-  hasRouteLimit,
   findBestMatchingRoute,
 } from '../utils/routes'
 import createKey from '../utils/createKey'
-import { validatePattern } from '../utils/patternMatcher'
 import { UNKNOWN_IP } from '../utils/constants'
 
 export default defineEventHandler(async (event) => {
@@ -33,30 +30,13 @@ export default defineEventHandler(async (event) => {
     return
   }
 
-  // Check if there's a matching route configuration (exact or wildcard)
-  const hasMatchingRoute = hasRouteLimit(url.pathname, config)
-  console.log('Has matching route:', hasMatchingRoute)
+  // Find the best matching route configuration
+  const matchingRoute = findBestMatchingRoute(url.pathname, config)
+  console.log('Matching route found:', matchingRoute?.path || 'none')
 
-  // If no route configuration exists and we have route configurations defined,
-  // check if any patterns might match (for backward compatibility)
-  if (!hasMatchingRoute && config.routes?.length) {
-    const routePaths = extractRoutePaths(config.routes)
-    const hasStringMatch = routePaths.some(path => url.pathname.startsWith(path))
-    console.log('String matches:', hasStringMatch)
-
-    // Check for wildcard pattern matches
-    const hasPatternMatch = config.routes.some((route) => {
-      if (typeof route === 'string') return false
-      return route.pattern === true
-        && validatePattern(route.path)
-        && findBestMatchingRoute(url.pathname, config) !== null
-    })
-    console.log('Pattern matches:', hasPatternMatch)
-
-    if (!hasStringMatch && !hasPatternMatch) {
-      console.log('No matching routes found, skipping')
-      return
-    }
+  if (!matchingRoute) {
+    console.log('No matching routes found, skipping')
+    return
   }
 
   console.log('Processing rate limiting for:', url.pathname)
@@ -87,21 +67,11 @@ export default defineEventHandler(async (event) => {
   }
 
   const routeLimit = getRouteLimit(url?.pathname, config)
-  const isRouteLimit = hasRouteLimit(url?.pathname, config)
 
   // For wildcard patterns, use the pattern as the storage key so all matching paths share the same counter
-  let storagePath: string | undefined = undefined
-  if (isRouteLimit) {
-    const matchingRoute = findBestMatchingRoute(url.pathname, config)
-    if (matchingRoute && 'pattern' in matchingRoute && matchingRoute.pattern === true) {
-      // Use the pattern as storage key for wildcard routes
-      storagePath = matchingRoute.path
-    }
-    else {
-      // Use the actual path for exact matches
-      storagePath = url?.pathname
-    }
-  }
+  const storagePath = ('pattern' in matchingRoute && matchingRoute.pattern === true)
+    ? matchingRoute.path
+    : url.pathname
 
   const ipKey = createKey({
     ipAddress: requestIP,

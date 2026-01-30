@@ -24,7 +24,12 @@ export function extractRoutePaths(routes: Array<string | { path: string }>): str
 export function findBestMatchingRoute(path: string, config: ModuleOptions) {
   const routeConfigs = config.routes || []
 
-  // Separate exact matches from pattern matches
+  // If no routes are configured, we return a default object to indicate it's a global match
+  if (routeConfigs.length === 0) {
+    return { path: '' }
+  }
+
+  // 1. Check for exact matches first
   const exactMatches = routeConfigs.filter((route: string | { path: string, pattern?: boolean }) => {
     if (typeof route === 'string') {
       return route === path
@@ -32,13 +37,12 @@ export function findBestMatchingRoute(path: string, config: ModuleOptions) {
     return !route.pattern && route.path === path
   })
 
-  // If we have exact matches, return the first one (they're all equivalent)
   if (exactMatches.length > 0) {
     const match = exactMatches[0]
     return typeof match === 'string' ? { path: match } : match
   }
 
-  // Find pattern matches and sort by specificity (most specific first)
+  // 2. Find pattern matches and sort by specificity (most specific first)
   const patternMatches = routeConfigs
     .filter((route): route is { path: string, pattern?: boolean } & Partial<LimitConfiguration> => {
       if (typeof route === 'string') return false
@@ -47,8 +51,28 @@ export function findBestMatchingRoute(path: string, config: ModuleOptions) {
     .filter((route: { path: string, pattern?: boolean } & Partial<LimitConfiguration>) => matchesPattern(route.path, path))
     .sort((a: { path: string }, b: { path: string }) => getPatternSpecificity(b.path) - getPatternSpecificity(a.path))
 
-  // Return the most specific pattern match
-  return patternMatches[0] || null
+  if (patternMatches.length > 0) {
+    return patternMatches[0]
+  }
+
+  // 3. Backward compatibility: Check for prefix matches if route is a string
+  const prefixMatches = routeConfigs
+    .filter((route): route is string | { path: string } => {
+      const routePath = typeof route === 'string' ? route : route.path
+      return path.startsWith(routePath)
+    })
+
+  if (prefixMatches.length > 0) {
+    // Return the longest prefix match
+    const bestPrefix = prefixMatches.reduce((prev, curr) => {
+      const prevPath = typeof prev === 'string' ? prev : prev.path
+      const currPath = typeof curr === 'string' ? curr : curr.path
+      return currPath.length > prevPath.length ? curr : prev
+    })
+    return typeof bestPrefix === 'string' ? { path: bestPrefix } : bestPrefix
+  }
+
+  return null
 }
 
 /**
