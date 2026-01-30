@@ -4,7 +4,9 @@
     "types": ["vitest/globals"],
     "baseUrl": "..",
     "paths": {
-      "nuxt-api-shield": ["./dist"]
+      "nuxt-api-shield": ["./dist"],
+      "#imports": ["../.nuxt/imports"],
+      "h3": ["../node_modules/h3"]
     }
   },
   "include": ["./**/*.ts"]

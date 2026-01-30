@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "name": "test-wildcard-fixture",
+  "version": "0.0.0",
+  "devDependencies": {
+    "nuxt": "^3.14.1592"
+  }
+}
