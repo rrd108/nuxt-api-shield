@@ -98,7 +98,21 @@ describe('wildcard route matching', async () => {
     // Should match /api/reports/monthly/2023/summary
     // and /api/reports/annual/summary
 
-    // First, verify the routes exist and return expected content
+    // Add initial delay to ensure server is fully ready
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // First, try a simple known working route to verify server is responsive
+    try {
+      const basicResponse = await $fetch('/api/users/123/profile', {
+        method: 'GET',
+        retryStatusCodes: [],
+      })
+      expect(basicResponse).toHaveProperty('result')
+    } catch (error) {
+      throw new Error(`Basic route test failed - server may not be ready: ${error}`)
+    }
+
+    // Now test the multi-segment routes
     try {
       const response = await $fetch('/api/reports/monthly/2023/summary', {
         method: 'GET',
@@ -107,6 +121,10 @@ describe('wildcard route matching', async () => {
 
       // Verify we got JSON response with expected structure
       if (typeof response !== 'object') {
+        // Check if we got HTML response (indicating 404)
+        if (typeof response === 'string' && response.includes('<!DOCTYPE html>')) {
+          throw new Error(`Received HTML response instead of JSON. This usually indicates the route doesn't exist or server isn't ready. Response preview: ${response.substring(0, 200)}...`)
+        }
         throw new TypeError(`Expected object data, but got ${typeof response}: ${JSON.stringify(response)}`)
       }
 
@@ -116,7 +134,7 @@ describe('wildcard route matching', async () => {
     }
     catch (error: unknown) {
       // If it's our custom error, just rethrow it
-      if (error instanceof Error && (error.message.startsWith('Expected object data') || error.message.startsWith('Expected object response'))) {
+      if (error instanceof Error && (error.message.startsWith('Expected object data') || error.message.startsWith('Expected object response') || error.message.includes('Received HTML response'))) {
         throw error
       }
       // If the initial request fails, provide detailed error information
@@ -140,6 +158,10 @@ describe('wildcard route matching', async () => {
 
       // Verify we got JSON response with expected structure
       if (typeof response !== 'object') {
+        // Check if we got HTML response (indicating 404)
+        if (typeof response === 'string' && response.includes('<!DOCTYPE html>')) {
+          throw new Error(`Received HTML response for annual summary instead of JSON. Response preview: ${response.substring(0, 200)}...`)
+        }
         throw new TypeError(`Expected object data for annual, but got ${typeof response}: ${JSON.stringify(response)}`)
       }
 
@@ -149,7 +171,7 @@ describe('wildcard route matching', async () => {
     }
     catch (error: unknown) {
       // If it's our custom error, just rethrow it
-      if (error instanceof Error && (error.message.startsWith('Expected object data') || error.message.startsWith('Expected object response'))) {
+      if (error instanceof Error && (error.message.startsWith('Expected object data') || error.message.startsWith('Expected object response') || error.message.includes('Received HTML response'))) {
         throw error
       }
       const err = error as { message?: string, data?: unknown, statusCode?: number, response?: { status?: number, _data?: unknown, headers?: { get: (n: string) => string } }, status?: number }
