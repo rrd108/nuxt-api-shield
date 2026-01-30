@@ -17,6 +17,7 @@ import {
 } from '../utils/routes'
 import createKey from '../utils/createKey'
 import { validatePattern } from '../utils/patternMatcher'
+import { UNKNOWN_IP } from '../utils/constants'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig().public.nuxtApiShield as ModuleOptions
@@ -61,7 +62,7 @@ export default defineEventHandler(async (event) => {
   console.log('Processing rate limiting for:', url.pathname)
 
   const shieldStorage = useStorage('shield')
-  const requestIP = getRequestIP(event, { xForwardedFor: true }) || 'unKnownIP'
+  const requestIP = getRequestIP(event, { xForwardedFor: true }) || UNKNOWN_IP
   const banKey = createKey({
     ipAddress: requestIP,
     prefix: 'ban',
