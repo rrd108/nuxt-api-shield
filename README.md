@@ -319,10 +319,7 @@ This is useful when certain endpoints (such as `/api/login`, `/api/auth`, or `/a
 
 ### Configuration Example
 
-The `routes` option accepts a mixed array:
-
-- **String:** applies the **global rate limit configuration**
-- **Object:** applies **custom per-route limits**
+The `routes` option accepts a mixed array of strings (exact matches) and objects (custom limits or patterns).
 
 ```ts
 export default defineNuxtConfig({
@@ -336,20 +333,48 @@ export default defineNuxtConfig({
     },
 
     routes: [
-      // 1. String: uses the global default limit
+      // 1. String: uses the global default limit (exact match)
       "/api/example",
 
-      // 2. Object: custom rate limit for a specific route
+      // 2. Object: custom rate limit for a specific route (exact match)
       {
         path: "/api/example-per-route",
-        max: 5, // custom max requests
-        duration: 10, // custom duration (seconds)
+        max: 5,
+        duration: 10,
         // ⚠️ "ban" always uses the global value
       },
+
+      // 3. Object: Wildcard pattern
+      {
+        path: "/api/users/*/profile",
+        pattern: true,
+        max: 10,
+        duration: 60
+      }
     ],
   },
 });
 ```
+
+### Wildcard Route Support
+
+Wildcard patterns allow you to apply the same limits to groups of related API endpoints. Enable them by setting `pattern: true` in your route configuration.
+
+#### Wildcard Pattern Syntax
+
+- **Single-Segment Wildcard (`*`)**: Matches exactly one path segment.
+  - `/api/users/*/profile` matches `/api/users/123/profile` or `/api/users/admin/profile`.
+- **Multi-Segment Wildcard (`**`)**: Matches zero or more path segments.
+  - `/api/reports/**/summary` matches `/api/reports/monthly/2023/summary` or `/api/reports/summary`.
+
+#### Pattern Precedence
+1. **Exact matches** always take precedence over wildcard patterns.
+2. **More specific wildcards** take precedence over less specific ones.
+3. When multiple wildcard patterns match, the most specific one is used.
+
+#### Important Notes
+- **Shared Rate Limits:** All requests that match the same wildcard pattern share the same rate limit counter.
+- **Security:** Broad or dangerous patterns like `/**` or `/*` are automatically rejected to prevent accidental global blocking.
 
 ## Important Considerations
 

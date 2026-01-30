@@ -1,7 +1,9 @@
+import { defineNuxtConfig } from 'nuxt/config'
 import nuxtApiShield from '../../../src/module'
 
 export default defineNuxtConfig({
   modules: [nuxtApiShield],
+  // @ts-ignore
   nitro: {
     storage: {
       shield: {
