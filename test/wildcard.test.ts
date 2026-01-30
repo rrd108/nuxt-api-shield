@@ -52,7 +52,7 @@ describe('wildcard pattern matching', () => {
       expect(validatePattern('/**')).toBe(false)
       expect(validatePattern('/*')).toBe(false)
       expect(validatePattern('/**/*')).toBe(false)
-      
+
       // Patterns with invalid syntax
       expect(validatePattern('/api/**/*/**')).toBe(false) // Too many wildcards
       expect(validatePattern('/api/****/test')).toBe(false) // Invalid wildcard usage

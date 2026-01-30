@@ -13,7 +13,7 @@ describe('simple wildcard test', async () => {
   await setup({
     rootDir: fileURLToPath(new URL('./fixtures/wildcard', import.meta.url)),
     nuxtConfig: {
-      // @ts-ignore
+      // @ts-expect-error: Nitro storage configuration is not fully typed in this test environment
       nitro: {
         storage: {
           shield: {
@@ -31,18 +31,20 @@ describe('simple wildcard test', async () => {
     await new Promise(resolve => setTimeout(resolve, 100))
     await $fetch('/api/users/456/profile', { method: 'GET', retryStatusCodes: [] })
     await new Promise(resolve => setTimeout(resolve, 100))
-    
+
     // Check storage state
     const storageData = await $fetch('/api/debug/storage')
     console.log('Storage data:', JSON.stringify(storageData, null, 2))
-    
+
     // This should trigger rate limiting
     try {
       await $fetch('/api/users/789/profile', { method: 'GET', retryStatusCodes: [] })
       expect.fail('Should have been rate limited')
-    } catch (error: any) {
+    }
+    catch (error: unknown) {
       console.log('Final error:', error)
-      expect(error.statusCode || error.response?.status || error.status).toBe(429)
+      const err = error as { statusCode?: number, response?: { status?: number }, status?: number }
+      expect(err.statusCode || err.response?.status || err.status).toBe(429)
     }
   })
 })

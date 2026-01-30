@@ -3,7 +3,7 @@ import nuxtApiShield from '../../../src/module'
 
 export default defineNuxtConfig({
   modules: [nuxtApiShield],
-  // @ts-ignore
+  // @ts-expect-error: Nitro storage configuration is not fully typed in this test environment
   nitro: {
     storage: {
       shield: {

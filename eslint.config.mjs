@@ -16,5 +16,14 @@ export default createConfigForNuxt({
   },
 })
   .append(
-    // your custom flat config here...
+    {
+      ignores: [
+        'dist',
+        'node_modules',
+        '.nuxt',
+        '.output',
+        '_logs',
+        '_test*',
+      ],
+    },
   )

@@ -18,8 +18,8 @@ describe('route matching debug', () => {
         {
           path: '/api/admin/special',
           max: 5,
-        }
-      ]
+        },
+      ],
     }
 
     // Test exact match

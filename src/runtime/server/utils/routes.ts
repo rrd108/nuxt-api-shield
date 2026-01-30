@@ -23,30 +23,30 @@ export function extractRoutePaths(routes: Array<string | { path: string }>): str
  */
 export function findBestMatchingRoute(path: string, config: ModuleOptions) {
   const routeConfigs = config.routes || []
-  
+
   // Separate exact matches from pattern matches
-  const exactMatches = routeConfigs.filter((route: string | { path: string; pattern?: boolean }) => {
+  const exactMatches = routeConfigs.filter((route: string | { path: string, pattern?: boolean }) => {
     if (typeof route === 'string') {
       return route === path
     }
     return !route.pattern && route.path === path
   })
-  
+
   // If we have exact matches, return the first one (they're all equivalent)
   if (exactMatches.length > 0) {
     const match = exactMatches[0]
     return typeof match === 'string' ? { path: match } : match
   }
-  
+
   // Find pattern matches and sort by specificity (most specific first)
   const patternMatches = routeConfigs
-    .filter((route): route is { path: string; pattern?: boolean } & Partial<LimitConfiguration> => {
+    .filter((route): route is { path: string, pattern?: boolean } & Partial<LimitConfiguration> => {
       if (typeof route === 'string') return false
       return route.pattern === true && validatePattern(route.path)
     })
-    .filter((route: { path: string; pattern?: boolean } & Partial<LimitConfiguration>) => matchesPattern(route.path, path))
+    .filter((route: { path: string, pattern?: boolean } & Partial<LimitConfiguration>) => matchesPattern(route.path, path))
     .sort((a: { path: string }, b: { path: string }) => getPatternSpecificity(b.path) - getPatternSpecificity(a.path))
-  
+
   // Return the most specific pattern match
   return patternMatches[0] || null
 }
@@ -60,11 +60,11 @@ export function findBestMatchingRoute(path: string, config: ModuleOptions) {
  */
 export function getRouteLimit(path: string, config: ModuleOptions): LimitConfiguration {
   const matchingRoute = findBestMatchingRoute(path, config)
-  
+
   if (!matchingRoute) {
     return config.limit
   }
-  
+
   // Merge global limit with route-specific overrides
   return Object.assign({}, config.limit, matchingRoute)
 }

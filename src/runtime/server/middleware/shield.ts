@@ -35,23 +35,23 @@ export default defineEventHandler(async (event) => {
   // Check if there's a matching route configuration (exact or wildcard)
   const hasMatchingRoute = hasRouteLimit(url.pathname, config)
   console.log('Has matching route:', hasMatchingRoute)
-  
+
   // If no route configuration exists and we have route configurations defined,
   // check if any patterns might match (for backward compatibility)
   if (!hasMatchingRoute && config.routes?.length) {
     const routePaths = extractRoutePaths(config.routes)
     const hasStringMatch = routePaths.some(path => url.pathname.startsWith(path))
     console.log('String matches:', hasStringMatch)
-    
+
     // Check for wildcard pattern matches
-    const hasPatternMatch = config.routes.some(route => {
+    const hasPatternMatch = config.routes.some((route) => {
       if (typeof route === 'string') return false
-      return route.pattern === true && 
-             validatePattern(route.path) && 
-             findBestMatchingRoute(url.pathname, config) !== null
+      return route.pattern === true
+        && validatePattern(route.path)
+        && findBestMatchingRoute(url.pathname, config) !== null
     })
     console.log('Pattern matches:', hasPatternMatch)
-    
+
     if (!hasStringMatch && !hasPatternMatch) {
       console.log('No matching routes found, skipping')
       return
@@ -87,7 +87,7 @@ export default defineEventHandler(async (event) => {
 
   const routeLimit = getRouteLimit(url?.pathname, config)
   const isRouteLimit = hasRouteLimit(url?.pathname, config)
-  
+
   // For wildcard patterns, use the pattern as the storage key so all matching paths share the same counter
   let storagePath: string | undefined = undefined
   if (isRouteLimit) {
@@ -95,7 +95,8 @@ export default defineEventHandler(async (event) => {
     if (matchingRoute && 'pattern' in matchingRoute && matchingRoute.pattern === true) {
       // Use the pattern as storage key for wildcard routes
       storagePath = matchingRoute.path
-    } else {
+    }
+    else {
       // Use the actual path for exact matches
       storagePath = url?.pathname
     }
