@@ -25,6 +25,7 @@ export default defineNuxtModule<ModuleOptions>({
     retryAfterHeader: false,
     log: { path: '', attempts: 0 },
     routes: [],
+    ipTTL: 7 * 24 * 60 * 60,
   },
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)

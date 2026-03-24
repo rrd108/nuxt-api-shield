@@ -37,5 +37,6 @@ export default defineNuxtConfig({
       path: 'logs',
       attempts: 5,
     },
+    ipTTL: 60,
   },
 })

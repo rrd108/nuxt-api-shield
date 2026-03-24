@@ -25,4 +25,5 @@ export interface ModuleOptions {
   retryAfterHeader: boolean
   log?: LogEntry
   routes: Array<string | RouteLimitConfiguration>
+  ipTTL?: number
 }
