@@ -27,7 +27,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const shieldStorage = useStorage('shield')
-  const requestIP = getRequestIP(event, { xForwardedFor: true }) || UNKNOWN_IP
+  const trustXForwardedFor = config.security?.trustXForwardedFor ?? true
+  const requestIP = getRequestIP(event, { xForwardedFor: trustXForwardedFor })
+    || event.node.req?.socket?.remoteAddress
+    || UNKNOWN_IP
 
   // Ban check
   const banKey = createKey({

@@ -26,4 +26,7 @@ export interface ModuleOptions {
   log?: LogEntry
   routes: Array<string | RouteLimitConfiguration>
   ipTTL?: number
+  security?: {
+    trustXForwardedFor?: boolean
+  }
 }

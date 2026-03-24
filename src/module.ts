@@ -26,6 +26,9 @@ export default defineNuxtModule<ModuleOptions>({
     log: { path: '', attempts: 0 },
     routes: [],
     ipTTL: 7 * 24 * 60 * 60,
+    security: {
+      trustXForwardedFor: true,
+    }
   },
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
