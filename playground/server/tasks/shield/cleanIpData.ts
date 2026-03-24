@@ -15,7 +15,7 @@ export default defineTask({
 
     if (!ipTTLseconds || ipTTLseconds <= 0) {
       console.log('[nuxt-api-shield] IP data cleanup (ipTTL) is disabled or invalid.')
-      return { result: { cleanedCount: 0, status: 'disabled_or_invalid_ttl' } }
+      return { result: { cleanedCount: 0 }, status: 'disabled_or_invalid_ttl' }
     }
     const ipTTLms = ipTTLseconds * 1000
 
