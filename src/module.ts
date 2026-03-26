@@ -46,6 +46,19 @@ export default defineNuxtModule<ModuleOptions>({
       },
     ])
 
+    nuxt.hook('nitro:config', (nitroConfig) => {
+      nitroConfig.tasks = nitroConfig.tasks || {}
+
+      nitroConfig.tasks['shield:cleanBans'] = {
+        handler: resolver.resolve('./runtime/server/tasks/shield/cleanBans'),
+        description: 'Clean expired bans from nuxt-api-shield storage.',
+      },
+      nitroConfig.tasks['shield:cleanIpData'] = {
+        handler: resolver.resolve('./runtime/server/tasks/shield/cleanIpData'),
+        description: 'Clean old IP tracking data from nuxt-api-shield storage.',
+      }
+    })
+
     // Make RateLimit type available via #imports for type-only imports
     addTypeTemplate({
       filename: 'types/nuxt-api-shield.d.ts',
