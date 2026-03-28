@@ -2,7 +2,7 @@
 
 ## v0.10.1
 
-[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.11.0...v0.10.1)
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.10.0...v0.10.1)
 
 ## v0.10.0
 
