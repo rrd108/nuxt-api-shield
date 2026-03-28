@@ -27,8 +27,8 @@ dist
 # Env
 .env
 
-# Testing
-reports
+# Testing (root only — do not ignore e.g. server/api/reports in fixtures)
+/reports
 coverage
 *.lcov
 .nyc_output
