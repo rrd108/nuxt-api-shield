@@ -32,6 +32,8 @@ This Nuxt module implements a rate limiting middleware to protect your API endpo
 - **Configurable with Runtime Config**
   - Easily adjust rate-limiting parameters without code changes.
   - Adapt to dynamic needs and maintain control over rate-limiting behavior through Nuxt's runtime configuration.
+- **Bundled cleanup tasks**
+  - Registers Nitro tasks `shield:cleanBans` and `shield:cleanIpData` so you can schedule maintenance without adding task files (see setup step 4).
 - **Clear Error Handling**
   - Returns a standardized 429 "Too Many Requests" error response when rate limits are exceeded or when a user is banned.
   - Facilitates proper error handling in client-side applications for a smooth user experience.
@@ -151,7 +153,9 @@ If you use for example redis, you can use the following configuration, define th
 }
 ```
 
-### 4. Add Cleanup Task(s) to `nuxt.config.ts`
+### 4. Schedule bundled cleanup tasks in `nuxt.config.ts`
+
+The module registers two Nitro tasks for you: `shield:cleanBans` (removes expired `ban:*` keys) and `shield:cleanIpData` (removes stale `ip:*` keys using `ipTTL`). Turn on Nitro tasks and add `scheduledTasks` so they run on a cadence you choose. You do **not** need files under `server/tasks/` for this default setup.
 
 ```json
 {
@@ -160,22 +164,24 @@ If you use for example redis, you can use the following configuration, define th
       "tasks": true
     },
     "scheduledTasks": {
-      "*/15 * * * *": ["shield:cleanBans"], // Example: clean expired bans every 15 minutes
-      "0 0 * * *": ["shield:cleanIpData"] // Example: clean old IP data daily at midnight
+      "*/15 * * * *": ["shield:cleanBans"],
+      "0 0 * * *": ["shield:cleanIpData"]
     }
   }
 }
 ```
 
-### 5. Create your Cleanup Task(s)
+Cron expressions are examples only: for instance, clean expired bans every 15 minutes and IP tracking data daily at midnight.
 
-It's recommended to clean up expired bans and old IP tracking data regularly to prevent storage bloat and ensure good performance.
+### 5. Optional: custom cleanup task implementations
 
-#### a) Task for Cleaning Expired Bans
+Skip this unless you need behavior different from the bundled handlers (for example extra logging, metrics, or storage layout). The snippets below mirror what the module already ships; they are useful as a reference or if you define **another** task name and point `scheduledTasks` at that name instead.
 
-This task removes ban entries (`ban:xxx.xxx.xxx.xxx`) from storage once their ban period has passed.
+#### a) Task for cleaning expired bans
 
-In `server/tasks/shield/cleanBans.ts` (you can name the file and task as you like):
+Removes ban entries (`ban:xxx.xxx.xxx.xxx`) after the ban timestamp has passed.
+
+Example `server/tasks/shield/cleanBans.ts` (task name must match what you schedule):
 
 ```ts
 import { isActualBanTimestampExpired } from "#imports"; // Auto-imported utility from nuxt-api-shield
@@ -207,11 +213,11 @@ export default defineTask({
 
 The `isActualBanTimestampExpired` utility is provided by `nuxt-api-shield` and should be available via `#imports`.
 
-#### b) Task for Cleaning Old IP Tracking Data
+#### b) Task for cleaning old IP tracking data
 
-This task cleans up IP tracking entries (`ip:xxx.xxx.xxx.xxx`) that haven't been active (i.e., their `time` field hasn't been updated) for a certain period. This period is defined by the `ipTTL` configuration option in your `nuxt.config.ts` (under `nuxtApiShield`), which defaults to 7 days. This cleanup helps prevent your storage from growing indefinitely with IPs that make a few requests but are never banned.
+Cleans IP tracking entries (`ip:xxx.xxx.xxx.xxx`) whose `time` is older than `nuxtApiShield.ipTTL` (default 7 days), and drops malformed entries. That keeps storage from growing with one-off IPs that were never banned.
 
-In `server/tasks/shield/cleanIpData.ts`:
+Example `server/tasks/shield/cleanIpData.ts`:
 
 ```ts
 import type { RateLimit } from "nuxt-api-shield";
@@ -265,7 +271,9 @@ export default defineTask({
 });
 ```
 
-Make sure to configure `ipTTL` in your `nuxt.config.ts` under `nuxtApiShield` if you wish to use a value different from the default (7 days). Setting `ipTTL: 0` (or any non-positive number) in your config will disable this cleanup task.
+Configure `ipTTL` under `nuxtApiShield` if you want a TTL other than the default. Setting `ipTTL` to `0` (or any non-positive value) makes the bundled `shield:cleanIpData` task skip IP cleanup (it logs and exits).
+
+If you add your own task file with the same `meta.name` as a bundled task (`shield:cleanBans` or `shield:cleanIpData`), Nitro may prefer your project file over the module—avoid duplicate names unless you intend to override.
 
 ## TypeScript Types
 
