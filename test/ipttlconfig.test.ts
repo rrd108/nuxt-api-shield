@@ -23,18 +23,18 @@ describe('ipTTL config options', async () => {
   })
 
   it('should have ipTTL config available in runtime', async () => {
-    const response = await $fetch('/api/debug-config', {
+    const response = await $fetch<{ ipTTL: number }>('/api/debug-config', {
       method: 'GET',
       retryStatusCodes: [],
     })
-    expect((response as any).ipTTL).toBe(3600)
+    expect(response.ipTTL).toBe(3600)
   })
 
   it('should have security.trustXForwardedFor config available in runtime', async () => {
-    const response = await $fetch('/api/debug-config', {
+    const response = await $fetch<{ security: { trustXForwardedFor: boolean } }>('/api/debug-config', {
       method: 'GET',
       retryStatusCodes: [],
     })
-    expect((response as any).security).toEqual({ trustXForwardedFor: true })
+    expect(response.security).toEqual({ trustXForwardedFor: true })
   })
 })

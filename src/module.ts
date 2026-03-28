@@ -7,6 +7,7 @@ import {
   addTypeTemplate,
 } from '@nuxt/kit'
 import defu from 'defu'
+import type { NitroConfig } from 'nitropack'
 import type { ModuleOptions } from './type'
 
 export default defineNuxtModule<ModuleOptions>({
@@ -28,7 +29,7 @@ export default defineNuxtModule<ModuleOptions>({
     ipTTL: 7 * 24 * 60 * 60,
     security: {
       trustXForwardedFor: true,
-    }
+    },
   },
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
@@ -36,7 +37,7 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.runtimeConfig.public.nuxtApiShield = defu(
       nuxt.options.runtimeConfig.public.nuxtApiShield as ModuleOptions,
       options,
-    )
+    ) as typeof nuxt.options.runtimeConfig.public.nuxtApiShield
 
     addServerImports([
       {
@@ -46,13 +47,14 @@ export default defineNuxtModule<ModuleOptions>({
       },
     ])
 
-    nuxt.hook('nitro:config', (nitroConfig) => {
+    nuxt.hook('nitro:config', (nitroConfig: NitroConfig) => {
       nitroConfig.tasks = nitroConfig.tasks || {}
 
       nitroConfig.tasks['shield:cleanBans'] = {
         handler: resolver.resolve('./runtime/server/tasks/shield/cleanBans'),
         description: 'Clean expired bans from nuxt-api-shield storage.',
-      },
+      }
+
       nitroConfig.tasks['shield:cleanIpData'] = {
         handler: resolver.resolve('./runtime/server/tasks/shield/cleanIpData'),
         description: 'Clean old IP tracking data from nuxt-api-shield storage.',

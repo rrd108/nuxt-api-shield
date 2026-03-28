@@ -99,7 +99,7 @@ describe('wildcard route matching', async () => {
     // and /api/reports/annual/summary
 
     // Extended delay for CI environments
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise(resolve => setTimeout(resolve, 5000))
 
     // First, verify basic functionality works
     try {
@@ -109,7 +109,8 @@ describe('wildcard route matching', async () => {
         timeout: 15000,
       })
       expect(basicResponse).toHaveProperty('result')
-    } catch (error) {
+    }
+    catch (error) {
       throw new Error(`Basic route test failed - server may not be ready: ${error}`)
     }
 

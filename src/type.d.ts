@@ -1,3 +1,4 @@
+import type { NitroConfig } from 'nitropack'
 import type { LogEntry } from './runtime/server/types/LogEntry'
 import type { RateLimit } from './runtime/server/types/RateLimit'
 
@@ -28,5 +29,11 @@ export interface ModuleOptions {
   ipTTL?: number
   security?: {
     trustXForwardedFor?: boolean
+  }
+}
+
+declare module 'nuxt/schema' {
+  interface NuxtHooks {
+    'nitro:config': (nitroConfig: NitroConfig) => void | Promise<void>
   }
 }
