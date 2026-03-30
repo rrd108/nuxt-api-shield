@@ -2,7 +2,7 @@ import { defineEventHandler, getRouterParam } from 'h3'
 
 export default defineEventHandler(async (event) => {
   const path = getRouterParam(event, 'path')
-  
+
   if (path?.endsWith('summary')) {
     if (path.startsWith('monthly/')) {
       return { result: 'Report Summary' }
@@ -14,6 +14,6 @@ export default defineEventHandler(async (event) => {
       return { result: 'Quarterly Report Summary' }
     }
   }
-  
+
   return { result: 'Report' }
 })

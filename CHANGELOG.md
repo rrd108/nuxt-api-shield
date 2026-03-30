@@ -1,5 +1,38 @@
 # Changelog
 
+## v0.10.2
+
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.10.1...v0.10.2)
+
+### 💅 Refactors
+
+- Improve type safety for Nitro configuration and tests ([c9b8436](https://github.com/rrd108/nuxt-api-shield/commit/c9b8436))
+
+### 📖 Documentation
+
+- Update documentation for bundled cleanup tasks ([00efea0](https://github.com/rrd108/nuxt-api-shield/commit/00efea0))
+- Fix v0.10.1 changelog compare link after removing stray v0.11.0 tag ([ccbaaf2](https://github.com/rrd108/nuxt-api-shield/commit/ccbaaf2))
+
+### 🏡 Chore
+
+- **release:** V0.10.1 ([1d654ad](https://github.com/rrd108/nuxt-api-shield/commit/1d654ad))
+- Upgrade typescript to v6.0 and @types/node ([8b4de7b](https://github.com/rrd108/nuxt-api-shield/commit/8b4de7b))
+
+### ✅ Tests
+
+- Add wildcard and dynamic route fixtures ([84f32e8](https://github.com/rrd108/nuxt-api-shield/commit/84f32e8))
+
+### ❤️ Contributors
+
+- Rrd108 ([@rrd108](https://github.com/rrd108))
+
+## v0.10.2
+
+### 🩹 Fixes
+
+- Server middleware: explicit `h3` / `nitropack/runtime` imports so `defineEventHandler` and related APIs resolve when the module is built from `node_modules` ([#156](https://github.com/rrd108/nuxt-api-shield/issues/156))
+- Remove stray debug `console.log` from shield middleware
+
 ## v0.10.1
 
 [compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v0.10.0...v0.10.1)

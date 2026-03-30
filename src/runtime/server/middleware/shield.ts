@@ -1,3 +1,6 @@
+import { defineEventHandler, getRequestURL, getRequestIP } from 'h3'
+import { useRuntimeConfig, useStorage } from 'nitropack/runtime'
+import type { ModuleOptions } from '../../../type'
 import {
   getRouteLimit,
   findBestMatchingRoute,
@@ -10,9 +13,6 @@ import { handleRateLimit } from '../utils/rateLimit'
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig().public.nuxtApiShield as ModuleOptions
   const url = getRequestURL(event)
-
-  // Debug logging
-  console.log('Middleware triggered for:', url?.pathname)
 
   // Check if this is an API route
   if (!url?.pathname?.startsWith('/api/')) {
