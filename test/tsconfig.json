@@ -1,7 +1,6 @@
 {
   "extends": "../playground/.nuxt/tsconfig.json",
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
     "types": ["vitest/globals"],
     "baseUrl": "..",
     "paths": {
