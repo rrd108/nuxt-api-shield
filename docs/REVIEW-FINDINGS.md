@@ -10,7 +10,7 @@ This document captures performance, security, bug, and feature suggestions from 
 
 ## Bug fixes (confirmed)
 
-### 1. `delayOnBan` is documented but not implemented
+### 1. `delayOnBan` is documented but not implemented ✅
 
 The option appears in config, types, and README, but no runtime code applies a delay when a user is banned.
 
@@ -18,7 +18,8 @@ The option appears in config, types, and README, but no runtime code applies a d
 - Documented in README as delaying responses when banned
 - **Not implemented** in `src/runtime/server/utils/ban.ts` or `rateLimit.ts`
 
-**Action:** Either implement in `checkBan()` (e.g. progressive delay based on ban count) or remove from docs/defaults to avoid misleading users.
+**Action:** Either implement in `checkBan()` (e.g. progressive delay based on ban count) or remove from docs/defaults to avoid misleading users.  
+**Fixed:** Added `await new Promise(resolve => setTimeout(resolve, 1000))` in `checkBan()` when `config.delayOnBan` is true, before throwing the 429 error. This delays each banned request by 1 second.
 
 ### 2. README vs module defaults mismatch for logging ✅
 

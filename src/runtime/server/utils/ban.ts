@@ -29,6 +29,9 @@ export const checkBan = async (
       const retryAfter = Math.ceil((bannedUntil - Date.now()) / 1e3)
       event.node.res.setHeader('Retry-After', retryAfter)
     }
+    if (config.delayOnBan) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+    }
     throw createError({
       statusCode: 429,
       message: config.errorMessage,
