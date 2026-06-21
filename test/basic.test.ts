@@ -5,7 +5,7 @@ import { setup, $fetch } from '@nuxt/test-utils/e2e'
 import type { ApiResponse } from './ApiResponse'
 
 // TODO get these from the config
-const nuxtConfigBan = 10
+const nuxtConfigBan = 4
 
 describe('shield', async () => {
   await setup({
@@ -124,8 +124,8 @@ describe('shield', async () => {
       expect(typedErr.statusCode).toBe(429)
     }
 
-    // 2. Wait after the duration (3 seconds), but still within the ban (10 seconds)
-    await new Promise(resolve => setTimeout(resolve, 4000))
+    // 2. Wait after the duration (2 seconds), but still within the ban (4 seconds)
+    await new Promise(resolve => setTimeout(resolve, 2500))
     try {
       await $fetch('/api/basicexample?c=77/4', { method: 'GET', retryStatusCodes: [] })
       throw new Error('Nem dobott hibát a ban idő alatt!')
@@ -135,8 +135,8 @@ describe('shield', async () => {
       expect(typedErr.statusCode).toBe(429)
     }
 
-    // 3. Wait for the ban to expire (+7 seconds)
-    await new Promise(resolve => setTimeout(resolve, 7000))
+    // 3. Wait for the ban to expire
+    await new Promise(resolve => setTimeout(resolve, 2000))
     const response = await $fetch('/api/basicexample?c=77/5', { method: 'GET', retryStatusCodes: [] })
     expect((response as ApiResponse).name).toBe('Gauranga')
   })

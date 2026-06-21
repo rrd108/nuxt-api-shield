@@ -8,68 +8,6 @@ This document captures performance, security, bug, and feature suggestions from 
 
 ---
 
-## Bug fixes (confirmed)
-
-### 1. `delayOnBan` is documented but not implemented ✅
-
-The option appears in config, types, and README, but no runtime code applies a delay when a user is banned.
-
-- Defined in `src/type.d.ts` and `src/module.ts` defaults
-- Documented in README as delaying responses when banned
-- **Not implemented** in `src/runtime/server/utils/ban.ts` or `rateLimit.ts`
-
-**Action:** Either implement in `checkBan()` (e.g. progressive delay based on ban count) or remove from docs/defaults to avoid misleading users.  
-**Fixed:** Added `await new Promise(resolve => setTimeout(resolve, 1000))` in `checkBan()` when `config.delayOnBan` is true, before throwing the 429 error. This delays each banned request by 1 second.
-
-### 2. README vs module defaults mismatch for logging ✅
-
-| Setting | `module.ts` default | README default |
-|---------|---------------------|----------------|
-| `log.path` | `''` (disabled) | `""` (fixed) |
-| `log.attempts` | `0` (disabled) | `0` (fixed) |
-
-Users reading the README may expect logging on by default when it is actually off.
-
-**Action:** Align README with actual module defaults, or change defaults to match README.  
-**Fixed in `8f6d668`:** Both inline config example and default values block updated in README.
-
-### 3. README says per-route `ban` is ignored — code merges it ✅
-
-README stated ban always uses the global value, but `getRouteLimit()` in `src/runtime/server/utils/routes.ts` merges route config over global via `Object.assign({}, config.limit, matchingRoute)`.
-
-The test fixture `test/fixtures/withPerRouteLimit/nuxt.config.ts` even sets `ban: 50` per route.
-
-**Action:** Update docs to reflect per-route `ban` support, or explicitly strip `ban` from route overrides if global-only ban is intended.  
-**Fixed:** Removed misleading `// ⚠️ "ban" always uses the global value` comment from README per-route example.
-
-### 4. Playground schedules a non-existent task ✅
-
-`playground/nuxt.config.ts` schedules `shield:clean`, but the module registers:
-
-- `shield:cleanBans`
-- `shield:cleanIpData`
-
-Cleanup never runs in the playground.
-
-**Action:** Fix playground `scheduledTasks` to use the correct task names.  
-**Fixed:** Changed `'shield:clean'` to `['shield:cleanBans', 'shield:cleanIpData']` in playground config.
-
-### 5. Empty client plugin is registered ✅
-
-`src/runtime/plugin.ts` registers an empty Nuxt plugin with no behavior.
-
-**Action:** Remove unless client-side features are planned.  
-**Fixed:** Removed `addPlugin` call from module.ts and deleted the empty `src/runtime/plugin.ts` file.
-
-### 6. Duplicate route matching on every request ✅
-
-In `src/runtime/server/middleware/shield.ts`, `findBestMatchingRoute()` runs once, then `getRouteLimit()` calls it again internally.
-
-**Action:** Cache the first match result and pass it to `getRouteLimit()` to avoid duplicate work.  
-**Fixed:** `getRouteLimit()` now accepts an optional pre-matched route parameter; middleware passes the already-found `matchingRoute`.
-
----
-
 ## Security
 
 ### 1. Default `trustXForwardedFor: true` is risky
@@ -144,12 +82,6 @@ For multi-instance deployments, `memory` and `fs` are per-process and ineffectiv
 
 **Action:** Consider async buffering or delegating to a logging service.
 
-### 5. Slow integration tests (~41s)
-
-Ban tests use real `setTimeout` waits (10+ seconds).
-
-**Action:** Use fake timers or inject shorter ban durations in test fixtures to speed CI.
-
 ---
 
 ## New features (high value)
@@ -195,19 +127,6 @@ flowchart TD
     G -->|No| I[Increment counter]
     I --> Z
 ```
-
-The design is solid for single-instance apps with moderate traffic. Main gaps: missing `delayOnBan`, non-atomic counters, global IP bans, and docs/defaults drift.
-
----
-
-## Suggested priority order
-
-1. **Fix `delayOnBan`** (implement or remove) — user-facing bug
-2. **Align README defaults with code** — reduces confusion
-3. **Default `trustXForwardedFor` to `false`** — security hardening
-4. **Add startup storage validation** — better DX
-5. **Cache route match + document Redis requirement** — performance
-6. **Add `skipRoutes` + rate-limit headers** — practical features
 
 ---
 
