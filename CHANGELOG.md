@@ -4,30 +4,32 @@
 
 ### Breaking: `security.trustXForwardedFor` now defaults to `false`
 
-Previously defaulted to `true`, which could allow IP spoofing if the app was directly internet-facing. If your app is behind a trusted proxy (Nginx, Cloudflare, etc.), explicitly set `security: { trustXForwardedFor: true }`.
+Previously `true`, which allowed IP spoofing on directly internet-facing apps. If behind a trusted proxy, explicitly set `security: { trustXForwardedFor: true }`.
 
 ### 🚀 Features
 
 - **delayOnBan** — 1-second delay before 429 when user is banned (was documented but not implemented)
-- Caches route match result to avoid duplicate `findBestMatchingRoute()` calls per request
+- Cache route match result to avoid duplicate `findBestMatchingRoute()` calls
 
 ### 🩹 Fixes
 
-- Server middleware: explicit `h3` / `nitropack/runtime` imports so `defineEventHandler` and related APIs resolve when the module is built from `node_modules` ([#156](https://github.com/rrd108/nuxt-api-shield/issues/156))
+- Default `trustXForwardedFor` to `false` (security hardening)
+- IPv6 compatibility — sanitize colons in storage keys (`2001:db8::1` → `2001_db8__1`) for `fs` driver
+- Server middleware: explicit `h3` / `nitropack/runtime` imports ([#156](https://github.com/rrd108/nuxt-api-shield/issues/156))
 - Remove stray debug `console.log` from shield middleware
-- Playground scheduled tasks use correct task names (`shield:cleanBans`, `shield:cleanIpData`)
+- Playground scheduled tasks use correct names (`shield:cleanBans`, `shield:cleanIpData`)
 - Empty client plugin removed (no-op registration)
 
 ### ⚡ Performance
 
-- **Log buffering** — shield log writes are batched in memory and flushed to disk every 5s instead of one `appendFile` per request. The `shieldLog` call is fire-and-forget, removing `await` from the hot path.
+- **Log buffering** — batch shield log writes in memory, flush every 5s; fire-and-forget (no `await` on hot path)
+- Reduce test ban duration 10s→4s, cutting CI time by ~13s
 
 ### 📖 Documentation
 
-- **Production Deployment** section added covering Redis vs memory/fs tradeoffs
+- **Production Deployment** section — Redis vs memory/fs tradeoffs
 - README defaults aligned with module defaults
 - Per-route `ban` override documented (was misleadingly marked as global-only)
-- Security Warning updated for new `trustXForwardedFor` default
 
 ## v0.10.2
 
