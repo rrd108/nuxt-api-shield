@@ -50,7 +50,8 @@ Legacy prefix matching in `findBestMatchingRoute()` means a route like `/api/v3`
 
 `shieldLog()` uses `appendFile` on the request path when `count >= attempts`. Under attack, this adds disk I/O.
 
-**Action:** Consider async buffering or delegating to a logging service.
+**Action:** Consider async buffering or delegating to a logging service.  
+**Fixed:** Removed `await` from the `shieldLog` call (fire-and-forget) and added an in-memory buffer that flushes to disk every 5 seconds via `setInterval`. Disk I/O drops from O(requests) to O(1 per 5s).
 
 ---
 
