@@ -53,11 +53,12 @@ Cleanup never runs in the playground.
 **Action:** Fix playground `scheduledTasks` to use the correct task names.  
 **Fixed:** Changed `'shield:clean'` to `['shield:cleanBans', 'shield:cleanIpData']` in playground config.
 
-### 5. Empty client plugin is registered
+### 5. Empty client plugin is registered ✅
 
 `src/runtime/plugin.ts` registers an empty Nuxt plugin with no behavior.
 
-**Action:** Remove unless client-side features are planned.
+**Action:** Remove unless client-side features are planned.  
+**Fixed:** Removed `addPlugin` call from module.ts and deleted the empty `src/runtime/plugin.ts` file.
 
 ### 6. Duplicate route matching on every request
 

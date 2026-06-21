@@ -1,6 +1,5 @@
 import {
   defineNuxtModule,
-  addPlugin,
   createResolver,
   addServerHandler,
   addServerImports,
@@ -76,6 +75,6 @@ export default defineNuxtModule<ModuleOptions>({
       handler: resolver.resolve('./runtime/server/middleware/shield'),
     })
 
-    addPlugin(resolver.resolve('./runtime/plugin'))
+
   },
 })
