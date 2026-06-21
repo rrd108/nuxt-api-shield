@@ -3,7 +3,7 @@ import type { H3Event } from 'h3'
 import type { ModuleOptions, LimitConfiguration } from '../../type'
 import type { Storage } from 'nitropack'
 import type { RateLimit } from '../types/RateLimit'
-import shieldLog from './shieldLog'
+import shieldLog, { shieldLogBan } from './shieldLog'
 
 /**
  * Handles the rate limiting logic for a specific request.
@@ -48,6 +48,8 @@ export const handleRateLimit = async (
       count: 1,
       time: now,
     })
+
+    shieldLogBan(requestIP, url, routeLimit, config.log)
 
     if (config.retryAfterHeader) {
       event.node.res.setHeader('Retry-After', routeLimit.ban)

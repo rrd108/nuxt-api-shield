@@ -9,12 +9,15 @@ Previously `true`, which allowed IP spoofing on directly internet-facing apps. I
 ### 🚀 Features
 
 - **delayOnBan** — 1-second delay before 429 when user is banned (was documented but not implemented)
+- **Fail2ban export format** — `log.fail2ban` writes ban events in fail2ban-compatible format for firewall-level blocking
 - Cache route match result to avoid duplicate `findBestMatchingRoute()` calls
 
 ### 🩹 Fixes
 
 - Default `trustXForwardedFor` to `false` (security hardening)
+- Prefix matching respects path segment boundaries (`/api/v3` no longer matches `/api/v3-secret`)
 - IPv6 compatibility — sanitize colons in storage keys (`2001:db8::1` → `2001_db8__1`) for `fs` driver
+- Warn at build time if `nitro.storage.shield` is missing
 - Server middleware: explicit `h3` / `nitropack/runtime` imports ([#156](https://github.com/rrd108/nuxt-api-shield/issues/156))
 - Remove stray debug `console.log` from shield middleware
 - Playground scheduled tasks use correct names (`shield:cleanBans`, `shield:cleanIpData`)
@@ -28,6 +31,7 @@ Previously `true`, which allowed IP spoofing on directly internet-facing apps. I
 ### 📖 Documentation
 
 - **Production Deployment** section — Redis vs memory/fs tradeoffs
+- **Fail2ban Integration** section — full setup guide with filter and jail config
 - README defaults aligned with module defaults
 - Per-route `ban` override documented (was misleadingly marked as global-only)
 

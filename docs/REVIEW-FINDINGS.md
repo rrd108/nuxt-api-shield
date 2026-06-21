@@ -18,20 +18,6 @@ This may be intentional for brute-force protection but can lock out legitimate u
 
 **Action:** Consider per-route ban keys (`ban:/api/login:IP`) as a configurable option (`banScope: 'ip' | 'ip+route'`).
 
-### 2. No validation that `shield` storage exists
-
-If users forget `nitro.storage.shield`, requests fail at runtime with an unclear error.
-
-**Action:** Add a startup check in the module `setup()` hook with a clear error message.  
-**Fixed:** Added a `modules:done` hook that checks `nuxt.options.nitro?.storage?.shield` at build time and warns with a config example if missing.
-
-### 3. Prefix matching can over-match
-
-Legacy prefix matching in `findBestMatchingRoute()` means a route like `/api/v3` also matches `/api/v3-secret`.
-
-**Action:** Prefer explicit patterns or document this behavior clearly.  
-**Fixed:** Prefix matching now checks for a path segment boundary — the matched prefix must be followed by `/` or end-of-string. `/api/v3` no longer matches `/api/v3-secret` but still matches `/api/v3/settings`.
-
 ---
 
 ## New features (high value)
@@ -48,7 +34,6 @@ Legacy prefix matching in `findBestMatchingRoute()` means a route like `/api/v3`
 | **Sliding window algorithm** | Current fixed window allows burst at window boundaries |
 | **Configurable storage key prefix** | Avoid collisions if sharing a Redis instance |
 | **DevTools panel** | Show active bans, top offenders, storage stats in `@nuxt/devtools` |
-| **Fail2ban export format** | Structured log format for automatic IP blocking at the firewall |
 
 ---
 
@@ -69,7 +54,7 @@ flowchart TD
     B -->|No| Z[Pass through]
     B -->|Yes| C[Resolve IP]
     C --> D{Banned? ban:IP}
-    D -->|Yes| E[429]
+    D -->|Yes| H1[1s delay] --> E[429]
     D -->|No| F[Read ip:path:IP counter]
     F --> G{Over limit?}
     G -->|Yes| H[Set ban:IP + 429]
@@ -86,6 +71,7 @@ flowchart TD
 | Middleware | `src/runtime/server/middleware/shield.ts` |
 | Rate limiting | `src/runtime/server/utils/rateLimit.ts` |
 | Ban check | `src/runtime/server/utils/ban.ts` |
+| Logging | `src/runtime/server/utils/shieldLog.ts` |
 | Route matching | `src/runtime/server/utils/routes.ts` |
 | Pattern matching | `src/runtime/server/utils/patternMatcher.ts` |
 | Module setup | `src/module.ts` |

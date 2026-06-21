@@ -1,7 +1,8 @@
 import { createError } from 'h3'
 import type { H3Event } from 'h3'
-import type { ModuleOptions } from '../../type'
+import type { ModuleOptions, LimitConfiguration } from '../../type'
 import type { Storage } from 'nitropack'
+import { shieldLogBan } from './shieldLog'
 
 /**
  * Checks if a user is currently banned and handles the response.
@@ -13,6 +14,9 @@ export const checkBan = async (
   shieldStorage: Storage,
   banKey: string,
   config: ModuleOptions,
+  requestIP?: string,
+  url?: string,
+  routeLimit?: LimitConfiguration,
 ) => {
   const bannedUntilRaw = await shieldStorage.getItem(banKey)
   if (!bannedUntilRaw) {
@@ -28,6 +32,9 @@ export const checkBan = async (
     if (config.retryAfterHeader) {
       const retryAfter = Math.ceil((bannedUntil - Date.now()) / 1e3)
       event.node.res.setHeader('Retry-After', retryAfter)
+    }
+    if (requestIP && url) {
+      shieldLogBan(requestIP, url, routeLimit ?? config.limit, config.log)
     }
     if (config.delayOnBan) {
       await new Promise(resolve => setTimeout(resolve, 1000))

@@ -73,6 +73,7 @@ export default defineNuxtConfig({
     log: {
       path: "", // path to the log file, every day a new log file will be created, use "" to disable logging
       attempts: 0,    // if an IP reach 0 requests (disabled), all the requests will be logged, can be used for further analysis or blocking for example with fail2ban, use 0 to disable logging
+      fail2ban: false, // enable fail2ban-compatible log format for ban events (see fail2ban section)
     },
     routes: [], // specify routes to apply rate limiting to, default is an empty array meaning all routes are protected.
     // Example:
@@ -102,6 +103,7 @@ export default defineNuxtConfig({
   log: {
     path: "", // Logging is disabled if path is empty
     attempts: 0, // Logging per IP is disabled if attempts is 0
+    fail2ban: false,
   },
   routes: [],
   ipTTL: 7 * 24 * 60 * 60, // 7 days in seconds
@@ -313,6 +315,68 @@ The `memory` and `fs` drivers are fine for:
 - Low-traffic applications where occasional race conditions are acceptable
 
 For everything else, use Redis.
+
+## Fail2ban Integration
+
+When a user exceeds the rate limit and gets banned, `nuxt-api-shield` can write ban events to the log file in a `fail2ban`-compatible format. You can then configure fail2ban to watch these logs and automatically block the IP at the firewall level.
+
+### Setup
+
+Enable fail2ban logging by setting `log.fail2ban` to `true` and configuring the `log.path`:
+
+```js
+export default defineNuxtConfig({
+  modules: ["nuxt-api-shield"],
+  nuxtApiShield: {
+    log: {
+      path: "/var/log/nuxt-api-shield", // required — must be set
+      attempts: 1,                       // optional — threshold for regular request logging
+      fail2ban: true,                     // enable fail2ban format
+    },
+  },
+})
+```
+
+When enabled, every ban event writes a line like:
+
+```
+2026-06-21 12:34:56,789 nuxt-api-shield ban 192.168.1.100 — /api/v3/login exceeded limit (12 requests in 108s)
+```
+
+### Fail2ban filter configuration
+
+Create `/etc/fail2ban/filter.d/nuxt-api-shield.conf`:
+
+```ini
+[Definition]
+failregex = ^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} nuxt-api-shield ban <HOST>
+```
+
+### Jail configuration
+
+Add a jail entry in `/etc/fail2ban/jail.local`:
+
+```ini
+[nuxt-api-shield]
+enabled  = true
+filter   = nuxt-api-shield
+logpath  = /var/log/nuxt-api-shield/shield-*.log
+port     = http,https
+banaction = iptables-multiport
+maxretry = 1
+findtime = 1
+bantime  = 3600
+```
+
+Since `nuxt-api-shield` already applies its own ban logic (configurable via `limit.ban`), set `maxretry = 1` and `findtime = 1` so fail2ban acts immediately on each ban log entry. Adjust `bantime` to match or extend your module-level ban duration.
+
+Restart fail2ban after adding the config:
+
+```bash
+sudo systemctl restart fail2ban
+```
+
+> **Note:** The `log.path` directory must be readable by the fail2ban service. Ensure permissions are set accordingly.
 
 ## TypeScript Types
 

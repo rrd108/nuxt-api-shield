@@ -32,20 +32,20 @@ export default defineEventHandler(async (event) => {
     || event.node.req?.socket?.remoteAddress
     || UNKNOWN_IP
 
+  // Rate limit config for this route
+  const routeLimit = getRouteLimit(url.pathname, config, matchingRoute)
+
   // Ban check
   const banKey = createKey({
     ipAddress: requestIP,
     prefix: 'ban',
   })
 
-  const isBanExpired = await checkBan(event, shieldStorage, banKey, config)
+  const isBanExpired = await checkBan(event, shieldStorage, banKey, config, requestIP, url.toString(), routeLimit)
 
   if (isBanExpired) {
     await shieldStorage.removeItem(banKey)
   }
-
-  // Rate limit check
-  const routeLimit = getRouteLimit(url.pathname, config, matchingRoute)
 
   // For wildcard patterns, use the pattern as the storage key so all matching paths share the same counter
   const storagePath = ('pattern' in matchingRoute && matchingRoute.pattern === true)
