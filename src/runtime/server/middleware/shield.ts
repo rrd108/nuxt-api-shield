@@ -5,6 +5,7 @@ import {
   getRouteLimit,
   findBestMatchingRoute,
 } from '../utils/routes'
+import { matchesPattern } from '../utils/patternMatcher'
 import createKey from '../utils/createKey'
 import { UNKNOWN_IP } from '../utils/constants'
 import { checkBan } from '../utils/ban'
@@ -17,6 +18,15 @@ export default defineEventHandler(async (event) => {
   // Check if this is an API route
   if (!url?.pathname?.startsWith('/api/')) {
     return
+  }
+
+  // Check if this route should be skipped
+  if (config.skipRoutes?.length) {
+    for (const route of config.skipRoutes) {
+      if (matchesPattern(route, url.pathname)) {
+        return
+      }
+    }
   }
 
   // Find the best matching route configuration

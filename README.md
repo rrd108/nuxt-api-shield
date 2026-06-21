@@ -80,6 +80,9 @@ export default defineNuxtConfig({
     routes: [], // specify routes to apply rate limiting to, default is an empty array meaning all routes are protected.
     // Example:
     // routes: ["/api/v2/", "/api/v3/"], // /api/v1 will not be protected, /api/v2/ and /api/v3/ will be protected */
+    skipRoutes: [], // specify routes to skip/exempt from rate limiting, supports wildcard patterns (*/**)
+    // Example:
+    // skipRoutes: ["/api/health", "/api/_nuxt/**", "/api/webhooks/stripe"],
     ipTTL: 604800, // Optional: Time-to-live in seconds for IP tracking entries (default: 7 days). Set to 0 or negative to disable this specific cleanup.
     security: {
       // Optional: Security-related configurations
@@ -108,6 +111,7 @@ export default defineNuxtConfig({
     fail2ban: false,
   },
   routes: [],
+  skipRoutes: [],
   ipTTL: 7 * 24 * 60 * 60, // 7 days in seconds
   security: {
     trustXForwardedFor: false,
@@ -488,6 +492,40 @@ Wildcard patterns allow you to apply the same limits to groups of related API en
 #### Important Notes
 - **Shared Rate Limits:** All requests that match the same wildcard pattern share the same rate limit counter.
 - **Security:** Broad or dangerous patterns like `/**` or `/*` are automatically rejected to prevent accidental global blocking.
+
+## Skipping Routes
+
+The `skipRoutes` option lets you exempt specific paths from all shield processing (ban check, rate limit counter, and logging) without needing to list every protected route in the `routes` array.
+
+This is useful for health checks, webhook endpoints, monitoring probes, or internal status routes that should always respond regardless of traffic.
+
+### Configuration Example
+
+```ts
+export default defineNuxtConfig({
+  modules: ["nuxt-api-shield"],
+
+  nuxtApiShield: {
+    limit: {
+      max: 12,
+      duration: 108,
+      ban: 3600,
+    },
+
+    skipRoutes: [
+      "/api/health",          // exact match
+      "/api/_nuxt/**",        // multi-segment wildcard
+      "/api/webhooks/stripe", // exact match
+    ],
+  },
+})
+```
+
+### How It Works
+
+- Routes in `skipRoutes` bypass the middleware entirely — no ban check, no rate limit counter, no log entry.
+- The rest of your API routes (those matching the global defaults or the `routes` option) continue to be rate limited normally.
+- Supports the same wildcard syntax as per-route patterns: `*` for single segment, `**` for multi-segment.
 
 ## Important Considerations
 

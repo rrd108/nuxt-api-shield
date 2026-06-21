@@ -26,6 +26,7 @@ export interface ModuleOptions {
   retryAfterHeader: boolean
   log?: LogEntry
   routes: Array<string | RouteLimitConfiguration>
+  skipRoutes?: string[]
   ipTTL?: number
   security?: {
     trustXForwardedFor?: boolean

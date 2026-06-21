@@ -25,6 +25,7 @@ export default defineNuxtModule<ModuleOptions>({
     retryAfterHeader: false,
     log: { path: '', attempts: 0 },
     routes: [],
+    skipRoutes: [],
     ipTTL: 7 * 24 * 60 * 60,
     security: {
       trustXForwardedFor: false,

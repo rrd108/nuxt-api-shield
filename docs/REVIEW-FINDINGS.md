@@ -25,7 +25,6 @@ This may be intentional for brute-force protection but can lock out legitimate u
 | Feature | Why |
 |---------|-----|
 | **IP allowlist / CIDR blocklist** | Exempt health checks, internal services, or block known bad ranges |
-| **`skipRoutes` / `excludeRoutes`** | Exempt `/api/health`, `/api/_nuxt/*`, webhooks |
 | **Standard rate-limit headers** | `X-RateLimit-Limit`, `Remaining`, `Reset` on all responses (not only `Retry-After` on ban) |
 | **Per-route ban scope** | `banScope: 'ip' \| 'ip+route'` |
 | **User/API-key based limiting** | IP limits are weak behind NAT and useless for authenticated APIs |
