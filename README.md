@@ -71,8 +71,8 @@ export default defineNuxtConfig({
     errorMessage: "Too Many Requests",  // error message when the user is banned, default is "Too Many Requests"
     retryAfterHeader: false, // when the user is banned add the Retry-After header to the response, default is false
     log: {
-      path: "logs", // path to the log file, every day a new log file will be created, use "" to disable logging
-      attempts: 100,    // if an IP reach 100 requests, all the requests will be logged, can be used for further analysis or blocking for example with fail2ban, use 0 to disable logging
+      path: "", // path to the log file, every day a new log file will be created, use "" to disable logging
+      attempts: 0,    // if an IP reach 0 requests (disabled), all the requests will be logged, can be used for further analysis or blocking for example with fail2ban, use 0 to disable logging
     },
     routes: [], // specify routes to apply rate limiting to, default is an empty array meaning all routes are protected.
     // Example:
@@ -100,8 +100,8 @@ export default defineNuxtConfig({
   errorMessage: "Too Many Requests",
   retryAfterHeader: false,
   log: {
-    path: "logs", // Logging is disabled if path is empty
-    attempts: 100, // Logging per IP is disabled if attempts is 0
+    path: "", // Logging is disabled if path is empty
+    attempts: 0, // Logging per IP is disabled if attempts is 0
   },
   routes: [],
   ipTTL: 7 * 24 * 60 * 60, // 7 days in seconds
