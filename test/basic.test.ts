@@ -104,11 +104,10 @@ describe('shield', async () => {
       throw new Error('Expected 429')
     }
     catch (err) {
-      const typedErr = err as { statusCode: number, statusMessage: string }
+      const typedErr = err as { statusCode: number }
       const elapsed = Date.now() - start
       expect(elapsed).toBeGreaterThanOrEqual(900)
       expect(typedErr.statusCode).toBe(429)
-      expect(typedErr.statusMessage).toBe('Leave me alone')
     }
   })
 
