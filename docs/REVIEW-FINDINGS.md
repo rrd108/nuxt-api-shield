@@ -29,7 +29,8 @@ If users forget `nitro.storage.shield`, requests fail at runtime with an unclear
 
 Legacy prefix matching in `findBestMatchingRoute()` means a route like `/api/v3` also matches `/api/v3-secret`.
 
-**Action:** Prefer explicit patterns or document this behavior clearly.
+**Action:** Prefer explicit patterns or document this behavior clearly.  
+**Fixed:** Prefix matching now checks for a path segment boundary — the matched prefix must be followed by `/` or end-of-string. `/api/v3` no longer matches `/api/v3-secret` but still matches `/api/v3/settings`.
 
 ---
 

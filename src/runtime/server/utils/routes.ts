@@ -59,7 +59,7 @@ export function findBestMatchingRoute(path: string, config: ModuleOptions) {
   const prefixMatches = routeConfigs
     .filter((route): route is string | { path: string } => {
       const routePath = typeof route === 'string' ? route : route.path
-      return path.startsWith(routePath)
+      return path.startsWith(routePath) && (path.length === routePath.length || path[routePath.length] === '/')
     })
 
   if (prefixMatches.length > 0) {

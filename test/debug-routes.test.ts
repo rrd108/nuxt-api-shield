@@ -39,4 +39,21 @@ describe('route matching debug', () => {
     console.log('No match:', noMatch)
     expect(noMatch).toBeNull()
   })
+
+  it('should not over-match on prefix segments', () => {
+    const config: ModuleOptions = {
+      limit: { max: 10, duration: 60, ban: 30 },
+      delayOnBan: false,
+      errorMessage: 'Too Many Requests',
+      retryAfterHeader: false,
+      routes: ['/api/v3'],
+    }
+
+    // /api/v3 should NOT match /api/v3-secret (different segment)
+    expect(findBestMatchingRoute('/api/v3-secret', config)).toBeNull()
+    // /api/v3 should match /api/v3/ (sub-path)
+    expect(findBestMatchingRoute('/api/v3/settings', config)).toBeDefined()
+    // Exact match
+    expect(findBestMatchingRoute('/api/v3', config)).toBeDefined()
+  })
 })
