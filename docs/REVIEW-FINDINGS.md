@@ -2,7 +2,7 @@
 
 Review date: 2026-06-21  
 Version reviewed: v1.0.0  
-Test status at review: 28/28 tests passing
+Test status at review: 29/29 tests passing
 
 This document captures performance, security, bug, and feature suggestions from a codebase review. Use it as a backlog for future work.
 
@@ -23,7 +23,7 @@ This may be intentional for brute-force protection but can lock out legitimate u
 If users forget `nitro.storage.shield`, requests fail at runtime with an unclear error.
 
 **Action:** Add a startup check in the module `setup()` hook with a clear error message.  
-**Fixed:** Added a one-time runtime check in the middleware. On the first matching request, `useStorage('shield')` is called in a try-catch. If the mount is missing, a clear error message is logged to the console with a configuration example.
+**Fixed:** Added a `modules:done` hook that checks `nuxt.options.nitro?.storage?.shield` at build time and warns with a config example if missing.
 
 ### 3. Prefix matching can over-match
 
