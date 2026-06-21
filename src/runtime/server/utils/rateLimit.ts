@@ -53,6 +53,10 @@ export const handleRateLimit = async (
       event.node.res.setHeader('Retry-After', routeLimit.ban)
     }
 
+    if (config.delayOnBan) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+    }
+
     throw createError({
       statusCode: 429,
       message: config.errorMessage,

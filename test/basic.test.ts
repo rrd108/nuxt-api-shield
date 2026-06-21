@@ -95,6 +95,23 @@ describe('shield', async () => {
     expect((response as ApiResponse).name).toBe('Gauranga')
   })
 
+  it('should delay the 429 response by 1 second when delayOnBan is true', async () => {
+    await $fetch('/api/basicexample?c=delay/1', { method: 'GET', retryStatusCodes: [] })
+    await $fetch('/api/basicexample?c=delay/2', { method: 'GET', retryStatusCodes: [] })
+    const start = Date.now()
+    try {
+      await $fetch('/api/basicexample?c=delay/3', { method: 'GET', retryStatusCodes: [] })
+      throw new Error('Expected 429')
+    }
+    catch (err) {
+      const typedErr = err as { statusCode: number, statusMessage: string }
+      const elapsed = Date.now() - start
+      expect(elapsed).toBeGreaterThanOrEqual(900)
+      expect(typedErr.statusCode).toBe(429)
+      expect(typedErr.statusMessage).toBe('Leave me alone')
+    }
+  })
+
   it('should enforce ban period after rate limit duration expires (issue #77)', async () => {
     // 1. Exceed the limit (2 requests in 3 seconds)
     await $fetch('/api/basicexample?c=77/1', { method: 'GET', retryStatusCodes: [] })
