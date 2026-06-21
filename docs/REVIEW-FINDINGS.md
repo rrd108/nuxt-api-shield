@@ -24,25 +24,19 @@ This may be intentional for brute-force protection but can lock out legitimate u
 
 **Action:** Consider per-route ban keys (`ban:/api/login:IP`) as a configurable option (`banScope: 'ip' | 'ip+route'`).
 
-### 3. Race condition under concurrency
-
-Rate limiting uses read → increment → write without atomicity in `src/runtime/server/utils/rateLimit.ts`. Concurrent requests can both read the same count and slip through.
-
-**Action:** With Redis, use `INCR` or Lua scripts. Document this limitation for `memory`/`fs` drivers.
-
-### 4. IPv6 + filesystem storage keys
+### 3. IPv6 + filesystem storage keys
 
 Keys like `ip:/api/foo:2001:db8::1` contain many colons. The `fs` driver may mishandle these on some filesystems.
 
 **Action:** Sanitize IPs in keys (e.g. replace `:` with `_` or use a hash).
 
-### 5. No validation that `shield` storage exists
+### 4. No validation that `shield` storage exists
 
 If users forget `nitro.storage.shield`, requests fail at runtime with an unclear error.
 
 **Action:** Add a startup check in the module `setup()` hook with a clear error message.
 
-### 6. Prefix matching can over-match
+### 5. Prefix matching can over-match
 
 Legacy prefix matching in `findBestMatchingRoute()` means a route like `/api/v3` also matches `/api/v3-secret`.
 
@@ -52,31 +46,7 @@ Legacy prefix matching in `findBestMatchingRoute()` means a route like `/api/v3`
 
 ## Performance
 
-### 1. Multiple storage round-trips per request
-
-Each protected request typically performs:
-
-- `getItem(banKey)`
-- optionally `removeItem(banKey)`
-- `getItem(ipKey)` + `setItem(ipKey)`
-
-That is 2–4 I/O operations per request.
-
-**Action:** With Redis, consider pipelining or a single JSON blob per IP. Document that `fs` does not scale well under load.
-
-### 2. Recommend Redis for production
-
-For multi-instance deployments, `memory` and `fs` are per-process and ineffective.
-
-**Action:** Document Redis (or another shared store) as required for production clusters.
-
-### 3. Cleanup tasks scan all keys
-
-`cleanBans` and `cleanIpData` call `getKeys()` and iterate every entry. At large scale this can block the event loop.
-
-**Action:** Consider TTL-native storage (Redis `EXPIRE`), batched SCAN, or rely more on lazy expiry on read (already done for bans in middleware).
-
-### 4. File logging on hot path
+### 1. File logging on hot path
 
 `shieldLog()` uses `appendFile` on the request path when `count >= attempts`. Under attack, this adds disk I/O.
 

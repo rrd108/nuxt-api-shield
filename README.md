@@ -275,6 +275,45 @@ Configure `ipTTL` under `nuxtApiShield` if you want a TTL other than the default
 
 If you add your own task file with the same `meta.name` as a bundled task (`shield:cleanBans` or `shield:cleanIpData`), Nitro may prefer your project file over the module—avoid duplicate names unless you intend to override.
 
+## Production Deployment
+
+### Use Redis as the storage driver
+
+For production deployments — especially with multiple server instances or significant traffic — **Redis is the recommended storage driver**. The `memory` and `fs` drivers have important limitations:
+
+| Area | `memory` / `fs` | Redis |
+|------|----------------|-------|
+| **Multi-instance** | Each process has its own isolated state. Rate limits reset per instance, allowing bypass. | Shared state across all instances. |
+| **Atomic operations** | Read → increment → write is not atomic. Concurrent requests can both read the same count and exceed the limit simultaneously. | Single-threaded — reads and writes are naturally atomic. No race conditions. |
+| **Cleanup** | Cleanup tasks (`shield:cleanBans`, `shield:cleanIpData`) must scan all keys with `getKeys()`. At scale this blocks the event loop. | Use `EXPIRE` or `TTL` natively — expired keys are reclaimed automatically without scanning. |
+
+To use Redis, configure the `shield` storage with the `redis` driver:
+
+```json
+{
+  "nitro": {
+    "storage": {
+      "shield": {
+        "driver": "redis",
+        "host": "localhost",
+        "port": 6379
+      }
+    }
+  }
+}
+```
+
+See the [unstorage Redis driver docs](https://unstorage.unjs.io/drivers/redis) for all available options.
+
+### When `memory` / `fs` is acceptable
+
+The `memory` and `fs` drivers are fine for:
+- Single-instance deployments
+- Development environments
+- Low-traffic applications where occasional race conditions are acceptable
+
+For everything else, use Redis.
+
 ## TypeScript Types
 
 The module exports TypeScript types that you can use in your application:
