@@ -1,15 +1,9 @@
-import { createError } from 'h3'
 import type { H3Event } from 'h3'
 import type { ModuleOptions, LimitConfiguration } from '../../type'
 import type { Storage } from 'nitropack'
 import { shieldLogBan } from './shieldLog'
 import { setRateLimitHeaders } from './rateLimit'
 
-/**
- * Checks if a user is currently banned and handles the response.
- * @returns boolean True if the user was banned but the ban has expired (needs cleanup)
- * @throws H3Error 429 if the user is currently banned
- */
 export const checkBan = async (
   event: H3Event,
   shieldStorage: Storage,
@@ -18,7 +12,7 @@ export const checkBan = async (
   requestIP?: string,
   url?: string,
   routeLimit?: LimitConfiguration,
-) => {
+): Promise<boolean | 'banned'> => {
   const bannedUntilRaw = await shieldStorage.getItem(banKey)
   if (!bannedUntilRaw) {
     return false
@@ -43,10 +37,11 @@ export const checkBan = async (
     if (config.delayOnBan) {
       await new Promise(resolve => setTimeout(resolve, 1000))
     }
-    throw createError({
-      statusCode: 429,
-      message: config.errorMessage,
-    })
+    const retryAfter = Math.ceil((bannedUntil - Date.now()) / 1e3)
+    event.node.res.statusCode = 429
+    event.node.res.setHeader('Content-Type', 'application/json')
+    event.node.res.end(JSON.stringify({ error: config.errorMessage, retryAfter }))
+    return 'banned'
   }
 
   return true // Ban expired

@@ -1,4 +1,3 @@
-import { createError } from 'h3'
 import type { H3Event } from 'h3'
 import type { ModuleOptions, LimitConfiguration } from '../../type'
 import type { Storage } from 'nitropack'
@@ -16,10 +15,6 @@ export const setRateLimitHeaders = (
   event.node.res.setHeader('X-RateLimit-Reset', reset)
 }
 
-/**
- * Handles the rate limiting logic for a specific request.
- * @throws H3Error 429 if the rate limit is exceeded
- */
 export const handleRateLimit = async (
   event: H3Event,
   shieldStorage: Storage,
@@ -77,10 +72,10 @@ export const handleRateLimit = async (
       await new Promise(resolve => setTimeout(resolve, 1000))
     }
 
-    throw createError({
-      statusCode: 429,
-      message: config.errorMessage,
-    })
+    event.node.res.statusCode = 429
+    event.node.res.setHeader('Content-Type', 'application/json')
+    event.node.res.end(JSON.stringify({ error: config.errorMessage, retryAfter: routeLimit.ban }))
+    return
   }
 
   // Update the count for the current duration

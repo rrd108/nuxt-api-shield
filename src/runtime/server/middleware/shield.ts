@@ -51,9 +51,13 @@ export default defineEventHandler(async (event) => {
     prefix: 'ban',
   })
 
-  const isBanExpired = await checkBan(event, shieldStorage, banKey, config, requestIP, url.toString(), routeLimit)
+  const banResult = await checkBan(event, shieldStorage, banKey, config, requestIP, url.toString(), routeLimit)
 
-  if (isBanExpired) {
+  if (banResult === 'banned') {
+    return
+  }
+
+  if (banResult) {
     await shieldStorage.removeItem(banKey)
   }
 

@@ -36,6 +36,7 @@ This Nuxt module implements a rate limiting middleware to protect your API endpo
   - Registers Nitro tasks `shield:cleanBans` and `shield:cleanIpData` so you can schedule maintenance without adding task files (see setup step 4).
 - **Clear Error Handling**
   - Returns a standardized 429 "Too Many Requests" error response when rate limits are exceeded or when a user is banned.
+  - The 429 body is JSON (`{ error, retryAfter }`) for predictable client-side handling.
   - Facilitates proper error handling in client-side applications for a smooth user experience.
 - **Standard Rate-Limit Headers**
   - Every response includes `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` headers so clients and CDNs can track usage without parsing response bodies.

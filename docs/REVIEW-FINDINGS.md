@@ -39,9 +39,8 @@ This may be intentional for brute-force protection but can lock out legitimate u
 ## Smaller improvements
 
 1. **Export `ModuleOptions` from package exports** — README imports it; verify the public API surface matches `./types` export.
-2. **429 response body** — Return JSON `{ error, retryAfter }` instead of plain text for easier client handling.
-3. **Ban count / progressive bans** — Escalate ban duration for repeat offenders.
-4. **Nitro route rules integration** — Optional tie-in with Nitro's built-in rate limiting for edge deployments.
+2. **Ban count / progressive bans** — Escalate ban duration for repeat offenders.
+3. **Nitro route rules integration** — Optional tie-in with Nitro's built-in rate limiting for edge deployments.
 
 ---
 
