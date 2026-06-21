@@ -41,7 +41,7 @@ The test fixture `test/fixtures/withPerRouteLimit/nuxt.config.ts` even sets `ban
 **Action:** Update docs to reflect per-route `ban` support, or explicitly strip `ban` from route overrides if global-only ban is intended.  
 **Fixed:** Removed misleading `// ⚠️ "ban" always uses the global value` comment from README per-route example.
 
-### 4. Playground schedules a non-existent task
+### 4. Playground schedules a non-existent task ✅
 
 `playground/nuxt.config.ts` schedules `shield:clean`, but the module registers:
 
@@ -50,7 +50,8 @@ The test fixture `test/fixtures/withPerRouteLimit/nuxt.config.ts` even sets `ban
 
 Cleanup never runs in the playground.
 
-**Action:** Fix playground `scheduledTasks` to use the correct task names.
+**Action:** Fix playground `scheduledTasks` to use the correct task names.  
+**Fixed:** Changed `'shield:clean'` to `['shield:cleanBans', 'shield:cleanIpData']` in playground config.
 
 ### 5. Empty client plugin is registered
 

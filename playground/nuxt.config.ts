@@ -14,7 +14,7 @@ export default defineNuxtConfig({
       tasks: true,
     },
     scheduledTasks: {
-      '*/5 * * * *': ['shield:clean'],
+      '*/5 * * * *': ['shield:cleanBans', 'shield:cleanIpData'],
     },
   },
   nuxtApiShield: {
