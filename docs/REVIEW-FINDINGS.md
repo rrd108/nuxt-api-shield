@@ -14,7 +14,8 @@ This document captures performance, security, bug, and feature suggestions from 
 
 Default in `src/module.ts` is `true`. Spoofed `X-Forwarded-For` headers can bypass limits when the app is not behind a trusted proxy.
 
-**Action:** Consider defaulting to `false` and documenting when to enable (similar to Express `trust proxy`).
+**Action:** Consider defaulting to `false` and documenting when to enable (similar to Express `trust proxy`).  
+**Fixed:** Default changed to `false`. Fallback in middleware aligned to `?? false`. README Security Warning updated. Users behind a trusted proxy should explicitly set `security: { trustXForwardedFor: true }`.
 
 ### 2. Bans are IP-global, not per-route
 

@@ -80,7 +80,7 @@ export default defineNuxtConfig({
     ipTTL: 604800, // Optional: Time-to-live in seconds for IP tracking entries (default: 7 days). Set to 0 or negative to disable this specific cleanup.
     security: {
       // Optional: Security-related configurations
-      trustXForwardedFor: true, // Default: true. Whether to trust X-Forwarded-For headers. See warning below.
+      trustXForwardedFor: false, // Default: false. Whether to trust X-Forwarded-For headers. See warning below.
     },
   },
 });
@@ -106,14 +106,14 @@ export default defineNuxtConfig({
   routes: [],
   ipTTL: 7 * 24 * 60 * 60, // 7 days in seconds
   security: {
-    trustXForwardedFor: true,
+    trustXForwardedFor: false,
   }
 }
 ```
 
 **Security Warning: `trustXForwardedFor`**
 
-The `security.trustXForwardedFor` option (default is `true`, set by the module) determines if the module uses the `X-Forwarded-For` HTTP header to identify the client's IP address.
+The `security.trustXForwardedFor` option (default is `false`, set by the module) determines if the module uses the `X-Forwarded-For` HTTP header to identify the client's IP address.
 
 - If set to `true`: The module will use the IP address provided in the `X-Forwarded-For` header. This is common when your Nuxt application is behind a trusted reverse proxy, load balancer, or CDN (like Nginx, Cloudflare, AWS ELB/ALB) that correctly sets this header with the real client IP.
 - **WARNING:** If `trustXForwardedFor` is `true` and your application is directly internet-facing OR your proxy is not configured to strip incoming `X-Forwarded-For` headers from clients, malicious users can spoof their IP address by sending a fake `X-Forwarded-For` header. This would allow them to bypass rate limits or cause other users to be incorrectly rate-limited.

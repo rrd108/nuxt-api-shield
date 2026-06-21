@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const shieldStorage = useStorage('shield')
-  const trustXForwardedFor = config.security?.trustXForwardedFor ?? true
+  const trustXForwardedFor = config.security?.trustXForwardedFor ?? false
   const requestIP = getRequestIP(event, { xForwardedFor: trustXForwardedFor })
     || event.node.req?.socket?.remoteAddress
     || UNKNOWN_IP
