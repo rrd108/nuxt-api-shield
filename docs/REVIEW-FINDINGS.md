@@ -29,7 +29,8 @@ This may be intentional for brute-force protection but can lock out legitimate u
 
 Keys like `ip:/api/foo:2001:db8::1` contain many colons. The `fs` driver may mishandle these on some filesystems.
 
-**Action:** Sanitize IPs in keys (e.g. replace `:` with `_` or use a hash).
+**Action:** Sanitize IPs in keys (e.g. replace `:` with `_` or use a hash).  
+**Fixed:** `createKey()` now replaces `:` with `_` in the IP address before building the key. IPv6 `2001:db8::1` becomes `2001_db8__1` in storage keys. IPv4 addresses (dots, no colons) are unchanged.
 
 ### 4. No validation that `shield` storage exists
 
@@ -80,7 +81,7 @@ Legacy prefix matching in `findBestMatchingRoute()` means a route like `/api/v3`
 2. **429 response body** — Return JSON `{ error, retryAfter }` instead of plain text for easier client handling.
 3. **Ban count / progressive bans** — Escalate ban duration for repeat offenders.
 4. **Nitro route rules integration** — Optional tie-in with Nitro's built-in rate limiting for edge deployments.
-5. **CHANGELOG duplicate v0.10.2 section** — Two entries for the same version; clean up for clarity.
+5. **CHANGELOG duplicate v0.10.2 section** — Two entries for the same version; clean up for clarity. **Fixed in v1.0.0.**
 
 ---
 
