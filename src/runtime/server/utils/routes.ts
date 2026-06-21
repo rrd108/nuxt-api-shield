@@ -82,8 +82,10 @@ export function findBestMatchingRoute(path: string, config: ModuleOptions) {
  * @param config - The module configuration containing global and per-route settings.
  * @returns The merged rate limit configuration for the route.
  */
-export function getRouteLimit(path: string, config: ModuleOptions): LimitConfiguration {
-  const matchingRoute = findBestMatchingRoute(path, config)
+export function getRouteLimit(path: string, config: ModuleOptions, matchingRoute?: ReturnType<typeof findBestMatchingRoute>): LimitConfiguration {
+  if (!matchingRoute) {
+    matchingRoute = findBestMatchingRoute(path, config)
+  }
 
   if (!matchingRoute) {
     return config.limit

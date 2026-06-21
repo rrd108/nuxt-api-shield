@@ -60,11 +60,12 @@ Cleanup never runs in the playground.
 **Action:** Remove unless client-side features are planned.  
 **Fixed:** Removed `addPlugin` call from module.ts and deleted the empty `src/runtime/plugin.ts` file.
 
-### 6. Duplicate route matching on every request
+### 6. Duplicate route matching on every request ✅
 
 In `src/runtime/server/middleware/shield.ts`, `findBestMatchingRoute()` runs once, then `getRouteLimit()` calls it again internally.
 
-**Action:** Cache the first match result and pass it to `getRouteLimit()` to avoid duplicate work.
+**Action:** Cache the first match result and pass it to `getRouteLimit()` to avoid duplicate work.  
+**Fixed:** `getRouteLimit()` now accepts an optional pre-matched route parameter; middleware passes the already-found `matchingRoute`.
 
 ---
 

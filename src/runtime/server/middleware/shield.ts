@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Rate limit check
-  const routeLimit = getRouteLimit(url.pathname, config)
+  const routeLimit = getRouteLimit(url.pathname, config, matchingRoute)
 
   // For wildcard patterns, use the pattern as the storage key so all matching paths share the same counter
   const storagePath = ('pattern' in matchingRoute && matchingRoute.pattern === true)
