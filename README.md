@@ -37,6 +37,8 @@ This Nuxt module implements a rate limiting middleware to protect your API endpo
 - **Clear Error Handling**
   - Returns a standardized 429 "Too Many Requests" error response when rate limits are exceeded or when a user is banned.
   - Facilitates proper error handling in client-side applications for a smooth user experience.
+- **Standard Rate-Limit Headers**
+  - Every response includes `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` headers so clients and CDNs can track usage without parsing response bodies.
 
 ## Quick Setup
 

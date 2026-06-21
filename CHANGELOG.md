@@ -9,6 +9,7 @@ Previously `true`, which allowed IP spoofing on directly internet-facing apps. I
 ### 🚀 Features
 
 - **delayOnBan** — 1-second delay before 429 when user is banned (was documented but not implemented)
+- **Standard rate-limit headers** — `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` on all responses
 - **Fail2ban export format** — `log.fail2ban` writes ban events in fail2ban-compatible format for firewall-level blocking
 - Cache route match result to avoid duplicate `findBestMatchingRoute()` calls
 

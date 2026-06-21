@@ -5,6 +5,17 @@ import type { Storage } from 'nitropack'
 import type { RateLimit } from '../types/RateLimit'
 import shieldLog, { shieldLogBan } from './shieldLog'
 
+export const setRateLimitHeaders = (
+  event: H3Event,
+  limit: number,
+  remaining: number,
+  reset: number,
+) => {
+  event.node.res.setHeader('X-RateLimit-Limit', limit)
+  event.node.res.setHeader('X-RateLimit-Remaining', Math.max(0, remaining))
+  event.node.res.setHeader('X-RateLimit-Reset', reset)
+}
+
 /**
  * Handles the rate limiting logic for a specific request.
  * @throws H3Error 429 if the rate limit is exceeded
@@ -24,6 +35,8 @@ export const handleRateLimit = async (
 
   // Check if a new request is outside the duration window
   if (!rateLimitState || (now - rateLimitState.time) / 1000 >= routeLimit.duration) {
+    const reset = Math.ceil((now + routeLimit.duration * 1000) / 1000)
+    setRateLimitHeaders(event, routeLimit.max, routeLimit.max - 1, reset)
     await shieldStorage.setItem(ipKey, {
       count: 1,
       time: now,
@@ -40,8 +53,13 @@ export const handleRateLimit = async (
 
   shieldLog(updatedState, requestIP, url, config.log)
 
+  const windowEnd = rateLimitState.time + routeLimit.duration * 1000
+  const reset = Math.ceil(windowEnd / 1000)
+
   // Check if the new count triggers a rate limit
   if (newCount > routeLimit.max) {
+    setRateLimitHeaders(event, routeLimit.max, 0, reset)
+
     const banUntil = now + routeLimit.ban * 1e3
     await shieldStorage.setItem(banKey, banUntil)
     await shieldStorage.setItem(ipKey, {
@@ -66,5 +84,6 @@ export const handleRateLimit = async (
   }
 
   // Update the count for the current duration
+  setRateLimitHeaders(event, routeLimit.max, routeLimit.max - newCount, reset)
   await shieldStorage.setItem(ipKey, updatedState)
 }
