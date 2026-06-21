@@ -22,7 +22,8 @@ This may be intentional for brute-force protection but can lock out legitimate u
 
 If users forget `nitro.storage.shield`, requests fail at runtime with an unclear error.
 
-**Action:** Add a startup check in the module `setup()` hook with a clear error message.
+**Action:** Add a startup check in the module `setup()` hook with a clear error message.  
+**Fixed:** Added a one-time runtime check in the middleware. On the first matching request, `useStorage('shield')` is called in a try-catch. If the mount is missing, a clear error message is logged to the console with a configuration example.
 
 ### 3. Prefix matching can over-match
 

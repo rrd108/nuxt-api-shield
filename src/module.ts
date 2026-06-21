@@ -38,6 +38,22 @@ export default defineNuxtModule<ModuleOptions>({
       options,
     ) as typeof nuxt.options.runtimeConfig.public.nuxtApiShield
 
+    nuxt.hook('modules:done', () => {
+      const nitroStorage = (nuxt.options as Record<string, any>).nitro?.storage
+      if (!nitroStorage?.shield) {
+        console.warn(
+          '[nuxt-api-shield] Missing storage configuration: "nitro.storage.shield".\n'
+          + 'Add a "shield" storage entry to your nuxt.config, for example:\n\n'
+          + '  nitro: {\n'
+          + '    storage: {\n'
+          + '      shield: { driver: "fs", base: "./shield" }\n'
+          + '    }\n'
+          + '  }\n\n'
+          + 'The module will work but rate limit data resets on restart.',
+        )
+      }
+    })
+
     addServerImports([
       {
         name: 'isActualBanTimestampExpired',
