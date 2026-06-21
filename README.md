@@ -349,7 +349,7 @@ export default defineNuxtConfig({
         path: "/api/example-per-route",
         max: 5,
         duration: 10,
-        // ⚠️ "ban" always uses the global value
+        // "ban" can also be overridden per route
       },
 
       // 3. Object: Wildcard pattern

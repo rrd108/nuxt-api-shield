@@ -20,24 +20,26 @@ The option appears in config, types, and README, but no runtime code applies a d
 
 **Action:** Either implement in `checkBan()` (e.g. progressive delay based on ban count) or remove from docs/defaults to avoid misleading users.
 
-### 2. README vs module defaults mismatch for logging
+### 2. README vs module defaults mismatch for logging ✅
 
 | Setting | `module.ts` default | README default |
 |---------|---------------------|----------------|
-| `log.path` | `''` (disabled) | `"logs"` |
-| `log.attempts` | `0` (disabled) | `100` |
+| `log.path` | `''` (disabled) | `""` (fixed) |
+| `log.attempts` | `0` (disabled) | `0` (fixed) |
 
 Users reading the README may expect logging on by default when it is actually off.
 
-**Action:** Align README with actual module defaults, or change defaults to match README.
+**Action:** Align README with actual module defaults, or change defaults to match README.  
+**Fixed in `8f6d668`:** Both inline config example and default values block updated in README.
 
-### 3. README says per-route `ban` is ignored — code merges it
+### 3. README says per-route `ban` is ignored — code merges it ✅
 
-README states ban always uses the global value, but `getRouteLimit()` in `src/runtime/server/utils/routes.ts` merges route config over global via `Object.assign({}, config.limit, matchingRoute)`.
+README stated ban always uses the global value, but `getRouteLimit()` in `src/runtime/server/utils/routes.ts` merges route config over global via `Object.assign({}, config.limit, matchingRoute)`.
 
 The test fixture `test/fixtures/withPerRouteLimit/nuxt.config.ts` even sets `ban: 50` per route.
 
-**Action:** Update docs to reflect per-route `ban` support, or explicitly strip `ban` from route overrides if global-only ban is intended.
+**Action:** Update docs to reflect per-route `ban` support, or explicitly strip `ban` from route overrides if global-only ban is intended.  
+**Fixed:** Removed misleading `// ⚠️ "ban" always uses the global value` comment from README per-route example.
 
 ### 4. Playground schedules a non-existent task
 
