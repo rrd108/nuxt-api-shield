@@ -13,7 +13,7 @@ import { checkBan } from '../utils/ban'
 import { handleRateLimit } from '../utils/rateLimit'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig().public.nuxtApiShield as ModuleOptions
+  const config = useRuntimeConfig().nuxtApiShield as ModuleOptions
   const url = getRequestURL(event)
   // Match on the decoded path the router uses, not the raw URL, so encoded
   // variants like /%61pi/login can't skip the shield.

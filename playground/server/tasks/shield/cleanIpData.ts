@@ -8,7 +8,7 @@ export default defineTask({
   },
   async run() {
     const shieldStorage = useStorage('shield')
-    const config = useRuntimeConfig().public.nuxtApiShield
+    const config = useRuntimeConfig().nuxtApiShield
 
     // ipTTL is expected to be in seconds from config, module applies default if not set by user
     const ipTTLseconds = config.ipTTL

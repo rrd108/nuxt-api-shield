@@ -94,6 +94,8 @@ export default defineNuxtConfig({
 });
 ```
 
+The resolved options are kept in the server-only runtime config (`useRuntimeConfig().nuxtApiShield`) and are never sent to the browser. Runtime overrides use the `NUXT_NUXT_API_SHIELD_*` environment variables.
+
 **Default Configuration Values:**
 (These are applied by the module if not specified in your `nuxtApiShield` config)
 
@@ -242,7 +244,7 @@ export default defineTask({
   },
   async run() {
     const shieldStorage = useStorage("shield");
-    const config = useRuntimeConfig().public.nuxtApiShield;
+    const config = useRuntimeConfig().nuxtApiShield;
 
     // ipTTL is expected to be in seconds from config (module applies default if not set by user)
     const ipTTLseconds = config.ipTTL;

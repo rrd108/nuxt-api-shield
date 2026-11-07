@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking: config moved to private runtime config
+
+The module options were stored in `runtimeConfig.public.nuxtApiShield`, which Nuxt serializes into every HTML page, exposing limits, `skipRoutes` and the log path. They now live in the server-only `runtimeConfig.nuxtApiShield`. Read them with `useRuntimeConfig().nuxtApiShield` in custom tasks, and rename runtime env overrides from `NUXT_PUBLIC_NUXT_API_SHIELD_*` to `NUXT_NUXT_API_SHIELD_*`. A `runtimeConfig.public.nuxtApiShield` block in `nuxt.config` is still merged in, with a deprecation warning.
+
 ### Breaking: `X-Forwarded-For` is read from the right
 
 With `trustXForwardedFor: true` the module used the **leftmost** entry, which the client controls behind most proxies, so attackers could rotate it to bypass limits or spoof someone else's IP into a ban (and into the fail2ban log). The client IP is now read `security.trustedProxyHops` entries from the right (default `1`). If you run two or more proxies that append to the header, set `trustedProxyHops` accordingly.

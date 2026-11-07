@@ -8,7 +8,7 @@ export default defineTask({
   },
   async run() {
     const shieldStorage = useStorage('shield')
-    const config = useRuntimeConfig().public.nuxtApiShield
+    const config = useRuntimeConfig().nuxtApiShield
     const ipTTLseconds = config.ipTTL
 
     if (!ipTTLseconds || ipTTLseconds <= 0) {

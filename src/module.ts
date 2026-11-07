@@ -35,10 +35,24 @@ export default defineNuxtModule<ModuleOptions>({
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
-    nuxt.options.runtimeConfig.public.nuxtApiShield = defu(
-      nuxt.options.runtimeConfig.public.nuxtApiShield as ModuleOptions,
+    // Keep the options in the private (server-only) runtime config. Public
+    // runtime config is serialized into every HTML page, which would expose
+    // limits, skipRoutes and the log path to anyone.
+    const publicRuntimeConfig = nuxt.options.runtimeConfig.public as Record<string, unknown>
+    const legacyPublicConfig = publicRuntimeConfig.nuxtApiShield as Partial<ModuleOptions> | undefined
+    if (legacyPublicConfig) {
+      console.warn(
+        '[nuxt-api-shield] "runtimeConfig.public.nuxtApiShield" is deprecated and exposes your config to the browser. '
+        + 'Move it to "runtimeConfig.nuxtApiShield".',
+      )
+      delete publicRuntimeConfig.nuxtApiShield
+    }
+
+    nuxt.options.runtimeConfig.nuxtApiShield = defu(
+      nuxt.options.runtimeConfig.nuxtApiShield as Partial<ModuleOptions> | undefined,
+      legacyPublicConfig,
       options,
-    ) as typeof nuxt.options.runtimeConfig.public.nuxtApiShield
+    ) as typeof nuxt.options.runtimeConfig.nuxtApiShield
 
     nuxt.hook('modules:done', () => {
       const nitroStorage = (nuxt.options as Record<string, any>).nitro?.storage

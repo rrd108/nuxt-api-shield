@@ -140,4 +140,10 @@ describe('shield', async () => {
     const response = await $fetch('/api/basicexample?c=77/5', { method: 'GET', retryStatusCodes: [] })
     expect((response as ApiResponse).name).toBe('Gauranga')
   })
+
+  it('does not expose the module config in the rendered page', async () => {
+    const html = await $fetch<string>('/', { method: 'GET', retryStatusCodes: [] })
+    expect(html).toContain('<div')
+    expect(html).not.toContain('nuxtApiShield')
+  })
 })
