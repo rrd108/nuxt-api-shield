@@ -55,7 +55,7 @@ export default defineNuxtModule<ModuleOptions>({
     ) as typeof nuxt.options.runtimeConfig.nuxtApiShield
 
     nuxt.hook('modules:done', () => {
-      const nitroStorage = (nuxt.options as Record<string, any>).nitro?.storage
+      const nitroStorage = nuxt.options.nitro?.storage
       if (!nitroStorage?.shield) {
         console.warn(
           '[nuxt-api-shield] Missing storage configuration: "nitro.storage.shield".\n'
@@ -106,7 +106,5 @@ export default defineNuxtModule<ModuleOptions>({
       middleware: true,
       handler: resolver.resolve('./runtime/server/middleware/shield'),
     })
-
-
   },
 })

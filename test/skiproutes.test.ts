@@ -2,7 +2,6 @@ import { fileURLToPath } from 'node:url'
 import { rm } from 'node:fs/promises'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { setup, $fetch } from '@nuxt/test-utils/e2e'
-import type { ApiResponse } from './ApiResponse'
 
 const storagePath = fileURLToPath(new URL('../_testSkipRoutesShield', import.meta.url))
 
