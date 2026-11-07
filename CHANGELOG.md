@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### 🔒 Security
+
+- **Percent-encoded paths no longer bypass the shield** — the middleware matched on the raw URL while the router decodes it, so `/%61pi/login` or `/api/logi%6E` reached `/api/login` with no rate limit and even while the IP was banned. The shield now uses the same decoded path as the router and ignores trailing slashes.
+
 ## v1.0.0
 
 ### Breaking: `security.trustXForwardedFor` now defaults to `false`
