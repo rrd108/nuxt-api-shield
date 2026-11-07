@@ -60,3 +60,6 @@ _test*
 
 # Snyk Security Extension - AI Rules (auto-generated)
 .cursor/rules/snyk_rules.mdc
+
+# Local npm config (may hold auth tokens)
+.npmrc
