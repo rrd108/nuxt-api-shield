@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.1.1
+
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v1.1.0...v1.1.1)
+
+### 🩹 Fixes
+
+- Stop bundling nitropack types into dist/module.d.mts ([bb5cb8b](https://github.com/rrd108/nuxt-api-shield/commit/bb5cb8b))
+
+### 🏡 Chore
+
+- Stop tracking .npmrc ([120e945](https://github.com/rrd108/nuxt-api-shield/commit/120e945))
+
+### ❤️ Contributors
+
+- Rrd108 ([@rrd108](https://github.com/rrd108))
+
 ## v1.1.0
 
 [compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v1.0.0...v1.1.0)
