@@ -13,7 +13,6 @@ describe('simple wildcard test', async () => {
   await setup({
     rootDir: fileURLToPath(new URL('./fixtures/wildcard', import.meta.url)),
     nuxtConfig: {
-      // @ts-expect-error: Nitro storage configuration is not fully typed in this test environment
       nitro: {
         storage: {
           shield: {

@@ -51,13 +51,13 @@ describe('shield', async () => {
   it('respond to the 2nd api call when more then limit.duration time passes', async () => {
     // see #13
     // req.count = 1
-    let response = await $fetch('/api/basicexample?c=2/1', {
+    await $fetch('/api/basicexample?c=2/1', {
       method: 'GET',
       retryStatusCodes: [],
     })
 
     // req.count = 2
-    response = await $fetch('/api/basicexample?c=2/2', {
+    const response = await $fetch('/api/basicexample?c=2/2', {
       method: 'GET',
       retryStatusCodes: [],
     })

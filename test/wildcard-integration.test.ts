@@ -17,7 +17,6 @@ describe('wildcard route matching', async () => {
   await setup({
     rootDir: fileURLToPath(new URL('./fixtures/wildcard', import.meta.url)),
     nuxtConfig: {
-      // @ts-expect-error: Nitro storage configuration is not fully typed in this test environment
       nitro: {
         storage: {
           shield: {
@@ -111,7 +110,7 @@ describe('wildcard route matching', async () => {
       expect(basicResponse).toHaveProperty('result')
     }
     catch (error) {
-      throw new Error(`Basic route test failed - server may not be ready: ${error}`)
+      throw new Error(`Basic route test failed - server may not be ready: ${error}`, { cause: error })
     }
 
     // Test the multi-segment routes with generous timeout
@@ -147,7 +146,7 @@ describe('wildcard route matching', async () => {
       const statusCode = err.statusCode || err.response?.status || err.status || 'Unknown status'
       const contentType = err.response?.headers?.get('content-type') || 'Unknown content-type'
 
-      throw new Error(`Failed to access /api/reports/monthly/2023/summary: ${errorMessage} (Status: ${statusCode}, Content-Type: ${contentType}) Data: ${JSON.stringify(errorData)}`)
+      throw new Error(`Failed to access /api/reports/monthly/2023/summary: ${errorMessage} (Status: ${statusCode}, Content-Type: ${contentType}) Data: ${JSON.stringify(errorData)}`, { cause: error })
     }
 
     // Add longer delay for CI stability
@@ -184,7 +183,7 @@ describe('wildcard route matching', async () => {
       const statusCode = err.statusCode || err.response?.status || err.status || 'Unknown status'
       const contentType = err.response?.headers?.get('content-type') || 'Unknown content-type'
 
-      throw new Error(`Failed to access /api/reports/annual/summary: ${errorMessage} (Status: ${statusCode}, Content-Type: ${contentType}) Data: ${JSON.stringify(errorData)}`)
+      throw new Error(`Failed to access /api/reports/annual/summary: ${errorMessage} (Status: ${statusCode}, Content-Type: ${contentType}) Data: ${JSON.stringify(errorData)}`, { cause: error })
     }
 
     // Add another longer delay
@@ -211,7 +210,7 @@ describe('wildcard route matching', async () => {
 
       // Additional check to ensure we're not getting HTML responses
       if (typeof err.data === 'string' && err.data.startsWith('<!DOCTYPE')) {
-        throw new Error('Received HTML error page instead of JSON response')
+        throw new Error('Received HTML error page instead of JSON response', { cause: error })
       }
     }
   })
