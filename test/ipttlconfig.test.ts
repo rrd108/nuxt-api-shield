@@ -35,6 +35,6 @@ describe('ipTTL config options', async () => {
       method: 'GET',
       retryStatusCodes: [],
     })
-    expect(response.security).toEqual({ trustXForwardedFor: true })
+    expect(response.security).toEqual({ trustXForwardedFor: true, trustedProxyHops: 1 })
   })
 })

@@ -1,4 +1,4 @@
-import { defineEventHandler, getRequestURL, getRequestIP } from 'h3'
+import { defineEventHandler, getRequestURL } from 'h3'
 import { useRuntimeConfig, useStorage } from 'nitropack/runtime'
 import type { ModuleOptions } from '../../../type'
 import {
@@ -7,7 +7,7 @@ import {
 } from '../utils/routes'
 import { matchesPattern } from '../utils/patternMatcher'
 import createKey from '../utils/createKey'
-import { UNKNOWN_IP } from '../utils/constants'
+import { getClientIP } from '../utils/getClientIP'
 import { normalizePath } from '../utils/normalizePath'
 import { checkBan } from '../utils/ban'
 import { handleRateLimit } from '../utils/rateLimit'
@@ -41,10 +41,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const shieldStorage = useStorage('shield')
-  const trustXForwardedFor = config.security?.trustXForwardedFor ?? false
-  const requestIP = getRequestIP(event, { xForwardedFor: trustXForwardedFor })
-    || event.node.req?.socket?.remoteAddress
-    || UNKNOWN_IP
+  const requestIP = getClientIP(event, {
+    trustXForwardedFor: config.security?.trustXForwardedFor ?? false,
+    trustedProxyHops: config.security?.trustedProxyHops ?? 1,
+  })
 
   // Rate limit config for this route
   const routeLimit = getRouteLimit(pathname, config, matchingRoute)

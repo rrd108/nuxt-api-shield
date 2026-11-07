@@ -29,6 +29,7 @@ export default defineNuxtModule<ModuleOptions>({
     ipTTL: 7 * 24 * 60 * 60,
     security: {
       trustXForwardedFor: false,
+      trustedProxyHops: 1,
     },
   },
   setup(options, nuxt) {

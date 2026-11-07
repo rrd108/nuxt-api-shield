@@ -88,6 +88,7 @@ export default defineNuxtConfig({
     security: {
       // Optional: Security-related configurations
       trustXForwardedFor: false, // Default: false. Whether to trust X-Forwarded-For headers. See warning below.
+      trustedProxyHops: 1, // Default: 1. Number of trusted proxies in front of the app; the client IP is read this many entries from the right of X-Forwarded-For.
     },
   },
 });
@@ -116,6 +117,7 @@ export default defineNuxtConfig({
   ipTTL: 7 * 24 * 60 * 60, // 7 days in seconds
   security: {
     trustXForwardedFor: false,
+    trustedProxyHops: 1,
   }
 }
 ```
@@ -128,6 +130,7 @@ The `security.trustXForwardedFor` option (default is `false`, set by the module)
 - **WARNING:** If `trustXForwardedFor` is `true` and your application is directly internet-facing OR your proxy is not configured to strip incoming `X-Forwarded-For` headers from clients, malicious users can spoof their IP address by sending a fake `X-Forwarded-For` header. This would allow them to bypass rate limits or cause other users to be incorrectly rate-limited.
 - If set to `false`: The module will use the direct IP address of the incoming connection (i.e., `event.node.req.socket.remoteAddress`). Use this setting if your application is directly internet-facing or if you are unsure about your proxy's configuration.
 - **Recommendation:** Only enable `trustXForwardedFor: true` if you are certain your reverse proxy is correctly configured to set this header and strip any client-sent versions of it. Otherwise, set it to `false`.
+- **Which entry is used:** proxies append the address they received the request from, so only the rightmost entries come from your infrastructure; the leftmost entry is whatever the client sent. The module reads the entry `trustedProxyHops` positions from the right (default `1`, the last entry). With one proxy (e.g. nginx with `$proxy_add_x_forwarded_for`, or an AWS ALB) keep `1`; with two (e.g. a CDN in front of nginx) set `2`. Values that are not valid IP addresses are ignored and the socket address is used instead, so header contents never reach storage keys or the fail2ban log.
 
 ### 3. Add `nitro/storage` to `nuxt.config.ts`
 

@@ -30,6 +30,11 @@ export interface ModuleOptions {
   ipTTL?: number
   security?: {
     trustXForwardedFor?: boolean
+    /**
+     * Number of trusted proxies in front of the app that append to X-Forwarded-For.
+     * The client IP is read this many entries from the right. Default: 1.
+     */
+    trustedProxyHops?: number
   }
 }
 
