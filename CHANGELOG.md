@@ -1,5 +1,30 @@
 # Changelog
 
+## v1.1.0
+
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v1.0.0...v1.1.0)
+
+### 🚀 Enhancements
+
+- **security:** Add trustedProxyHops and read X-Forwarded-For from the right ([33b2358](https://github.com/rrd108/nuxt-api-shield/commit/33b2358))
+
+### 🩹 Fixes
+
+- Match on the decoded request path to stop encoded-path bypass ([0d1b03e](https://github.com/rrd108/nuxt-api-shield/commit/0d1b03e))
+- Keep module options out of the public runtime config ([565876a](https://github.com/rrd108/nuxt-api-shield/commit/565876a))
+
+### 📖 Documentation
+
+- Shape unreleased changelog notes for the changelogen release ([d67c3de](https://github.com/rrd108/nuxt-api-shield/commit/d67c3de))
+
+### 🏡 Chore
+
+- Fix eslint errors ([a3ac880](https://github.com/rrd108/nuxt-api-shield/commit/a3ac880))
+
+### ❤️ Contributors
+
+- Rrd108 ([@rrd108](https://github.com/rrd108))
+
 ### ⚠️ Upgrade notes
 
 - **Config moved to the private runtime config** — the module options were stored in `runtimeConfig.public.nuxtApiShield`, which Nuxt serializes into every HTML page, exposing limits, `skipRoutes` and the log path. They now live in the server-only `runtimeConfig.nuxtApiShield`. Read them with `useRuntimeConfig().nuxtApiShield` in custom tasks, and rename runtime env overrides from `NUXT_PUBLIC_NUXT_API_SHIELD_*` to `NUXT_NUXT_API_SHIELD_*`. A `runtimeConfig.public.nuxtApiShield` block in `nuxt.config` is still merged in, with a deprecation warning.
