@@ -6,7 +6,6 @@ import {
   addTypeTemplate,
 } from '@nuxt/kit'
 import defu from 'defu'
-import type { NitroConfig } from 'nitropack'
 import type { ModuleOptions } from './type'
 
 export default defineNuxtModule<ModuleOptions>({
@@ -78,7 +77,9 @@ export default defineNuxtModule<ModuleOptions>({
       },
     ])
 
-    nuxt.hook('nitro:config', (nitroConfig: NitroConfig) => {
+    // Only `tasks` is touched here. Typing it locally avoids importing
+    // nitropack's types, which the module build would inline into dist.
+    nuxt.hook('nitro:config', (nitroConfig: { tasks?: Record<string, { handler?: string, description?: string } | undefined> }) => {
       nitroConfig.tasks = nitroConfig.tasks || {}
 
       nitroConfig.tasks['shield:cleanBans'] = {

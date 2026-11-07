@@ -1,4 +1,3 @@
-import type { NitroConfig } from 'nitropack'
 import type { LogEntry } from './runtime/server/types/LogEntry'
 import type { RateLimit } from './runtime/server/types/RateLimit'
 
@@ -35,11 +34,5 @@ export interface ModuleOptions {
      * The client IP is read this many entries from the right. Default: 1.
      */
     trustedProxyHops?: number
-  }
-}
-
-declare module 'nuxt/schema' {
-  interface NuxtHooks {
-    'nitro:config': (nitroConfig: NitroConfig) => void | Promise<void>
   }
 }
