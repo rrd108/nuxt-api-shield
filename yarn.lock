@@ -862,7 +862,7 @@
   resolved "https://registry.yarnpkg.com/@nuxt/devalue/-/devalue-2.0.2.tgz#5749f04df13bda4c863338d8dabaf370f45ef7c7"
   integrity sha512-GBzP8zOc7CGWyFQS6dv1lQz8VVpz5C2yRszbXufwG/9zhStTIH50EtD87NmWbTMwXDvZLNg8GIpb1UFdH93JCA==
 
-"@nuxt/devtools-kit@3.4.4", "@nuxt/devtools-kit@^3.4.2":
+"@nuxt/devtools-kit@3.4.4", "@nuxt/devtools-kit@^3.4.4":
   version "3.4.4"
   resolved "https://registry.yarnpkg.com/@nuxt/devtools-kit/-/devtools-kit-3.4.4.tgz#c9049a49085f9d3106a85780ef3dfc8ad3f9c73e"
   integrity sha512-q3aRKpnriK/kITYlYUXSE3O0R7WeJwSMLvtbo1HfcKXYg/q8688iIb5VURl0fbkSaFTk7ndU5HIbW+5f0JOJPQ==
@@ -958,7 +958,7 @@
     "@typescript-eslint/types" "^8.66.0"
     "@typescript-eslint/utils" "^8.66.0"
 
-"@nuxt/kit@4.6.4", "@nuxt/kit@^4.0.0", "@nuxt/kit@^4.6.1", "@nuxt/kit@^4.6.4":
+"@nuxt/kit@4.6.4", "@nuxt/kit@^4.0.0", "@nuxt/kit@^4.6.1", "@nuxt/kit@^4.6.3", "@nuxt/kit@^4.6.4":
   version "4.6.4"
   resolved "https://registry.yarnpkg.com/@nuxt/kit/-/kit-4.6.4.tgz#d33b4fcb063af56f4e0f607ef77485b7e2a191de"
   integrity sha512-S7JqP/CCJejDNGADlCIct/SHEPf+Jz3Chrxq7GDgyRPRkRD2flbxoanGq4bkib9kD9QBXJlF4TuCsqqL9a7COw==
@@ -1058,19 +1058,19 @@
     std-env "^4.2.0"
 
 "@nuxt/test-utils@^4.0.0":
-  version "4.3.4"
-  resolved "https://registry.yarnpkg.com/@nuxt/test-utils/-/test-utils-4.3.4.tgz#18c70a276c9366387397bb24870c3bf1c24a459a"
-  integrity sha512-8x0w16DDUi1/6ZivL1zuOaDt9xtACZFHMQySBirUZNIU0H0qljjB5yyajXPtlb8YCQ5l6piFJqafK/zDpDcCnA==
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@nuxt/test-utils/-/test-utils-4.4.0.tgz#dda10b26dc86f5b5ebb8a7663da1b276058fd736"
+  integrity sha512-ptXsLEdlh676GVNDwFiFjAbttuTRUq3MBlJFGYqQQK4+IKS2Qo9dhxjqkckxFIuIoy5VjquZVARq+q+yKQR/6w==
   dependencies:
     "@clack/prompts" "1.8.1"
-    "@nuxt/devtools-kit" "^3.4.2"
-    "@nuxt/kit" "^4.6.1"
+    "@nuxt/devtools-kit" "^3.4.4"
+    "@nuxt/kit" "^4.6.3"
     consola "^3.4.2"
     defu "^6.1.7"
-    exsolve "^1.1.3"
-    fake-indexeddb "^6.2.5"
+    exsolve "^1.2.0"
+    fake-indexeddb "^6.2.7"
     get-port-please "^3.2.0"
-    magic-string "^1.4.2"
+    magic-string "^1.4.5"
     ofetch "^1.5.1"
     oxc-walker "^1.1.1"
     package-manager-detector "^1.9.0"
@@ -1080,7 +1080,7 @@
     std-env "^4.3.0"
     tinyexec "^1.3.1"
     ufo "^1.6.4"
-    unplugin "^3.4.0"
+    unplugin "^3.7.0"
     vitest-environment-nuxt "2.0.0"
 
 "@nuxt/vite-builder@4.6.4":
@@ -1249,10 +1249,15 @@
   resolved "https://registry.yarnpkg.com/@rolldown/binding-win32-x64-msvc/-/binding-win32-x64-msvc-1.2.16.tgz#cda4755739a62beba28a612e243a9a4155c76821"
   integrity sha512-1lv1KvX0Z871zfk7vw+dnXMMnHNyDwMzWG8Kv3HxDXMOhzCX4SHc7HK319fInP0i+0p9D8brkfzL7pJOaGl+tw==
 
-"@rolldown/pluginutils@^1.0.0", "@rolldown/pluginutils@^1.0.1":
+"@rolldown/pluginutils@^1.0.0":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@rolldown/pluginutils/-/pluginutils-1.0.1.tgz#e3fcee093fbb5ce765e1ad088ff4de2889f6f9be"
   integrity sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==
+
+"@rolldown/pluginutils@^1.0.1":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@rolldown/pluginutils/-/pluginutils-1.1.0.tgz#9c029af4d8bdd9c0765784edbabe741f2b314629"
+  integrity sha512-K+NU2HDCEem4sClgHH4ZZXwdJeNFkJo+hRk479DIwdIviAPN2hFJH1KHHwg8CxHQXvi0M5XY4deTXINfIiSG6w==
 
 "@rollup/plugin-alias@^5.1.1":
   version "5.1.1"
@@ -3312,10 +3317,10 @@ exsolve@^1.0.8, exsolve@^1.1.1, exsolve@^1.1.3, exsolve@^1.2.0:
   resolved "https://registry.yarnpkg.com/exsolve/-/exsolve-1.2.0.tgz#b04645ff58c203984e2f06fd19d2551c914c78ca"
   integrity sha512-h1pQPR9XoeSMdntRNCjyTznaume4UpfXrULBnlkZ2CUM/G5eSa+pBByGldO5uR8dxbPC+OuJXsPPNf+JZ81ADg==
 
-fake-indexeddb@^6.2.5:
-  version "6.2.7"
-  resolved "https://registry.yarnpkg.com/fake-indexeddb/-/fake-indexeddb-6.2.7.tgz#c9db7a845e3eac22335dd3271e11c2d62ca61559"
-  integrity sha512-g0ghQ+BmU3CSZaHup5FigEAAtCmtNyxkrmID7OAeK2qONHghw1aQ2l2T1RxmfhP1H1tEXVRWArUTGVCk5832ww==
+fake-indexeddb@^6.2.7:
+  version "6.2.8"
+  resolved "https://registry.yarnpkg.com/fake-indexeddb/-/fake-indexeddb-6.2.8.tgz#79593572cf4dc670128d439a937956716bfd546d"
+  integrity sha512-mpVW/HLUqwKXJ6F/s0hMgdK1eQfM4ncTHDioNGHWL0WKV3VcZCoZq1NKgboBbAge07aRCO7L48yziKssL59XEQ==
 
 fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
   version "3.1.3"
@@ -4139,7 +4144,7 @@ magic-string@^0.30.17, magic-string@^0.30.19, magic-string@^0.30.21, magic-strin
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.5.5"
 
-magic-string@^1.0.0, magic-string@^1.1.0, magic-string@^1.2.0, magic-string@^1.2.3, magic-string@^1.3.1, magic-string@^1.4.2, magic-string@^1.4.3, magic-string@^1.4.5:
+magic-string@^1.0.0, magic-string@^1.1.0, magic-string@^1.2.0, magic-string@^1.2.3, magic-string@^1.3.1, magic-string@^1.4.3, magic-string@^1.4.5:
   version "1.4.5"
   resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-1.4.5.tgz#201c852d51eb0664d6f66cf7ab93b20b416e48d9"
   integrity sha512-oLLC2+YvQUfAa+vxoufE/yc1icb87M9iXIRqAoR/2EhE/8cb3SF/+Gi0c2By1B+5Vz2e2vQtUvHiu1+63Znh+w==
