@@ -51,7 +51,7 @@
     "@types/node": "^25.5.0",
     "changelogen": "^0.6.0",
     "eslint": "^10.0.0",
-    "nuxi": "^3.25.1",
+    "nuxi": "^4.0.0",
     "nuxt": "^4.0.0",
     "typescript": "~6.0.0",
     "vitest": "^4.0.0",
