@@ -1,5 +1,38 @@
 # Changelog
 
+## v2.0.0
+
+[compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v1.1.1...v2.0.0)
+
+### 🚀 Enhancements
+
+- Add configurable storageKeyPrefix for storage keys ([ced64e5](https://github.com/rrd108/nuxt-api-shield/commit/ced64e5))
+- ⚠️  Resolve config in one place and support .config/nuxt-api-shield.ts ([91c9c0a](https://github.com/rrd108/nuxt-api-shield/commit/91c9c0a))
+
+### 🩹 Fixes
+
+- Create the GitHub release only after the tag is pushed ([6ea53b8](https://github.com/rrd108/nuxt-api-shield/commit/6ea53b8))
+- Ignore trailing slashes in routes and skipRoutes ([3a1bec3](https://github.com/rrd108/nuxt-api-shield/commit/3a1bec3))
+
+### 📖 Documentation
+
+- Add agent skills configuration ([a66a8f4](https://github.com/rrd108/nuxt-api-shield/commit/a66a8f4))
+- Restructure README around a quick start and an options reference ([d064ab9](https://github.com/rrd108/nuxt-api-shield/commit/d064ab9))
+- Add a step-by-step guide for upgrading from v1 to v2 ([d2c0871](https://github.com/rrd108/nuxt-api-shield/commit/d2c0871))
+
+### 🏡 Chore
+
+- Publish releases with npm instead of yarn ([48fa138](https://github.com/rrd108/nuxt-api-shield/commit/48fa138))
+- Add release script that picks the bump and checks npm access ([18ea95a](https://github.com/rrd108/nuxt-api-shield/commit/18ea95a))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Resolve config in one place and support .config/nuxt-api-shield.ts ([91c9c0a](https://github.com/rrd108/nuxt-api-shield/commit/91c9c0a))
+
+### ❤️ Contributors
+
+- Rrd108 ([@rrd108](https://github.com/rrd108))
+
 ### ⚠️ Upgrade notes (v2)
 
 Step-by-step migration: [Upgrading from v1](/README.md#upgrading-from-v1).
