@@ -5,632 +5,430 @@
 [![License][license-src]][license-href]
 [![Nuxt][nuxt-src]][nuxt-href]
 
-This Nuxt module implements a rate limiting middleware to protect your API endpoints from excessive requests.
+Rate limiting and IP banning for the `/api/` routes of your Nuxt app.
 
-- [✨ &nbsp;Release Notes](/CHANGELOG.md)
-  <!-- - [🏀 Online playground](https://stackblitz.com/github/your-org/nuxt-api-shield?file=playground%2Fapp.vue) -->
-  - [📖 &nbsp;Documentation](https://github.com/rrd108/nuxt-api-shield)
+When one IP address sends too many requests to an API route, Nuxt API Shield bans that IP for a while and answers its requests with `429 Too Many Requests`. It stores its counters in any [unstorage](https://unstorage.unjs.io) driver (memory, filesystem, Redis ...), can write ban events for [fail2ban](#fail2ban), and ships cleanup tasks so the storage does not grow forever.
 
-## Features
+- [Release notes](/CHANGELOG.md)
 
-- **IP-Based Rate limiting and Brute Force Protection**
-  - Tracks and enforces rate limits for individual IP addresses.
-  - Prevents malicious actors or excessive requests from a single source from overwhelming your API.
-- **Customizable Rate Limits**
-  - Configure maximum request count, duration within which the limit applies, and a ban period for exceeding the limit.
-  - If the request limit is exceeded, the user is banned for the configured ban period. During the ban period, **all requests are blocked with a 429 error**, regardless of the rate limit window.
-  - Add a delay to responses when a user is banned to discourage further abuse (optional).
-  - Customize the error message for banned users.
-  - Optionally include the `Retry-After` header in responses when a user is banned.
-  - Tailor the rate-limiting behavior to align with your API's specific needs and usage patterns.
-- **Event-Driven Handling**
-  - Intercepts incoming API requests efficiently using Nuxt's event system.
-  - Ensures seamless integration with your Nuxt application's request lifecycle.
-- **Flexible Storage**
-  - Utilizes Nuxt's unstorage abstraction for versatile storage options.
-  - Store rate-limiting data in various storage providers (filesystem, memory, databases, etc.) based on your project's requirements.
-- **Configurable with Runtime Config**
-  - Easily adjust rate-limiting parameters without code changes.
-  - Adapt to dynamic needs and maintain control over rate-limiting behavior through Nuxt's runtime configuration.
-- **Bundled cleanup tasks**
-  - Registers Nitro tasks `shield:cleanBans` and `shield:cleanIpData` so you can schedule maintenance without adding task files (see setup step 4).
-- **Clear Error Handling**
-  - Returns a standardized 429 "Too Many Requests" error response when rate limits are exceeded or when a user is banned.
-  - The 429 body is JSON (`{ error, retryAfter }`) for predictable client-side handling.
-  - Facilitates proper error handling in client-side applications for a smooth user experience.
-- **Standard Rate-Limit Headers**
-  - Every response includes `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` headers so clients and CDNs can track usage without parsing response bodies.
+## Contents
 
-## Quick Setup
+- [Quick start](#quick-start)
+- [How it works](#how-it-works)
+- [Configuration](#configuration)
+  - [Where to put the options](#where-to-put-the-options)
+  - [All options](#all-options)
+- [Choosing which routes are protected](#choosing-which-routes-are-protected)
+- [Storage](#storage)
+- [Cleanup tasks](#cleanup-tasks)
+- [Behind a proxy or CDN](#behind-a-proxy-or-cdn)
+- [Logging and fail2ban](#logging-and-fail2ban)
+- [TypeScript](#typescript)
+- [Security and privacy notes](#security-and-privacy-notes)
+- [Development](#development)
 
-### 1. Add `nuxt-api-shield` dependency to your project
+## Quick start
+
+**1. Install**
 
 ```bash
-# Using pnpm
-pnpm add nuxt-api-shield
-
-# Using yarn
-yarn add nuxt-api-shield
-
-# Using npm
-npm install nuxt-api-shield
+npm install nuxt-api-shield   # or: yarn add / pnpm add nuxt-api-shield
 ```
 
-### 2. Add `nuxt-api-shield` to the `modules` section of `nuxt.config.ts`
+**2. Configure** `nuxt.config.ts`
 
-You should add only the values you want to use differently from the default values.
-
-```js
+```ts
 export default defineNuxtConfig({
-  modules: ["nuxt-api-shield"],
+  modules: ['nuxt-api-shield'],
+
   nuxtApiShield: {
-    /*limit: {
-      max: 12,        // maximum requests per duration time, default is 12/duration
-      duration: 108,   // duration time in seconds, default is 108 seconds
-      ban: 3600,      // ban time in seconds, default is 3600 seconds = 1 hour
-      // If the request limit is exceeded, the user is banned for this period. During the ban, all requests are blocked with 429.
-    },
-    delayOnBan: true  // delay every response with +1sec when the user is banned, default is true
-    errorMessage: "Too Many Requests",  // error message when the user is banned, default is "Too Many Requests"
-    retryAfterHeader: false, // when the user is banned add the Retry-After header to the response, default is false
-    log: {
-      path: "", // path to the log file, every day a new log file will be created, use "" to disable logging
-      attempts: 0,    // if an IP reach 0 requests (disabled), all the requests will be logged, can be used for further analysis or blocking for example with fail2ban, use 0 to disable logging
-      fail2ban: false, // enable fail2ban-compatible log format for ban events (see fail2ban section)
-    },
-    routes: [], // specify routes to apply rate limiting to, default is an empty array meaning all routes are protected.
-    // Example:
-    // routes: ["/api/v2/", "/api/v3/"], // /api/v1 will not be protected, /api/v2/ and /api/v3/ will be protected */
-    skipRoutes: [], // specify routes to skip/exempt from rate limiting, supports wildcard patterns (*/**)
-    // Example:
-    // skipRoutes: ["/api/health", "/api/_nuxt/**", "/api/webhooks/stripe"],
-    ipTTL: 604800, // Optional: Time-to-live in seconds for IP tracking entries (default: 7 days). Set to 0 or negative to disable this specific cleanup.
-    storageKeyPrefix: "", // Optional: prepended to every storage key, e.g. "myapp:" gives "myapp:ip:..." and "myapp:ban:...". Default: "". See "Sharing one storage between apps".
-    security: {
-      // Optional: Security-related configurations
-      trustXForwardedFor: false, // Default: false. Whether to trust X-Forwarded-For headers. See warning below.
-      trustedProxyHops: 1, // Default: 1. Number of trusted proxies in front of the app; the client IP is read this many entries from the right of X-Forwarded-For.
+    limit: {
+      max: 12,       // requests allowed ...
+      duration: 108, // ... per this many seconds
+      ban: 3600,     // seconds an IP is banned after going over the limit
     },
   },
-});
-```
 
-The resolved options are kept in the server-only runtime config (`useRuntimeConfig().nuxtApiShield`) and are never sent to the browser. Runtime overrides use the `NUXT_NUXT_API_SHIELD_*` environment variables.
-
-#### Or keep the options in `.config/nuxt-api-shield.ts`
-
-Following the [`.config` directory convention](https://github.com/pi0/config-dir), you can move the options out of `nuxt.config.ts` into a dedicated file. `nuxt-api-shield.config.ts` at the project root works too, as do `.js`, `.mjs` and `.json`.
-
-```ts
-// .config/nuxt-api-shield.ts
-import { defineShieldConfig } from "nuxt-api-shield/config";
-
-export default defineShieldConfig({
-  limit: { max: 10, duration: 60, ban: 600 },
-  routes: ["/api/login"],
-});
-```
-
-`nuxt dev` restarts when the file changes.
-
-**Where options come from**, highest priority first:
-
-1. `runtimeConfig.nuxtApiShield` in `nuxt.config.ts`
-2. the `nuxtApiShield` key in `nuxt.config.ts`
-3. `.config/nuxt-api-shield.ts`
-4. the defaults below
-
-Objects (`limit`, `log`, `security`) are merged key by key. Arrays (`routes`, `skipRoutes`) are **not** merged: the highest source that sets one wins whole. If you set options both in `nuxt.config.ts` and in the config file, the module prints a warning, so keep them in one place.
-
-**Default Configuration Values:**
-(These are applied by the module if not specified in your `nuxtApiShield` config)
-
-```js
-{
-  limit: {
-    max: 12,
-    duration: 108, // seconds
-    ban: 3600,     // seconds
-  },
-  delayOnBan: true,
-  errorMessage: "Too Many Requests",
-  retryAfterHeader: false,
-  log: {
-    path: "", // Logging is disabled if path is empty
-    attempts: 0, // Logging per IP is disabled if attempts is 0
-    fail2ban: false,
-  },
-  routes: [],
-  skipRoutes: [],
-  ipTTL: 7 * 24 * 60 * 60, // 7 days in seconds
-  storageKeyPrefix: "",
-  security: {
-    trustXForwardedFor: false,
-    trustedProxyHops: 1,
-  }
-}
-```
-
-**Security Warning: `trustXForwardedFor`**
-
-The `security.trustXForwardedFor` option (default is `false`, set by the module) determines if the module uses the `X-Forwarded-For` HTTP header to identify the client's IP address.
-
-- If set to `true`: The module will use the IP address provided in the `X-Forwarded-For` header. This is common when your Nuxt application is behind a trusted reverse proxy, load balancer, or CDN (like Nginx, Cloudflare, AWS ELB/ALB) that correctly sets this header with the real client IP.
-- **WARNING:** If `trustXForwardedFor` is `true` and your application is directly internet-facing OR your proxy is not configured to strip incoming `X-Forwarded-For` headers from clients, malicious users can spoof their IP address by sending a fake `X-Forwarded-For` header. This would allow them to bypass rate limits or cause other users to be incorrectly rate-limited.
-- If set to `false`: The module will use the direct IP address of the incoming connection (i.e., `event.node.req.socket.remoteAddress`). Use this setting if your application is directly internet-facing or if you are unsure about your proxy's configuration.
-- **Recommendation:** Only enable `trustXForwardedFor: true` if you are certain your reverse proxy is correctly configured to set this header and strip any client-sent versions of it. Otherwise, set it to `false`.
-- **Which entry is used:** proxies append the address they received the request from, so only the rightmost entries come from your infrastructure; the leftmost entry is whatever the client sent. The module reads the entry `trustedProxyHops` positions from the right (default `1`, the last entry). With one proxy (e.g. nginx with `$proxy_add_x_forwarded_for`, or an AWS ALB) keep `1`; with two (e.g. a CDN in front of nginx) set `2`. Values that are not valid IP addresses are ignored and the socket address is used instead, so header contents never reach storage keys or the fail2ban log.
-
-### 3. Add `nitro/storage` to `nuxt.config.ts`
-
-You can use any storage you want, but you have to use **shield** as the name of the storage.
-
-```json
-{
-  "nitro": {
-    "storage": {
-      "shield": {
-        // storage name, you **must** use "shield" as the name
-        "driver": "memory"
-      }
-    }
-  }
-}
-```
-
-If you use for example redis, you can use the following configuration, define the host and port.
-
-```json
-{
-  "nitro": {
-    "storage": {
-      "shield": {
-        "driver": "redis",
-        "host": "localhost",
-        "port": 6379
-      }
-    }
-  }
-}
-```
-
-### 4. Schedule bundled cleanup tasks in `nuxt.config.ts`
-
-The module registers two Nitro tasks for you: `shield:cleanBans` (removes expired `ban:*` keys) and `shield:cleanIpData` (removes stale `ip:*` keys using `ipTTL`). With a `storageKeyPrefix` set they only touch `<storageKeyPrefix>ban:*` and `<storageKeyPrefix>ip:*`, so they never clean another app's keys. Turn on Nitro tasks and add `scheduledTasks` so they run on a cadence you choose. You do **not** need files under `server/tasks/` for this default setup.
-
-```json
-{
-  "nitro": {
-    "experimental": {
-      "tasks": true
+  nitro: {
+    // Where the counters and bans are kept. The name must be "shield".
+    storage: {
+      shield: { driver: 'fs', base: '.shield' },
     },
-    "scheduledTasks": {
-      "*/15 * * * *": ["shield:cleanBans"],
-      "0 0 * * *": ["shield:cleanIpData"]
-    }
-  }
-}
-```
-
-Cron expressions are examples only: for instance, clean expired bans every 15 minutes and IP tracking data daily at midnight.
-
-### 5. Optional: custom cleanup task implementations
-
-Skip this unless you need behavior different from the bundled handlers (for example extra logging, metrics, or storage layout). The snippets below mirror what the module already ships; they are useful as a reference or if you define **another** task name and point `scheduledTasks` at that name instead.
-
-#### a) Task for cleaning expired bans
-
-Removes ban entries (`ban:xxx.xxx.xxx.xxx`) after the ban timestamp has passed.
-
-Example `server/tasks/shield/cleanBans.ts` (task name must match what you schedule):
-
-```ts
-import { isActualBanTimestampExpired, useRuntimeConfig } from "#imports"; // isActualBanTimestampExpired is auto-imported from nuxt-api-shield
-
-export default defineTask({
-  meta: {
-    name: "shield:cleanBans", // Match the name in scheduledTasks
-    description: "Clean expired bans from nuxt-api-shield storage.",
-  },
-  async run() {
-    const shieldStorage = useStorage("shield"); // Use your configured storage name
-
-    const storageKeyPrefix = useRuntimeConfig().nuxtApiShield.storageKeyPrefix ?? "";
-
-    // Only fetch this app's ban keys
-    const banKeys = await shieldStorage.getKeys(`${storageKeyPrefix}ban:`);
-
-    let cleanedCount = 0;
-    for (const key of banKeys) {
-      const bannedUntilRaw = await shieldStorage.getItem(key);
-      if (isActualBanTimestampExpired(bannedUntilRaw)) {
-        await shieldStorage.removeItem(key);
-        cleanedCount++;
-      }
-    }
-    console.log(`[nuxt-api-shield] Cleaned ${cleanedCount} expired ban(s).`);
-    return { result: { cleanedCount } };
-  },
-});
-```
-
-The `isActualBanTimestampExpired` utility is provided by `nuxt-api-shield` and should be available via `#imports`.
-
-#### b) Task for cleaning old IP tracking data
-
-Cleans IP tracking entries (`ip:xxx.xxx.xxx.xxx`) whose `time` is older than `nuxtApiShield.ipTTL` (default 7 days), and drops malformed entries. That keeps storage from growing with one-off IPs that were never banned.
-
-Example `server/tasks/shield/cleanIpData.ts`:
-
-```ts
-import type { RateLimit } from "nuxt-api-shield";
-import { useRuntimeConfig } from "#imports";
-
-export default defineTask({
-  meta: {
-    name: "shield:cleanIpData", // Match the name in scheduledTasks
-    description: "Clean old IP tracking data from nuxt-api-shield storage.",
-  },
-  async run() {
-    const shieldStorage = useStorage("shield");
-    const config = useRuntimeConfig().nuxtApiShield;
-
-    // ipTTL is expected to be in seconds from config (module applies default if not set by user)
-    const ipTTLseconds = config.ipTTL;
-
-    if (!ipTTLseconds || ipTTLseconds <= 0) {
-      console.log(
-        "[nuxt-api-shield] IP data cleanup (ipTTL) is disabled or invalid."
-      );
-      return { result: { cleanedCount: 0 }, status: "disabled_or_invalid_ttl" };
-    }
-    const ipTTLms = ipTTLseconds * 1000;
-
-    const ipKeys = await shieldStorage.getKeys(`${config.storageKeyPrefix ?? ""}ip:`);
-    const currentTime = Date.now();
-    let cleanedCount = 0;
-
-    for (const key of ipKeys) {
-      const entry = (await shieldStorage.getItem(key)) as RateLimit | null;
-
-      // Check if entry exists and has a numeric 'time' property
-      if (entry && typeof entry.time === "number") {
-        if (currentTime - entry.time > ipTTLms) {
-          await shieldStorage.removeItem(key);
-          cleanedCount++;
-        }
-      } else {
-        // Clean up entries that are null, not an object, or missing a numeric 'time'
-        await shieldStorage.removeItem(key);
-        cleanedCount++;
-      }
-    }
-
-    console.log(
-      `[nuxt-api-shield] Cleaned ${cleanedCount} old/malformed IP data entries.`
-    );
-    return { result: { cleanedCount } };
-  },
-});
-```
-
-Configure `ipTTL` under `nuxtApiShield` if you want a TTL other than the default. Setting `ipTTL` to `0` (or any non-positive value) makes the bundled `shield:cleanIpData` task skip IP cleanup (it logs and exits).
-
-If you add your own task file with the same `meta.name` as a bundled task (`shield:cleanBans` or `shield:cleanIpData`), Nitro may prefer your project file over the module—avoid duplicate names unless you intend to override.
-
-## Production Deployment
-
-### Use Redis as the storage driver
-
-For production deployments — especially with multiple server instances or significant traffic — **Redis is the recommended storage driver**. The `memory` and `fs` drivers have important limitations:
-
-| Area | `memory` / `fs` | Redis |
-|------|----------------|-------|
-| **Multi-instance** | Each process has its own isolated state. Rate limits reset per instance, allowing bypass. | Shared state across all instances. |
-| **Atomic operations** | Read → increment → write is not atomic. Concurrent requests can both read the same count and exceed the limit simultaneously. | Single-threaded — reads and writes are naturally atomic. No race conditions. |
-| **Cleanup** | Cleanup tasks (`shield:cleanBans`, `shield:cleanIpData`) must scan all keys with `getKeys()`. At scale this blocks the event loop. | Use `EXPIRE` or `TTL` natively — expired keys are reclaimed automatically without scanning. |
-
-To use Redis, configure the `shield` storage with the `redis` driver:
-
-```json
-{
-  "nitro": {
-    "storage": {
-      "shield": {
-        "driver": "redis",
-        "host": "localhost",
-        "port": 6379
-      }
-    }
-  }
-}
-```
-
-See the [unstorage Redis driver docs](https://unstorage.unjs.io/drivers/redis) for all available options.
-
-### Sharing one storage between apps
-
-Keys are `ip:<path>:<ip>` and `ban:<ip>` by default, so two apps (or a staging and a production environment) using the same Redis would share rate limit counters and bans. Give each one its own `storageKeyPrefix`:
-
-```ts
-nuxtApiShield: {
-  storageKeyPrefix: "myapp:", // keys become myapp:ip:api:login:192.168.1.1 and myapp:ban:192.168.1.1
-}
-```
-
-The prefix is prepended as is, so end it with a colon (`"myapp"` would give `myappip:...`). Storage drivers turn `/` in keys into `:`, which is why the path shows up as `api:login`. To use a different prefix per environment without changing the config, set `NUXT_NUXT_API_SHIELD_STORAGE_KEY_PREFIX`.
-
-The bundled cleanup tasks only scan keys under the app's own prefix. Changing the prefix on a running app orphans the keys written under the old one, and the bundled tasks no longer clean them, so remove them by hand.
-
-### When `memory` / `fs` is acceptable
-
-The `memory` and `fs` drivers are fine for:
-- Single-instance deployments
-- Development environments
-- Low-traffic applications where occasional race conditions are acceptable
-
-For everything else, use Redis.
-
-## Fail2ban Integration
-
-When a user exceeds the rate limit and gets banned, `nuxt-api-shield` can write ban events to the log file in a `fail2ban`-compatible format. You can then configure fail2ban to watch these logs and automatically block the IP at the firewall level.
-
-### Setup
-
-Enable fail2ban logging by setting `log.fail2ban` to `true` and configuring the `log.path`:
-
-```js
-export default defineNuxtConfig({
-  modules: ["nuxt-api-shield"],
-  nuxtApiShield: {
-    log: {
-      path: "/var/log/nuxt-api-shield", // required — must be set
-      attempts: 1,                       // optional — threshold for regular request logging
-      fail2ban: true,                     // enable fail2ban format
+    // Remove expired bans and old counters on a schedule
+    experimental: { tasks: true },
+    scheduledTasks: {
+      '*/15 * * * *': ['shield:cleanBans'],
+      '0 0 * * *': ['shield:cleanIpData'],
     },
   },
 })
 ```
 
-When enabled, every ban event writes a line like:
+That's it: every route under `/api/` is now protected with 12 requests per 108 seconds per IP. Every option is optional, so `nuxtApiShield` only needs the values you want to change from the [defaults](#all-options).
 
+**3. Check it**
+
+```bash
+for i in $(seq 1 14); do curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3000/api/hello; done
 ```
-2026-06-21 12:34:56,789 nuxt-api-shield ban 192.168.1.100 — /api/v3/login exceeded limit (12 requests in 108s)
+
+The first 12 requests get `200`, the 13th and every request after it get `429` until the ban ends.
+
+> Running more than one server instance? Use [Redis](#storage) instead of `fs`. Behind nginx, Cloudflare or a load balancer? Read [Behind a proxy or CDN](#behind-a-proxy-or-cdn), otherwise every visitor looks like the same IP.
+
+## How it works
+
+For every request the shield goes through these steps:
+
+1. **Only `/api/` paths.** Pages, assets and anything outside `/api/` are never touched.
+2. **Skip routes.** If the path matches `skipRoutes`, the request goes through untouched.
+3. **Route rules.** The path is matched against `routes`. With no `routes` configured, every `/api/` path is protected with the global `limit`. With `routes` configured, paths that match none of them are not protected.
+4. **Ban check.** If the IP is banned, the request gets `429` straight away.
+5. **Counting.** The request is counted in the IP's window for that route. The window starts at the IP's first request and lasts `duration` seconds. Request number `max + 1` inside the window gets `429` and starts a ban of `ban` seconds.
+
+Two things to keep in mind:
+
+- **Counters are per IP and per route.** `/api/login` and `/api/products` each have their own counter. Paths that match the same [wildcard rule](#wildcard-rules) share one counter.
+- **A ban is per IP, for every protected route.** An IP banned on `/api/login` is also refused on `/api/products` until the ban ends. Routes in `skipRoutes` and routes outside your `routes` list stay reachable.
+
+### What the client sees
+
+Every protected response carries these headers:
+
+| Header | Meaning |
+|---|---|
+| `X-RateLimit-Limit` | `max` for this route |
+| `X-RateLimit-Remaining` | requests left in the current window |
+| `X-RateLimit-Reset` | Unix time (seconds) when the window or the ban ends |
+| `Retry-After` | seconds until the ban ends, only on `429` and only with `retryAfterHeader: true` |
+
+A rejected request gets status `429` and a JSON body:
+
+```json
+{ "error": "Too Many Requests", "retryAfter": 3600 }
 ```
 
-### Fail2ban filter configuration
+`error` is your `errorMessage`, `retryAfter` is the number of seconds until the ban ends. With `delayOnBan: true` (the default) the `429` is sent after an extra second, to slow down scripts.
 
-Create `/etc/fail2ban/filter.d/nuxt-api-shield.conf`:
+## Configuration
+
+### Where to put the options
+
+You can set the options in three places. Use one of them.
+
+**In `nuxt.config.ts`** under the `nuxtApiShield` key, as in the [quick start](#quick-start).
+
+**In a separate file**, `.config/nuxt-api-shield.ts` (following the [`.config` directory convention](https://github.com/pi0/config-dir)). `nuxt-api-shield.config.ts` at the project root works too, as do `.js`, `.mjs` and `.json`. `nuxt dev` restarts when the file changes.
+
+```ts
+// .config/nuxt-api-shield.ts
+import { defineShieldConfig } from 'nuxt-api-shield/config'
+
+export default defineShieldConfig({
+  limit: { max: 10, duration: 60, ban: 600 },
+  routes: ['/api/login'],
+})
+```
+
+**In `runtimeConfig.nuxtApiShield`** in `nuxt.config.ts`. This is mainly useful because Nuxt lets you override runtime config with environment variables when the app starts, for example:
+
+```bash
+NUXT_NUXT_API_SHIELD_LIMIT_MAX=20
+NUXT_NUXT_API_SHIELD_STORAGE_KEY_PREFIX=staging:
+```
+
+> Per-route limits in `routes` are worked out at build time, so an environment variable for `limit` changes the global limit but not routes that were already given their limit from it.
+
+If an option is set in more than one place, the higher one in this list wins:
+
+1. `runtimeConfig.nuxtApiShield`
+2. the `nuxtApiShield` key
+3. the config file
+4. the defaults
+
+Objects (`limit`, `log`, `security`) are merged key by key. Arrays (`routes`, `skipRoutes`) are not merged: the highest place that sets one wins whole. If you set options both under `nuxtApiShield` and in the config file you get a warning at build time.
+
+The final options live in the server-only runtime config (`useRuntimeConfig().nuxtApiShield`) and are never sent to the browser.
+
+### All options
+
+| Option | Default | What it does |
+|---|---|---|
+| `limit.max` | `12` | Requests an IP may send to one route within `duration`. |
+| `limit.duration` | `108` | Length of the counting window, in seconds. |
+| `limit.ban` | `3600` | How long an IP is banned after going over `max`, in seconds. |
+| `routes` | `[]` | Which `/api/` routes to protect, optionally with their own limits. Empty means all of them. See [Choosing which routes are protected](#choosing-which-routes-are-protected). |
+| `skipRoutes` | `[]` | `/api/` paths the shield ignores completely. Supports `*` and `**`. |
+| `delayOnBan` | `true` | Wait one second before sending a `429`. |
+| `errorMessage` | `"Too Many Requests"` | The `error` field of the `429` body. |
+| `retryAfterHeader` | `false` | Add a `Retry-After` header to `429` responses. |
+| `ipTTL` | `604800` (7 days) | The `shield:cleanIpData` task deletes counters older than this many seconds. `0` turns that cleanup off. |
+| `storageKeyPrefix` | `""` | Put in front of every storage key, to keep several apps apart in one Redis. See [Sharing one storage between apps](#sharing-one-storage-between-apps). |
+| `security.trustXForwardedFor` | `false` | Read the client IP from the `X-Forwarded-For` header. Only turn on behind a proxy, see [Behind a proxy or CDN](#behind-a-proxy-or-cdn). |
+| `security.trustedProxyHops` | `1` | How many of your own proxies add to `X-Forwarded-For`. |
+| `log.path` | `""` | Folder for log files. Empty turns logging off. |
+| `log.attempts` | `0` | Log every request from an IP once its count in the window reaches this number. `0` turns it off. |
+| `log.fail2ban` | `false` | Write a fail2ban-friendly line for every ban event. Needs `log.path`. |
+
+## Choosing which routes are protected
+
+Without `routes`, every `/api/` route gets the global `limit`. That is a good start for most apps. Use `routes` when you want to protect only some routes, or give some of them a stricter limit.
+
+> As soon as `routes` has an entry, **only** the routes it matches are protected. To protect everything and make a few routes stricter, add a catch-all rule such as `'/api'`.
+
+### Route rules
+
+Each entry in `routes` is a string or an object:
+
+```ts
+nuxtApiShield: {
+  limit: { max: 60, duration: 60, ban: 600 },
+
+  routes: [
+    // A string: this path and everything below it, with the global limit
+    '/api',
+
+    // An object: its own limit (any of max, duration, ban; the rest come from `limit`)
+    { path: '/api/login', max: 5, duration: 60, ban: 3600 },
+
+    // A wildcard rule
+    { path: '/api/users/*/avatar', pattern: true, max: 10, duration: 60 },
+  ],
+}
+```
+
+Here `/api/login` allows 5 tries a minute, avatar uploads 10 a minute for all users together, and every other `/api/` route 60 a minute.
+
+A plain `path` (no `pattern: true`) matches that path and everything below it on a `/` boundary: `'/api/v2'` matches `/api/v2` and `/api/v2/users`, but not `/api/v20`. A trailing slash is ignored, so `'/api/v2/'` is the same rule as `'/api/v2'`.
+
+### Wildcard rules
+
+Add `pattern: true` to use wildcards:
+
+- `*` matches exactly one path segment: `/api/users/*/profile` matches `/api/users/42/profile`.
+- `**` matches any number of segments, including none: `/api/reports/**/summary` matches `/api/reports/summary` and `/api/reports/2026/03/summary`.
+
+All paths that match one wildcard rule **share one counter** per IP. Patterns that are too broad, such as `/**`, `/*` or `/api*`, stop the build with an error naming the rule, so a route never ends up unprotected by accident.
+
+### When several rules match
+
+1. A rule whose path is exactly the request path wins.
+2. Otherwise the most specific matching wildcard rule wins (fewer wildcards, and `*` before `**`).
+3. Otherwise the longest matching plain path wins, so `/api/login` beats `/api`.
+
+### Skipping routes
+
+`skipRoutes` lists `/api/` paths the shield ignores completely: no counting, no ban check, no logging. Use it for health checks, webhooks and monitoring probes. It accepts exact paths and the same `*` / `**` wildcards (no `pattern: true` needed).
+
+```ts
+nuxtApiShield: {
+  skipRoutes: [
+    '/api/health',
+    '/api/webhooks/stripe',
+    '/api/_internal/**',
+  ],
+}
+```
+
+`skipRoutes` is checked first, so a skipped path stays reachable even for a banned IP.
+
+## Storage
+
+The shield keeps its data in the Nitro storage named **`shield`**. If you don't configure it, the module warns at build time and uses memory, so all counters and bans are lost on every restart.
+
+```ts
+nitro: {
+  storage: {
+    shield: { driver: 'fs', base: '.shield' },                      // one server
+    // shield: { driver: 'redis', host: 'localhost', port: 6379 },  // production
+  },
+},
+```
+
+Any [unstorage driver](https://unstorage.unjs.io/drivers) works. Which one to pick:
+
+| | `memory` / `fs` | Redis |
+|---|---|---|
+| Several server instances | Each instance counts on its own, so the real limit is `max` × instances. | One shared count. |
+| Many requests at once | Two requests can read the same count at the same moment and both get through. | Fine for most traffic. Not strictly atomic either, since the shield reads, then writes. |
+| Cleanup | The cleanup tasks list every key, which gets slow with a lot of data. | Same tasks, but Redis handles large key sets much better. |
+
+`memory` and `fs` are fine for development and a single, low-traffic server. For anything else use Redis ([driver options](https://unstorage.unjs.io/drivers/redis)).
+
+### What is stored
+
+| Key | Value |
+|---|---|
+| `ip:<path>:<ip>` | `{ count, time }`: requests in the current window and when the window started |
+| `ban:<ip>` | the time the ban ends, in milliseconds |
+
+Storage drivers turn `/` in keys into `:`, so the counter for `/api/login` shows up as `ip:api:login:<ip>`. The `:` in IPv6 addresses is stored as `_`.
+
+### Sharing one storage between apps
+
+Two apps (or staging and production) that use the same Redis share counters and bans unless you give each its own `storageKeyPrefix`:
+
+```ts
+nuxtApiShield: {
+  storageKeyPrefix: 'myapp:', // keys become myapp:ip:... and myapp:ban:...
+}
+```
+
+End the prefix with a colon: it is added as is, so `'myapp'` gives `myappip:...`. To use a different prefix per environment, set `NUXT_NUXT_API_SHIELD_STORAGE_KEY_PREFIX`.
+
+The cleanup tasks only touch keys under the app's own prefix. If you change the prefix of a running app, delete the keys under the old prefix by hand.
+
+## Cleanup tasks
+
+Expired bans and old counters stay in storage until something deletes them. The module comes with two [Nitro tasks](https://nitro.build/guide/tasks) for that:
+
+- `shield:cleanBans` deletes bans that have ended.
+- `shield:cleanIpData` deletes counters older than `ipTTL` seconds (7 days by default), and any broken entries.
+
+Turn on Nitro tasks and schedule them:
+
+```ts
+nitro: {
+  experimental: { tasks: true },
+  scheduledTasks: {
+    '*/15 * * * *': ['shield:cleanBans'], // every 15 minutes
+    '0 0 * * *': ['shield:cleanIpData'],  // every day at midnight
+  },
+},
+```
+
+The cron times are only examples. You don't need any files in `server/tasks/` for this.
+
+**Your own cleanup logic.** To add logging, metrics or a different storage layout, write your own task under a **different name** and schedule that one instead. The bundled tasks in [`src/runtime/server/tasks/shield/`](src/runtime/server/tasks/shield/) are short and make a good starting point; `isActualBanTimestampExpired` is auto-imported on the server for checking ban values. A project task with the same name as a bundled one may replace it, so avoid `shield:cleanBans` and `shield:cleanIpData` unless that is what you want.
+
+## Behind a proxy or CDN
+
+By default the shield uses the IP address of the connection. Behind nginx, Cloudflare, a load balancer or most hosting platforms, that is the proxy's address, so **all visitors share one counter** and one busy visitor can get everyone banned.
+
+The real client IP is then in the `X-Forwarded-For` header. Tell the shield to read it:
+
+```ts
+nuxtApiShield: {
+  security: {
+    trustXForwardedFor: true,
+    trustedProxyHops: 1, // number of your own proxies in front of the app
+  },
+}
+```
+
+Each proxy adds the address it received the request from to the end of `X-Forwarded-For`. Anything at the start of the header may have been sent by the client and can be faked, so the shield counts `trustedProxyHops` entries from the **right**:
+
+- One proxy (nginx with `$proxy_add_x_forwarded_for`, an AWS ALB ...): `trustedProxyHops: 1`.
+- Two proxies (a CDN in front of nginx): `trustedProxyHops: 2`.
+
+If the chosen entry is not a valid IP address, the shield falls back to the connection's IP.
+
+> **Only turn on `trustXForwardedFor` behind a proxy you control.** If the app can be reached directly, anyone can send a made-up `X-Forwarded-For` header and get a fresh counter for every request, or get someone else banned.
+
+## Logging and fail2ban
+
+Logging is off by default. Set `log.path` to a folder to turn it on. The shield writes one file per day there (`shield-YYYYMMDD.log`), every 5 seconds.
+
+Two kinds of lines can be written:
+
+- **Busy IPs**, with `log.attempts`: every request from an IP once its count in the window reaches that number.
+
+  ```
+  192.168.1.100 - (8) - 2026-06-21T12:34:56.789Z - http://example.com/api/login
+  ```
+
+- **Ban events**, with `log.fail2ban: true`: one line each time a request is refused because of a ban.
+
+  ```
+  2026-06-21 12:34:56,789 nuxt-api-shield ban 192.168.1.100 — http://example.com/api/login exceeded limit (12 requests in 108s)
+  ```
+
+### fail2ban
+
+[fail2ban](https://github.com/fail2ban/fail2ban) can read the ban lines and block the IP in the firewall, so the requests never reach Node.
+
+**1.** Turn on the ban lines:
+
+```ts
+nuxtApiShield: {
+  log: {
+    path: '/var/log/nuxt-api-shield',
+    fail2ban: true,
+  },
+}
+```
+
+**2.** Create `/etc/fail2ban/filter.d/nuxt-api-shield.conf`:
 
 ```ini
 [Definition]
 failregex = ^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} nuxt-api-shield ban <HOST>
 ```
 
-### Jail configuration
-
-Add a jail entry in `/etc/fail2ban/jail.local`:
+**3.** Add a jail to `/etc/fail2ban/jail.local`:
 
 ```ini
 [nuxt-api-shield]
-enabled  = true
-filter   = nuxt-api-shield
-logpath  = /var/log/nuxt-api-shield/shield-*.log
-port     = http,https
+enabled   = true
+filter    = nuxt-api-shield
+logpath   = /var/log/nuxt-api-shield/shield-*.log
+port      = http,https
 banaction = iptables-multiport
-maxretry = 1
-findtime = 1
-bantime  = 3600
+maxretry  = 1
+findtime  = 1
+bantime   = 3600
 ```
 
-Since `nuxt-api-shield` already applies its own ban logic (configurable via `limit.ban`), set `maxretry = 1` and `findtime = 1` so fail2ban acts immediately on each ban log entry. Adjust `bantime` to match or extend your module-level ban duration.
+The shield has already decided to ban, so `maxretry = 1` makes fail2ban act on the first line. Set `bantime` to at least your `limit.ban`.
 
-Restart fail2ban after adding the config:
+**4.** Restart fail2ban:
 
 ```bash
 sudo systemctl restart fail2ban
 ```
 
-> **Note:** The `log.path` directory must be readable by the fail2ban service. Ensure permissions are set accordingly.
+The fail2ban service must be able to read the log folder.
 
-## TypeScript Types
-
-The module exports TypeScript types that you can use in your application:
-
-### `RateLimit` Type
-
-The `RateLimit` type represents the structure of rate limit data stored for each IP address:
+## TypeScript
 
 ```ts
-import type { RateLimit } from "nuxt-api-shield";
-
-// RateLimit structure:
-// {
-//   count: number  // Number of requests made
-//   time: number   // Timestamp of the last request
-// }
+import type { ModuleOptions, RateLimit, ResolvedShieldConfig } from 'nuxt-api-shield'
 ```
 
-**Usage Example:**
+- `ModuleOptions`: the options as you write them, all optional.
+- `ResolvedShieldConfig`: the final options with every default filled in. This is what `useRuntimeConfig().nuxtApiShield` holds on the server.
+- `RateLimit`: a stored counter, `{ count: number, time: number }`.
+
+For example, to read the counter of one IP in a server route or task:
 
 ```ts
-import type { RateLimit } from "nuxt-api-shield";
-import { useStorage } from "#imports";
+import type { RateLimit } from 'nuxt-api-shield'
 
-const shieldStorage = useStorage("shield");
-const ipKey = "ip:192.168.1.1";
-const entry = (await shieldStorage.getItem(ipKey)) as RateLimit | null;
-
+const entry = await useStorage('shield').getItem<RateLimit>('ip:api:login:192.168.1.1')
 if (entry) {
-  console.log(`IP has made ${entry.count} requests`);
-  console.log(`Last request at: ${new Date(entry.time).toISOString()}`);
+  console.log(`${entry.count} requests since ${new Date(entry.time).toISOString()}`)
 }
 ```
 
-### `ModuleOptions` Type
+## Security and privacy notes
 
-You can also import the module configuration type:
-
-```ts
-import type { ModuleOptions } from "nuxt-api-shield";
-```
-
-## Per-Route Rate Limiting
-
-`nuxt-api-shield` supports **per-route rate limiting**, allowing you to define custom limits for specific API endpoints while keeping a global default configuration for all other routes.
-
-This is useful when certain endpoints (such as `/api/login`, `/api/auth`, or `/api/payment`) require stricter protection.
-
----
-
-### Configuration Example
-
-The `routes` option accepts a mixed array of strings (exact matches) and objects (custom limits or patterns).
-
-```ts
-export default defineNuxtConfig({
-  modules: ["nuxt-api-shield"],
-
-  nuxtApiShield: {
-    limit: {
-      max: 12,
-      duration: 108,
-      ban: 3600,
-    },
-
-    routes: [
-      // 1. String: uses the global default limit (exact match)
-      "/api/example",
-
-      // 2. Object: custom rate limit for a specific route (exact match)
-      {
-        path: "/api/example-per-route",
-        max: 5,
-        duration: 10,
-        // "ban" can also be overridden per route
-      },
-
-      // 3. Object: Wildcard pattern
-      {
-        path: "/api/users/*/profile",
-        pattern: true,
-        max: 10,
-        duration: 60
-      }
-    ],
-  },
-});
-```
-
-### Wildcard Route Support
-
-Wildcard patterns allow you to apply the same limits to groups of related API endpoints. Enable them by setting `pattern: true` in your route configuration.
-
-#### Wildcard Pattern Syntax
-
-- **Single-Segment Wildcard (`*`)**: Matches exactly one path segment.
-  - `/api/users/*/profile` matches `/api/users/123/profile` or `/api/users/admin/profile`.
-- **Multi-Segment Wildcard (`**`)**: Matches zero or more path segments.
-  - `/api/reports/**/summary` matches `/api/reports/monthly/2023/summary` or `/api/reports/summary`.
-
-#### Pattern Precedence
-1. **Exact matches** always take precedence over wildcard patterns.
-2. **More specific wildcards** take precedence over less specific ones.
-3. When multiple wildcard patterns match, the most specific one is used.
-
-#### Important Notes
-- **Shared Rate Limits:** All requests that match the same wildcard pattern share the same rate limit counter.
-- **Security:** Broad or dangerous patterns like `/**` or `/*` fail the build with an error naming the route, so a route you meant to protect can never be silently skipped.
-
-## Skipping Routes
-
-The `skipRoutes` option lets you exempt specific paths from all shield processing (ban check, rate limit counter, and logging) without needing to list every protected route in the `routes` array.
-
-This is useful for health checks, webhook endpoints, monitoring probes, or internal status routes that should always respond regardless of traffic.
-
-### Configuration Example
-
-```ts
-export default defineNuxtConfig({
-  modules: ["nuxt-api-shield"],
-
-  nuxtApiShield: {
-    limit: {
-      max: 12,
-      duration: 108,
-      ban: 3600,
-    },
-
-    skipRoutes: [
-      "/api/health",          // exact match
-      "/api/_nuxt/**",        // multi-segment wildcard
-      "/api/webhooks/stripe", // exact match
-    ],
-  },
-})
-```
-
-### How It Works
-
-- Routes in `skipRoutes` bypass the middleware entirely — no ban check, no rate limit counter, no log entry.
-- The rest of your API routes (those matching the global defaults or the `routes` option) continue to be rate limited normally.
-- Supports the same wildcard syntax as per-route patterns: `*` for single segment, `**` for multi-segment.
-
-## Important Considerations
-
-### Data Privacy (IP Address Storage)
-
-`nuxt-api-shield` functions by tracking IP addresses to monitor request rates and apply bans. This means IP addresses, which can be considered Personally Identifiable Information (PII) under regulations like GDPR, are stored by the module.
-
-- **Data Stored:**
-  - `ip:<IP_ADDRESS>`: Stores `{ count: number, time: number }` for tracking request rates.
-  - `ban:<IP_ADDRESS>`: Stores a timestamp indicating when a ban on an IP address expires.
-- **Compliance:** Ensure your usage complies with any applicable data privacy regulations. This may involve updating your privacy policy to inform users about this data processing.
-- **Data Retention:**
-  - Ban entries are cleaned up by the `shield:cleanBans` task after expiry.
-  - IP tracking entries are cleaned up by the `shield:cleanIpData` task based on the `ipTTL` setting.
-
-### Storage Security
-
-- **Filesystem Driver (`driver: 'fs'`):** If you use the filesystem driver for `unstorage` (e.g., `driver: 'fs'`, `base: '.shield'`), ensure that the storage directory (and the `logs` directory if logging is enabled via `log.path`) is:
-  - **Not web-accessible:** Your web server should not be configured to serve files from these directories.
-  - **Properly permissioned:** The directories should have appropriate server-side file permissions to prevent unauthorized reading or writing.
-- **Other Drivers (Redis, etc.):** If using database drivers like Redis, ensure your database server itself is secured (e.g., authentication, network access controls).
-
-### Error Message (`errorMessage`)
-
-The `errorMessage` option in the module configuration is returned in the body of a 429 response.
-
-- It's recommended to use a plain text message.
-- If you choose to use HTML in your `errorMessage`, ensure your client-side application correctly sanitizes it or renders it in a way that prevents XSS vulnerabilities. The module itself does not sanitize this user-configured message.
+- **IP addresses are personal data** under laws like the GDPR. The shield stores them (see [What is stored](#what-is-stored)), so mention it in your privacy policy. Schedule the [cleanup tasks](#cleanup-tasks) so they are not kept longer than needed; `ipTTL` sets how long counters are kept.
+- **Protect the storage.** With the `fs` driver, keep the storage folder and the log folder out of anything your web server serves, and give them strict file permissions. With Redis, use authentication and keep it off the public network.
+- **`errorMessage` is sent as is.** Use plain text. If you put HTML in it, your client must escape it before showing it.
 
 ## Development
 
 ```bash
-# Install dependencies
-yarn
-
-# Generate type stubs
-yarn dev:prepare
-
-# Develop with the playground
-yarn dev
-
-# Build the playground
-yarn dev:build
-
-# Run ESLint
-yarn lint
-
-# Run Vitest
-yarn test
+yarn              # install dependencies
+yarn dev:prepare  # generate type stubs
+yarn dev          # run the playground
+yarn dev:build    # build the playground
+yarn lint         # ESLint
+yarn test         # Vitest and type checks
 yarn test:watch
-
-# Release new version
-yarn release:patch
-yarn release:minor
-yarn release:major
 ```
+
+Releases: `yarn release:patch`, `yarn release:minor` or `yarn release:major`.
 
 <!-- Badges -->
 
