@@ -6,6 +6,7 @@
 - **`runtimeConfig.public.nuxtApiShield` is removed** — deprecated in v1.1.0, it now fails the build. Move it to `runtimeConfig.nuxtApiShield`, the `nuxtApiShield` key or the config file.
 - **Arrays are no longer concatenated across sources** — if you set `routes` or `skipRoutes` in both `runtimeConfig.nuxtApiShield` and `nuxtApiShield`, only the `runtimeConfig` one is used now. Objects still merge key by key.
 - **Invalid wildcard routes fail the build** — a `pattern: true` route that breaks the pattern rules (e.g. `/**`, `/api*`) used to be skipped silently at request time, leaving that route unprotected. The build now stops with an error naming the route.
+- **Trailing slashes in `routes` and `skipRoutes` are ignored** — request paths are matched without a trailing slash, so a rule like `'/api/v2/'` or a skip route like `'/api/health/'` never matched anything and left those routes unprotected (or not skipped). They are now treated as `'/api/v2'` and `'/api/health'`.
 - **`ModuleOptions` fields are all optional** — and the resolved, fully-defaulted shape is exported as `ResolvedShieldConfig` (what `useRuntimeConfig().nuxtApiShield` holds).
 
 ## v1.1.1

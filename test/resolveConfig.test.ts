@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { resolveShieldConfig, SHIELD_DEFAULTS } from '../src/resolveConfig'
+import { findBestMatchingRoute } from '../src/runtime/server/utils/routes'
 
 describe('resolveShieldConfig', () => {
   it('returns the defaults when no source sets anything', () => {
@@ -61,6 +62,20 @@ describe('resolveShieldConfig', () => {
       { path: '/api/custom', pattern: false, max: 2, duration: 60, ban: 30 },
       { path: '/api/users/*/profile', pattern: true, max: 10, duration: 60, ban: 5 },
     ])
+  })
+
+  it('strips trailing slashes from routes and skipRoutes, as request paths have none', () => {
+    const { config } = resolveShieldConfig({
+      inline: {
+        routes: ['/api/v2/', { path: '/api/login//', max: 2 }, { path: '/api/users/*/', pattern: true }],
+        skipRoutes: ['/api/health/', '/api/_internal/**/'],
+      },
+    })
+    expect(config.routes.map(route => route.path)).toEqual(['/api/v2', '/api/login', '/api/users/*'])
+    expect(config.skipRoutes).toEqual(['/api/health', '/api/_internal/**'])
+
+    expect(findBestMatchingRoute('/api/v2/users', config)?.path).toBe('/api/v2')
+    expect(findBestMatchingRoute('/api/login', config)?.max).toBe(2)
   })
 
   it('throws on an invalid wildcard route, naming the route and the rule', () => {

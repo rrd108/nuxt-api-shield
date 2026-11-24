@@ -48,17 +48,22 @@ const mergeSources = createDefu((target, key, value) => {
 
 const hasKeys = (options?: ModuleOptions) => !!options && Object.keys(options).length > 0
 
+// Request paths are matched without trailing slashes (see normalizePath), so a
+// configured "/api/v2/" would never match anything. Strip them here too.
+const stripTrailingSlashes = (path: string) => path.replace(/\/+$/, '') || '/'
+
 const resolveRoute = (route: NonNullable<ModuleOptions['routes']>[number], limit: ResolvedShieldConfig['limit']): ResolvedRouteRule => {
   const rule = typeof route === 'string' ? { path: route } : route
+  const path = stripTrailingSlashes(rule.path)
   const pattern = rule.pattern === true
   if (pattern) {
-    const problem = patternProblem(rule.path)
+    const problem = patternProblem(path)
     if (problem) {
       throw new Error(`[nuxt-api-shield] Invalid wildcard route "${rule.path}": the pattern ${problem}.`)
     }
   }
   return {
-    path: rule.path,
+    path,
     pattern,
     max: rule.max ?? limit.max,
     duration: rule.duration ?? limit.duration,
@@ -93,6 +98,7 @@ export function resolveShieldConfig(sources: ShieldConfigSources): ResolvedShiel
   const config: ResolvedShieldConfig = {
     ...merged,
     routes: merged.routes.map(route => resolveRoute(route, merged.limit)),
+    skipRoutes: merged.skipRoutes.map(stripTrailingSlashes),
   }
 
   return { config, warnings }
