@@ -1,5 +1,5 @@
 import { isActualBanTimestampExpired } from '../../utils/isActualBanTimestampExpired'
-import { defineTask, useStorage } from 'nitropack/runtime'
+import { defineTask, useRuntimeConfig, useStorage } from 'nitropack/runtime'
 
 export default defineTask({
   meta: {
@@ -8,8 +8,9 @@ export default defineTask({
   },
   async run() {
     const shieldStorage = useStorage('shield')
-    // Only fetch keys that start with the 'ban:' prefix
-    const banKeys = await shieldStorage.getKeys('ban:')
+    const storageKeyPrefix = useRuntimeConfig().nuxtApiShield.storageKeyPrefix ?? ''
+    // Only fetch this app's ban keys (`<storageKeyPrefix>ban:`)
+    const banKeys = await shieldStorage.getKeys(`${storageKeyPrefix}ban:`)
 
     let cleanedCount = 0
     for (const key of banKeys) {

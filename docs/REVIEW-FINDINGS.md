@@ -31,7 +31,6 @@ This may be intentional for brute-force protection but can lock out legitimate u
 | **HTTP method limits** | Stricter limits on `POST /api/login` vs `GET /api/public` |
 | **Hooks / events** | `onRateLimitExceeded`, `onBan` for Slack alerts, metrics, custom responses |
 | **Sliding window algorithm** | Current fixed window allows burst at window boundaries |
-| **Configurable storage key prefix** | Avoid collisions if sharing a Redis instance |
 | **DevTools panel** | Show active bans, top offenders, storage stats in `@nuxt/devtools` |
 
 ---

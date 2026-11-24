@@ -53,6 +53,7 @@ export default defineEventHandler(async (event) => {
   const banKey = createKey({
     ipAddress: requestIP,
     prefix: 'ban',
+    storageKeyPrefix: config.storageKeyPrefix,
   })
 
   const banResult = await checkBan(event, shieldStorage, banKey, config, requestIP, url.toString(), routeLimit)
@@ -73,6 +74,7 @@ export default defineEventHandler(async (event) => {
   const ipKey = createKey({
     ipAddress: requestIP,
     path: storagePath,
+    storageKeyPrefix: config.storageKeyPrefix,
   })
 
   await handleRateLimit(

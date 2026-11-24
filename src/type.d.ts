@@ -27,6 +27,11 @@ export interface ModuleOptions {
   routes: Array<string | RouteLimitConfiguration>
   skipRoutes?: string[]
   ipTTL?: number
+  /**
+   * Prepended to every storage key (e.g. "myapp:" gives "myapp:ip:..." and "myapp:ban:...").
+   * Use it to keep apps or environments that share one storage (Redis) apart. Default: "".
+   */
+  storageKeyPrefix?: string
   security?: {
     trustXForwardedFor?: boolean
     /**

@@ -85,6 +85,7 @@ export default defineNuxtConfig({
     // Example:
     // skipRoutes: ["/api/health", "/api/_nuxt/**", "/api/webhooks/stripe"],
     ipTTL: 604800, // Optional: Time-to-live in seconds for IP tracking entries (default: 7 days). Set to 0 or negative to disable this specific cleanup.
+    storageKeyPrefix: "", // Optional: prepended to every storage key, e.g. "myapp:" gives "myapp:ip:..." and "myapp:ban:...". Default: "". See "Sharing one storage between apps".
     security: {
       // Optional: Security-related configurations
       trustXForwardedFor: false, // Default: false. Whether to trust X-Forwarded-For headers. See warning below.
@@ -117,6 +118,7 @@ The resolved options are kept in the server-only runtime config (`useRuntimeConf
   routes: [],
   skipRoutes: [],
   ipTTL: 7 * 24 * 60 * 60, // 7 days in seconds
+  storageKeyPrefix: "",
   security: {
     trustXForwardedFor: false,
     trustedProxyHops: 1,
@@ -169,7 +171,7 @@ If you use for example redis, you can use the following configuration, define th
 
 ### 4. Schedule bundled cleanup tasks in `nuxt.config.ts`
 
-The module registers two Nitro tasks for you: `shield:cleanBans` (removes expired `ban:*` keys) and `shield:cleanIpData` (removes stale `ip:*` keys using `ipTTL`). Turn on Nitro tasks and add `scheduledTasks` so they run on a cadence you choose. You do **not** need files under `server/tasks/` for this default setup.
+The module registers two Nitro tasks for you: `shield:cleanBans` (removes expired `ban:*` keys) and `shield:cleanIpData` (removes stale `ip:*` keys using `ipTTL`). With a `storageKeyPrefix` set they only touch `<storageKeyPrefix>ban:*` and `<storageKeyPrefix>ip:*`, so they never clean another app's keys. Turn on Nitro tasks and add `scheduledTasks` so they run on a cadence you choose. You do **not** need files under `server/tasks/` for this default setup.
 
 ```json
 {
@@ -198,7 +200,7 @@ Removes ban entries (`ban:xxx.xxx.xxx.xxx`) after the ban timestamp has passed.
 Example `server/tasks/shield/cleanBans.ts` (task name must match what you schedule):
 
 ```ts
-import { isActualBanTimestampExpired } from "#imports"; // Auto-imported utility from nuxt-api-shield
+import { isActualBanTimestampExpired, useRuntimeConfig } from "#imports"; // isActualBanTimestampExpired is auto-imported from nuxt-api-shield
 
 export default defineTask({
   meta: {
@@ -208,8 +210,10 @@ export default defineTask({
   async run() {
     const shieldStorage = useStorage("shield"); // Use your configured storage name
 
-    // Only fetch keys that start with the 'ban:' prefix
-    const banKeys = await shieldStorage.getKeys("ban:");
+    const storageKeyPrefix = useRuntimeConfig().nuxtApiShield.storageKeyPrefix ?? "";
+
+    // Only fetch this app's ban keys
+    const banKeys = await shieldStorage.getKeys(`${storageKeyPrefix}ban:`);
 
     let cleanedCount = 0;
     for (const key of banKeys) {
@@ -257,7 +261,7 @@ export default defineTask({
     }
     const ipTTLms = ipTTLseconds * 1000;
 
-    const ipKeys = await shieldStorage.getKeys("ip:");
+    const ipKeys = await shieldStorage.getKeys(`${config.storageKeyPrefix ?? ""}ip:`);
     const currentTime = Date.now();
     let cleanedCount = 0;
 
@@ -318,6 +322,20 @@ To use Redis, configure the `shield` storage with the `redis` driver:
 ```
 
 See the [unstorage Redis driver docs](https://unstorage.unjs.io/drivers/redis) for all available options.
+
+### Sharing one storage between apps
+
+Keys are `ip:<path>:<ip>` and `ban:<ip>` by default, so two apps (or a staging and a production environment) using the same Redis would share rate limit counters and bans. Give each one its own `storageKeyPrefix`:
+
+```ts
+nuxtApiShield: {
+  storageKeyPrefix: "myapp:", // keys become myapp:ip:api:login:192.168.1.1 and myapp:ban:192.168.1.1
+}
+```
+
+The prefix is prepended as is, so end it with a colon (`"myapp"` would give `myappip:...`). Storage drivers turn `/` in keys into `:`, which is why the path shows up as `api:login`. To use a different prefix per environment without changing the config, set `NUXT_NUXT_API_SHIELD_STORAGE_KEY_PREFIX`.
+
+The bundled cleanup tasks only scan keys under the app's own prefix. Changing the prefix on a running app orphans the keys written under the old one, and the bundled tasks no longer clean them, so remove them by hand.
 
 ### When `memory` / `fs` is acceptable
 

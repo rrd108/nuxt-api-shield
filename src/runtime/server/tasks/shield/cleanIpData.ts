@@ -17,7 +17,8 @@ export default defineTask({
     }
 
     const ipTTLms = ipTTLseconds * 1000
-    const ipKeys = await shieldStorage.getKeys('ip:')
+    // Only fetch this app's IP keys (`<storageKeyPrefix>ip:`)
+    const ipKeys = await shieldStorage.getKeys(`${config.storageKeyPrefix ?? ''}ip:`)
     const currentTime = Date.now()
     let cleanedCount = 0
 

@@ -26,6 +26,7 @@ export default defineNuxtModule<ModuleOptions>({
     routes: [],
     skipRoutes: [],
     ipTTL: 7 * 24 * 60 * 60,
+    storageKeyPrefix: '',
     security: {
       trustXForwardedFor: false,
       trustedProxyHops: 1,
