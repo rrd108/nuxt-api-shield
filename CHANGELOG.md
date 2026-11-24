@@ -2,6 +2,9 @@
 
 ### ⚠️ Upgrade notes (v2)
 
+Step-by-step migration: [Upgrading from v1](/README.md#upgrading-from-v1).
+
+- **Node 22.12 or later is required** (or Node 24).
 - **New: `.config/nuxt-api-shield.ts`** — options can live in a dedicated config file (`.config/nuxt-api-shield.ts` or `nuxt-api-shield.config.ts`), typed with `defineShieldConfig` from `nuxt-api-shield/config`. Precedence, highest first: `runtimeConfig.nuxtApiShield`, the `nuxtApiShield` key, the config file, the defaults.
 - **`runtimeConfig.public.nuxtApiShield` is removed** — deprecated in v1.1.0, it now fails the build. Move it to `runtimeConfig.nuxtApiShield`, the `nuxtApiShield` key or the config file.
 - **Arrays are no longer concatenated across sources** — if you set `routes` or `skipRoutes` in both `runtimeConfig.nuxtApiShield` and `nuxtApiShield`, only the `runtimeConfig` one is used now. Objects still merge key by key.

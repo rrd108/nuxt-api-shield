@@ -10,6 +10,7 @@ Rate limiting and IP banning for the `/api/` routes of your Nuxt app.
 When one IP address sends too many requests to an API route, Nuxt API Shield bans that IP for a while and answers its requests with `429 Too Many Requests`. It stores its counters in any [unstorage](https://unstorage.unjs.io) driver (memory, filesystem, Redis ...), can write ban events for [fail2ban](#fail2ban), and ships cleanup tasks so the storage does not grow forever.
 
 - [Release notes](/CHANGELOG.md)
+- Coming from v1? See [Upgrading from v1](#upgrading-from-v1).
 
 ## Contents
 
@@ -24,6 +25,7 @@ When one IP address sends too many requests to an API route, Nuxt API Shield ban
 - [Behind a proxy or CDN](#behind-a-proxy-or-cdn)
 - [Logging and fail2ban](#logging-and-fail2ban)
 - [TypeScript](#typescript)
+- [Upgrading from v1](#upgrading-from-v1)
 - [Security and privacy notes](#security-and-privacy-notes)
 - [Development](#development)
 
@@ -409,6 +411,51 @@ if (entry) {
   console.log(`${entry.count} requests since ${new Date(entry.time).toISOString()}`)
 }
 ```
+
+## Upgrading from v1
+
+Go through these steps in order. Steps 1 to 4 apply to everyone coming from v1.0; if you are already on v1.1 most of them are done. The [changelog](/CHANGELOG.md) has the background for each change.
+
+**1. Use Node 22.12 or later** (or Node 24). Older Node versions are no longer supported.
+
+**2. Move the options out of the public runtime config.** v2 stops the build if `runtimeConfig.public.nuxtApiShield` is set, because Nuxt sends the public runtime config to every browser.
+
+```ts
+// Before
+runtimeConfig: {
+  public: {
+    nuxtApiShield: { limit: { max: 10 } },
+  },
+},
+
+// After: use the nuxtApiShield key (or runtimeConfig.nuxtApiShield, or the config file)
+nuxtApiShield: { limit: { max: 10 } },
+```
+
+**3. Rename your environment variables** from `NUXT_PUBLIC_NUXT_API_SHIELD_*` to `NUXT_NUXT_API_SHIELD_*`, for example `NUXT_PUBLIC_NUXT_API_SHIELD_LIMIT_MAX` becomes `NUXT_NUXT_API_SHIELD_LIMIT_MAX`. The old names are ignored now.
+
+**4. Update your own cleanup tasks**, if you have any in `server/tasks/`. Read the options from the private runtime config:
+
+```ts
+// Before
+const config = useRuntimeConfig().public.nuxtApiShield
+// After
+const config = useRuntimeConfig().nuxtApiShield
+```
+
+If you only scheduled `shield:cleanBans` and `shield:cleanIpData` without your own task files, there is nothing to do.
+
+**5. Check `trustedProxyHops` if you use `trustXForwardedFor`.** The client IP is now read from the right end of `X-Forwarded-For` instead of the left, because the left end can be faked by the client. With one proxy in front of the app the default `1` is right. With two (for example a CDN in front of nginx) set `security.trustedProxyHops: 2`. See [Behind a proxy or CDN](#behind-a-proxy-or-cdn).
+
+**6. Keep `routes` and `skipRoutes` in one place.** v1 joined these lists when you set them both in `runtimeConfig.nuxtApiShield` and under `nuxtApiShield`. v2 uses only the `runtimeConfig` one. If you had them in both, merge them into one list.
+
+**7. Fix any wildcard route the build complains about.** A `pattern: true` route that is too broad (such as `/**` or `/api*`) used to be skipped silently, leaving that route unprotected. Now the build stops with an error naming the route. Make the pattern more specific, see [Wildcard rules](#wildcard-rules).
+
+**8. Look at routes written with a trailing slash.** In v1, `routes: ['/api/v2/']` or `skipRoutes: ['/api/health/']` matched nothing. In v2 they work like `'/api/v2'` and `'/api/health'`, so routes you thought were protected (or skipped) now really are. Check that this is what you want.
+
+**9. Optional: move the options to `.config/nuxt-api-shield.ts`**, typed with `defineShieldConfig`. See [Where to put the options](#where-to-put-the-options). Don't keep them both there and under `nuxtApiShield`.
+
+**TypeScript:** every field of `ModuleOptions` is optional now. If you read `useRuntimeConfig().nuxtApiShield` in your own code, type it as `ResolvedShieldConfig`, which has every default filled in.
 
 ## Security and privacy notes
 
