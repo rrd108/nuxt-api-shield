@@ -17,6 +17,10 @@
       "import": "./dist/module.mjs",
       "types": "./dist/index.d.mts"
     },
+    "./config": {
+      "import": "./dist/config.mjs",
+      "types": "./dist/config.d.mts"
+    },
     "./types": {
       "types": "./dist/index.d.mts"
     }
@@ -35,6 +39,7 @@
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
     "release:patch": "yarn lint && yarn test && yarn prepack && changelogen --release --patch --no-github && npm publish && git push --follow-tags && changelogen gh release",
     "release:minor": "yarn lint && yarn test && yarn prepack && changelogen --release --minor --no-github && npm publish && git push --follow-tags && changelogen gh release",
+    "release:major": "yarn lint && yarn test && yarn prepack && changelogen --release --major --no-github && npm publish && git push --follow-tags && changelogen gh release",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "yarn dev:prepare && vitest run --testTimeout 15000 --reporter=default --reporter.summary=false --disable-console-intercept && yarn test:types",
@@ -43,6 +48,7 @@
   },
   "dependencies": {
     "@nuxt/kit": "^4.7.0",
+    "c12": "^3.3.4",
     "defu": "^6.1.4"
   },
   "devDependencies": {

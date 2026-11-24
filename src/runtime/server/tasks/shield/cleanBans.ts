@@ -1,5 +1,6 @@
 import { isActualBanTimestampExpired } from '../../utils/isActualBanTimestampExpired'
 import { defineTask, useRuntimeConfig, useStorage } from 'nitropack/runtime'
+import type { ResolvedShieldConfig } from '../../../../type'
 
 export default defineTask({
   meta: {
@@ -8,7 +9,7 @@ export default defineTask({
   },
   async run() {
     const shieldStorage = useStorage('shield')
-    const storageKeyPrefix = useRuntimeConfig().nuxtApiShield.storageKeyPrefix ?? ''
+    const storageKeyPrefix = (useRuntimeConfig().nuxtApiShield as ResolvedShieldConfig).storageKeyPrefix
     // Only fetch this app's ban keys (`<storageKeyPrefix>ban:`)
     const banKeys = await shieldStorage.getKeys(`${storageKeyPrefix}ban:`)
 

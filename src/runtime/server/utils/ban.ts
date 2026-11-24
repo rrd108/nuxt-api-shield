@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3'
-import type { ModuleOptions, LimitConfiguration } from '../../type'
+import type { ResolvedShieldConfig, LimitConfiguration } from '../../../type'
 import type { Storage } from 'nitropack'
 import { shieldLogBan } from './shieldLog'
 import { setRateLimitHeaders } from './rateLimit'
@@ -8,7 +8,7 @@ export const checkBan = async (
   event: H3Event,
   shieldStorage: Storage,
   banKey: string,
-  config: ModuleOptions,
+  config: ResolvedShieldConfig,
   requestIP?: string,
   url?: string,
   routeLimit?: LimitConfiguration,

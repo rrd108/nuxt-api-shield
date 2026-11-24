@@ -1,10 +1,7 @@
 import { defineEventHandler, getRequestURL } from 'h3'
 import { useRuntimeConfig, useStorage } from 'nitropack/runtime'
-import type { ModuleOptions } from '../../../type'
-import {
-  getRouteLimit,
-  findBestMatchingRoute,
-} from '../utils/routes'
+import type { ResolvedShieldConfig } from '../../../type'
+import { getRouteLimit, findBestMatchingRoute } from '../utils/routes'
 import { matchesPattern } from '../utils/patternMatcher'
 import createKey from '../utils/createKey'
 import { getClientIP } from '../utils/getClientIP'
@@ -13,7 +10,7 @@ import { checkBan } from '../utils/ban'
 import { handleRateLimit } from '../utils/rateLimit'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig().nuxtApiShield as ModuleOptions
+  const config = useRuntimeConfig().nuxtApiShield as ResolvedShieldConfig
   const url = getRequestURL(event)
   // Match on the decoded path the router uses, not the raw URL, so encoded
   // variants like /%61pi/login can't skip the shield.
@@ -25,11 +22,9 @@ export default defineEventHandler(async (event) => {
   }
 
   // Check if this route should be skipped
-  if (config.skipRoutes?.length) {
-    for (const route of config.skipRoutes) {
-      if (matchesPattern(route, pathname)) {
-        return
-      }
+  for (const route of config.skipRoutes) {
+    if (matchesPattern(route, pathname)) {
+      return
     }
   }
 
@@ -41,13 +36,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const shieldStorage = useStorage('shield')
-  const requestIP = getClientIP(event, {
-    trustXForwardedFor: config.security?.trustXForwardedFor ?? false,
-    trustedProxyHops: config.security?.trustedProxyHops ?? 1,
-  })
+  const requestIP = getClientIP(event, config.security)
 
   // Rate limit config for this route
-  const routeLimit = getRouteLimit(pathname, config, matchingRoute)
+  const routeLimit = getRouteLimit(matchingRoute)
 
   // Ban check
   const banKey = createKey({
@@ -67,7 +59,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // For wildcard patterns, use the pattern as the storage key so all matching paths share the same counter
-  const storagePath = ('pattern' in matchingRoute && matchingRoute.pattern === true)
+  const storagePath = matchingRoute.pattern
     ? matchingRoute.path
     : pathname
 

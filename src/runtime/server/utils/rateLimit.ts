@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3'
-import type { ModuleOptions, LimitConfiguration } from '../../type'
+import type { ResolvedShieldConfig, LimitConfiguration } from '../../../type'
 import type { Storage } from 'nitropack'
 import type { RateLimit } from '../types/RateLimit'
 import shieldLog, { shieldLogBan } from './shieldLog'
@@ -23,7 +23,7 @@ export const handleRateLimit = async (
   requestIP: string,
   url: string,
   routeLimit: LimitConfiguration,
-  config: ModuleOptions,
+  config: ResolvedShieldConfig,
 ) => {
   const rateLimitState = await shieldStorage.getItem(ipKey) as RateLimit | null
   const now = Date.now()

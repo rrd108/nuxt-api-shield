@@ -1,7 +1,7 @@
 import type { LogEntry } from './runtime/server/types/LogEntry'
 import type { RateLimit } from './runtime/server/types/RateLimit'
 
-export type { RateLimit }
+export type { RateLimit, LogEntry }
 
 export interface LimitConfiguration {
   max: number
@@ -18,13 +18,18 @@ export interface RouteLimitConfiguration extends Partial<LimitConfiguration> {
   pattern?: boolean
 }
 
+/**
+ * Options as the user writes them, in nuxt.config, runtimeConfig or the
+ * Shield config file (`.config/nuxt-api-shield.ts`). Every field is optional;
+ * missing ones come from the defaults.
+ */
 export interface ModuleOptions {
-  limit: LimitConfiguration
-  delayOnBan: boolean
-  errorMessage: string
-  retryAfterHeader: boolean
-  log?: LogEntry
-  routes: Array<string | RouteLimitConfiguration>
+  limit?: Partial<LimitConfiguration>
+  delayOnBan?: boolean
+  errorMessage?: string
+  retryAfterHeader?: boolean
+  log?: Partial<LogEntry>
+  routes?: Array<string | RouteLimitConfiguration>
   skipRoutes?: string[]
   ipTTL?: number
   /**
@@ -39,5 +44,31 @@ export interface ModuleOptions {
      * The client IP is read this many entries from the right. Default: 1.
      */
     trustedProxyHops?: number
+  }
+}
+
+/** A route rule with the global limit already merged in. */
+export interface ResolvedRouteRule extends LimitConfiguration {
+  path: string
+  pattern: boolean
+}
+
+/**
+ * The Resolved config: every Config source merged over the defaults, nothing
+ * optional. This is the only shape the request-time code reads.
+ */
+export interface ResolvedShieldConfig {
+  limit: LimitConfiguration
+  delayOnBan: boolean
+  errorMessage: string
+  retryAfterHeader: boolean
+  log: Required<LogEntry>
+  routes: ResolvedRouteRule[]
+  skipRoutes: string[]
+  ipTTL: number
+  storageKeyPrefix: string
+  security: {
+    trustXForwardedFor: boolean
+    trustedProxyHops: number
   }
 }

@@ -1,5 +1,13 @@
 # Changelog
 
+### ⚠️ Upgrade notes (v2)
+
+- **New: `.config/nuxt-api-shield.ts`** — options can live in a dedicated config file (`.config/nuxt-api-shield.ts` or `nuxt-api-shield.config.ts`), typed with `defineShieldConfig` from `nuxt-api-shield/config`. Precedence, highest first: `runtimeConfig.nuxtApiShield`, the `nuxtApiShield` key, the config file, the defaults.
+- **`runtimeConfig.public.nuxtApiShield` is removed** — deprecated in v1.1.0, it now fails the build. Move it to `runtimeConfig.nuxtApiShield`, the `nuxtApiShield` key or the config file.
+- **Arrays are no longer concatenated across sources** — if you set `routes` or `skipRoutes` in both `runtimeConfig.nuxtApiShield` and `nuxtApiShield`, only the `runtimeConfig` one is used now. Objects still merge key by key.
+- **Invalid wildcard routes fail the build** — a `pattern: true` route that breaks the pattern rules (e.g. `/**`, `/api*`) used to be skipped silently at request time, leaving that route unprotected. The build now stops with an error naming the route.
+- **`ModuleOptions` fields are all optional** — and the resolved, fully-defaulted shape is exported as `ResolvedShieldConfig` (what `useRuntimeConfig().nuxtApiShield` holds).
+
 ## v1.1.1
 
 [compare changes](https://github.com/rrd108/nuxt-api-shield/compare/v1.1.0...v1.1.1)

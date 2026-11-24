@@ -1,7 +1,7 @@
 import { appendFile, mkdir } from 'node:fs/promises'
 import type { RateLimit } from '../types/RateLimit'
 import type { LogEntry } from '../types/LogEntry'
-import type { LimitConfiguration } from '../../type'
+import type { LimitConfiguration } from '../../../type'
 
 const buffer: string[] = []
 let flushTimer: ReturnType<typeof setInterval> | null = null

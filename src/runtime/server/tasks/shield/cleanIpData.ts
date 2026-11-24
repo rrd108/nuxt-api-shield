@@ -1,5 +1,6 @@
 import { useStorage, defineTask, useRuntimeConfig } from 'nitropack/runtime'
-import type { RateLimit } from '../../../../runtime/server/types/RateLimit'
+import type { RateLimit } from '../../types/RateLimit'
+import type { ResolvedShieldConfig } from '../../../../type'
 
 export default defineTask({
   meta: {
@@ -8,17 +9,17 @@ export default defineTask({
   },
   async run() {
     const shieldStorage = useStorage('shield')
-    const config = useRuntimeConfig().nuxtApiShield
+    const config = useRuntimeConfig().nuxtApiShield as ResolvedShieldConfig
     const ipTTLseconds = config.ipTTL
 
-    if (!ipTTLseconds || ipTTLseconds <= 0) {
+    if (ipTTLseconds <= 0) {
       console.log('[nuxt-api-shield] IP data cleanup (ipTTL) disabled.')
       return { result: { cleanedCount: 0 }, status: 'disabled' }
     }
 
     const ipTTLms = ipTTLseconds * 1000
     // Only fetch this app's IP keys (`<storageKeyPrefix>ip:`)
-    const ipKeys = await shieldStorage.getKeys(`${config.storageKeyPrefix ?? ''}ip:`)
+    const ipKeys = await shieldStorage.getKeys(`${config.storageKeyPrefix}ip:`)
     const currentTime = Date.now()
     let cleanedCount = 0
 

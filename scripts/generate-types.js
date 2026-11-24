@@ -15,7 +15,7 @@ const content = `// Auto-generated type exports for nuxt-api-shield
 
 export type { RateLimit } from './runtime/server/types/RateLimit.js'
 export type { LogEntry } from './runtime/server/types/LogEntry.js'
-export type { ModuleOptions, RouteLimitConfiguration } from './types.js'
+export type { ModuleOptions, RouteLimitConfiguration, ResolvedShieldConfig, ResolvedRouteRule } from './types.js'
 `
 
 writeFileSync(indexPath, content, 'utf-8')

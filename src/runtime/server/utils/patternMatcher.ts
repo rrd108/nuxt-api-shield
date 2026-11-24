@@ -36,9 +36,18 @@ export function matchesPattern(pattern: string, path: string): boolean {
  * @returns boolean indicating if pattern is safe
  */
 export function validatePattern(pattern: string): boolean {
+  return patternProblem(pattern) === undefined
+}
+
+/**
+ * Explain why a pattern is unsafe to use
+ * @param pattern - The pattern to check
+ * @returns the broken rule, or undefined if the pattern is safe
+ */
+export function patternProblem(pattern: string): string | undefined {
   // Basic safety checks
   if (!pattern.startsWith('/')) {
-    return false // Must be absolute path
+    return 'must start with "/"'
   }
 
   // Count wildcards to prevent excessive complexity
@@ -47,12 +56,12 @@ export function validatePattern(pattern: string): boolean {
 
   // Limit total wildcards
   if (starCount > 4) {
-    return false
+    return 'has more than 4 wildcards'
   }
 
   // Limit double wildcards
   if (doubleStarCount > 2) {
-    return false
+    return 'has more than 2 "**" wildcards'
   }
 
   // Prevent dangerous patterns that could match system paths
@@ -66,32 +75,32 @@ export function validatePattern(pattern: string): boolean {
 
   for (const dangerous of dangerousPatterns) {
     if (pattern === dangerous || pattern.startsWith(dangerous)) {
-      return false
+      return `is too broad (starts with "${dangerous}")`
     }
   }
 
   // Check for invalid consecutive wildcards
   if (pattern.includes('****') || pattern.includes('***')) {
-    return false
+    return 'has 3 or more "*" in a row'
   }
 
   // Check for invalid wildcard combinations
   if (pattern.includes('**/*/**') || pattern.includes('*/**/*')) {
-    return false
+    return 'mixes "*" and "**" in an ambiguous way'
   }
 
   // Prevent patterns that could bypass security by matching critical substrings
   if (pattern.includes('**/') && pattern.split('/').length < 3) {
-    return false // Too broad multi-segment match
+    return 'is a too broad multi-segment match'
   }
 
   // Ensure pattern has reasonable structure
   const segments = pattern.split('/')
   if (segments.length < 3) {
-    return false // Require at least /api/ structure
+    return 'needs at least two path segments (e.g. /api/...)'
   }
 
-  return true
+  return undefined
 }
 
 /**

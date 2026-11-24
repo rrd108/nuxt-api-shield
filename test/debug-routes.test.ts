@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import { findBestMatchingRoute } from '../src/runtime/server/utils/routes'
-import type { ModuleOptions } from '../src/type'
+import { resolveShieldConfig } from '../src/resolveConfig'
 
 describe('route matching debug', () => {
   it('should find correct matching routes', () => {
-    const config: ModuleOptions = {
+    const { config } = resolveShieldConfig({ inline: {
       limit: { max: 10, duration: 60, ban: 30 },
       delayOnBan: false,
       errorMessage: 'Too Many Requests',
@@ -20,7 +20,7 @@ describe('route matching debug', () => {
           max: 5,
         },
       ],
-    }
+    } })
 
     // Test exact match
     const exactMatch = findBestMatchingRoute('/api/admin/special', config)
@@ -41,13 +41,13 @@ describe('route matching debug', () => {
   })
 
   it('should not over-match on prefix segments', () => {
-    const config: ModuleOptions = {
+    const { config } = resolveShieldConfig({ inline: {
       limit: { max: 10, duration: 60, ban: 30 },
       delayOnBan: false,
       errorMessage: 'Too Many Requests',
       retryAfterHeader: false,
       routes: ['/api/v3'],
-    }
+    } })
 
     // /api/v3 should NOT match /api/v3-secret (different segment)
     expect(findBestMatchingRoute('/api/v3-secret', config)).toBeNull()

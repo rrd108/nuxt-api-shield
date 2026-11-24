@@ -97,6 +97,31 @@ export default defineNuxtConfig({
 
 The resolved options are kept in the server-only runtime config (`useRuntimeConfig().nuxtApiShield`) and are never sent to the browser. Runtime overrides use the `NUXT_NUXT_API_SHIELD_*` environment variables.
 
+#### Or keep the options in `.config/nuxt-api-shield.ts`
+
+Following the [`.config` directory convention](https://github.com/pi0/config-dir), you can move the options out of `nuxt.config.ts` into a dedicated file. `nuxt-api-shield.config.ts` at the project root works too, as do `.js`, `.mjs` and `.json`.
+
+```ts
+// .config/nuxt-api-shield.ts
+import { defineShieldConfig } from "nuxt-api-shield/config";
+
+export default defineShieldConfig({
+  limit: { max: 10, duration: 60, ban: 600 },
+  routes: ["/api/login"],
+});
+```
+
+`nuxt dev` restarts when the file changes.
+
+**Where options come from**, highest priority first:
+
+1. `runtimeConfig.nuxtApiShield` in `nuxt.config.ts`
+2. the `nuxtApiShield` key in `nuxt.config.ts`
+3. `.config/nuxt-api-shield.ts`
+4. the defaults below
+
+Objects (`limit`, `log`, `security`) are merged key by key. Arrays (`routes`, `skipRoutes`) are **not** merged: the highest source that sets one wins whole. If you set options both in `nuxt.config.ts` and in the config file, the module prints a warning, so keep them in one place.
+
 **Default Configuration Values:**
 (These are applied by the module if not specified in your `nuxtApiShield` config)
 
@@ -515,7 +540,7 @@ Wildcard patterns allow you to apply the same limits to groups of related API en
 
 #### Important Notes
 - **Shared Rate Limits:** All requests that match the same wildcard pattern share the same rate limit counter.
-- **Security:** Broad or dangerous patterns like `/**` or `/*` are automatically rejected to prevent accidental global blocking.
+- **Security:** Broad or dangerous patterns like `/**` or `/*` fail the build with an error naming the route, so a route you meant to protect can never be silently skipped.
 
 ## Skipping Routes
 
@@ -604,6 +629,7 @@ yarn test:watch
 # Release new version
 yarn release:patch
 yarn release:minor
+yarn release:major
 ```
 
 <!-- Badges -->
